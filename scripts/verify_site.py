@@ -1,8 +1,11 @@
-"""Production certification for the Steady Paws site and generated care-paperwork library."""
+"""Production certification for Steady Paws SEO, downloads, privacy, and build integrity."""
 
 from __future__ import annotations
 
+import base64
+import hashlib
 import logging
+import xml.etree.ElementTree as ET
 from html.parser import HTMLParser
 from pathlib import Path
 from urllib.parse import urlparse
@@ -16,11 +19,12 @@ LOGGER = logging.getLogger(__name__)
 ROOT = Path(__file__).resolve().parents[1]
 EXPECTED_SITE_URL = "https://steadypaws.netlify.app/"
 EXPECTED_SUPPORT_URL = "https://buymeacoffee.com/divclass016"
-EXPECTED_ASSET_REV = "20260901-familysoft1"
-EXPECTED_PDF_LIB = "https://cdn.jsdelivr.net/npm/pdf-lib@1.17.1/dist/pdf-lib.min.js"
+EXPECTED_ASSET_REV = "20260901-a11yseo1"
+EXPECTED_VENDOR_SHA512 = "z8IYLHO8bTgFqj+yrPyIJnzBDf7DDhWwiEsk4sY+Oe6J2M+WQequeGS7qioI5vT6rXgVRb4K1UVQC5ER7MKzKQ=="
+VENDOR_PATH = ROOT / "assets/vendor/pdf-lib-1.17.1.min.js"
 
 
-class LinkParser(HTMLParser):
+class HomeParser(HTMLParser):
     def __init__(self) -> None:
         super().__init__()
         self.targets: list[str] = []
@@ -30,6 +34,7 @@ class LinkParser(HTMLParser):
         self.form_variants = 0
         self.family_choices = 0
         self.care_downloads = 0
+        self.accessible_links = 0
         self.photo_inputs = 0
 
     def handle_starttag(self, tag: str, attrs: list[tuple[str, str | None]]) -> None:
@@ -48,6 +53,8 @@ class LinkParser(HTMLParser):
             self.family_choices += 1
         if tag == "a" and "care-download" in classes:
             self.care_downloads += 1
+        if tag == "a" and "accessible-link" in classes:
+            self.accessible_links += 1
         if tag == "input" and values.get("id") == "family-photo" and values.get("type") == "file":
             self.photo_inputs += 1
         for key in ("href", "src"):
@@ -56,18 +63,26 @@ class LinkParser(HTMLParser):
                 self.targets.append(value)
 
 
+def care_page_path(item: dict) -> Path:
+    return ROOT / "care" / f"{Path(item['filename']).stem}.html"
+
+
+def care_page_url(item: dict) -> str:
+    return f"{EXPECTED_SITE_URL.rstrip('/')}/care/{Path(item['filename']).stem}.html"
+
+
 def assert_catalog() -> None:
     filenames = [item["filename"] for item in TRACKERS]
     if len(TRACKERS) != 72:
         raise AssertionError(f"Expected 72 tailored care forms, found {len(TRACKERS)}")
+    if len(CONDITION_NAMES) != 40:
+        raise AssertionError(f"Expected 40 deduplicated primary health concerns, found {len(CONDITION_NAMES)}")
     if len(filenames) != len(set(filenames)):
         raise AssertionError("Duplicate care-form filenames in catalog")
     allowed_groups = set(GROUP_LABELS) - {"all"}
     unknown = sorted({item["group"] for item in TRACKERS} - allowed_groups)
     if unknown:
         raise AssertionError(f"Unknown care-form groups: {unknown}")
-    if len(CONDITION_NAMES) >= len(TRACKERS):
-        raise AssertionError("Health concerns were not deduplicated across tailored species variants")
 
     by_filename = {item["filename"]: item for item in TRACKERS}
     shared_sets = (
@@ -83,80 +98,86 @@ def assert_catalog() -> None:
         names = {condition_name(by_filename[name]) for name in filenames_to_compare}
         if len(names) != 1:
             raise AssertionError(f"Shared health concern split into duplicate names: {filenames_to_compare} -> {sorted(names)}")
-    LOGGER.info("72 tailored forms normalized into shared primary health concerns: PASS")
+    LOGGER.info("40 concerns / 72 tailored variants catalog: PASS")
 
 
 def assert_required_files() -> None:
     required = (
-        "index.html", "404.html", "styles/base.css", "styles/components.css", "styles/family.css",
-        "assets/paw.svg", "assets/site.js", "netlify.toml", "robots.txt", "sitemap.xml",
-        "requirements.txt", "templates/index.template.html", "scripts/tracker_catalog.py",
-        "scripts/build_trackers.py", "scripts/build_site.py",
+        "index.html", "404.html", "accessibility.html", "privacy.html",
+        "styles/base.css", "styles/components.css", "styles/family.css", "styles/care.css",
+        "assets/paw.svg", "assets/site.js", "assets/vendor/pdf-lib-1.17.1.min.js",
+        "netlify.toml", "robots.txt", "sitemap.xml", "requirements.txt",
+        "templates/index.template.html", "scripts/tracker_catalog.py", "scripts/fetch_vendor.py",
+        "scripts/build_trackers.py", "scripts/build_site.py", "scripts/build_accessible_pages.py",
     )
     missing = [path for path in required if not (ROOT / path).is_file()]
     if missing:
-        raise AssertionError(f"Missing required files: {', '.join(missing)}")
-    LOGGER.info("Required production files: PASS")
+        raise AssertionError(f"Missing required production files: {', '.join(missing)}")
+
+    care_pages = list((ROOT / "care").glob("*.html"))
+    if len(care_pages) != len(TRACKERS):
+        raise AssertionError(f"Expected {len(TRACKERS)} accessible care pages, found {len(care_pages)}")
+    LOGGER.info("Required production files + 72 accessible care pages: PASS")
+
+
+def assert_vendor_integrity() -> None:
+    data = VENDOR_PATH.read_bytes()
+    digest = base64.b64encode(hashlib.sha512(data).digest()).decode("ascii")
+    if digest != EXPECTED_VENDOR_SHA512:
+        raise AssertionError("Self-hosted pdf-lib bytes do not match the pinned SHA-512")
+    LOGGER.info("Pinned self-hosted personalization helper: PASS")
 
 
 def assert_homepage() -> None:
     html = (ROOT / "index.html").read_text(encoding="utf-8")
     required_markers = (
-        'lang="en"', 'name="viewport"', 'name="description"',
-        'name="robots" content="index, follow"', 'name="theme-color" content="#55756c"',
+        '<title>Free Pet Health Trackers & Care Paperwork | Steady Paws</title>',
+        'name="description" content="Free printable pet health trackers for dogs, cats, rabbits, birds, reptiles, horses and more.',
+        'name="robots" content="index, follow, max-image-preview:large"',
+        'name="theme-color" content="#55756c"', 'name="color-scheme" content="light"',
         f'rel="canonical" href="{EXPECTED_SITE_URL}"',
         f'property="og:url" content="{EXPECTED_SITE_URL}"',
+        'property="og:site_name" content="Steady Paws"',
+        'itemtype="https://schema.org/WebSite"', 'itemtype="https://schema.org/CollectionPage"',
         EXPECTED_SUPPORT_URL,
-        EXPECTED_PDF_LIB,
-        'integrity="sha512-z8IYLHO8bTgFqj+yrPyIJnzBDf7DDhWwiEsk4sY+Oe6J2M+WQequeGS7qioI5vT6rXgVRb4K1UVQC5ER7MKzKQ=="',
-        "Your family member's care paperwork",
-        "Pick your family member.",
-        "What is the biggest health concern right now?",
-        "Primary health concern",
-        "other conditions they are living with",
-        "Make their paperwork feel like theirs.",
-        "Private by design",
-        "Steady Paws does not upload them",
-        'id="family-name"',
-        'id="family-photo"',
-        'accept="image/*"',
-        "Get their care paperwork",
-        "Someone else",
-        "View all concerns",
-        f'/styles/base.css?v={EXPECTED_ASSET_REV}',
-        f'/styles/components.css?v={EXPECTED_ASSET_REV}',
-        f'/styles/family.css?v={EXPECTED_ASSET_REV}',
-        f'/assets/site.js?v={EXPECTED_ASSET_REV}',
+        "Your family member's care paperwork", "Pick your family member.",
+        "What is the biggest health concern right now?", "Primary health concern",
+        "other conditions they are living with", "Make their paperwork feel like theirs.",
+        "Private by design", "Steady Paws does not upload them", "Accessible web worksheet",
+        'id="family-name"', 'id="family-photo"', 'accept="image/*"',
+        "Get their care paperwork", "Someone else", "View all concerns",
+        f'/assets/paw.svg?v={EXPECTED_ASSET_REV}',
+        f'/styles/base.css?v={EXPECTED_ASSET_REV}', f'/styles/components.css?v={EXPECTED_ASSET_REV}',
+        f'/styles/family.css?v={EXPECTED_ASSET_REV}', f'/assets/site.js?v={EXPECTED_ASSET_REV}',
     )
     missing = [marker for marker in required_markers if marker not in html]
     if missing:
-        raise AssertionError(f"Homepage markers missing: {missing}")
-    if "In development" in html or "buymeacoffee.com/yourname" in html:
-        raise AssertionError("Homepage contains unfinished placeholder content")
+        raise AssertionError(f"Homepage SEO/UX markers missing: {missing}")
+    for forbidden in ("In development", "buymeacoffee.com/yourname", "cdn.jsdelivr.net", "<script>", "style="):
+        if forbidden in html:
+            raise AssertionError(f"Homepage contains forbidden production marker: {forbidden}")
 
-    parser = LinkParser()
+    parser = HomeParser()
     parser.feed(html)
     if parser.h1_count != 1:
         raise AssertionError(f"Expected exactly one h1, found {parser.h1_count}")
     if parser.condition_cards != len(CONDITION_NAMES):
-        raise AssertionError(
-            f"Expected {len(CONDITION_NAMES)} unique health-concern cards, found {parser.condition_cards}"
-        )
+        raise AssertionError(f"Expected {len(CONDITION_NAMES)} health-concern cards, found {parser.condition_cards}")
     if len(parser.condition_keys) != len(set(parser.condition_keys)):
         raise AssertionError("Duplicate primary health-concern cards rendered on homepage")
     if parser.form_variants != len(TRACKERS):
-        raise AssertionError(f"Expected {len(TRACKERS)} tailored form variants, found {parser.form_variants}")
+        raise AssertionError(f"Expected {len(TRACKERS)} tailored variants, found {parser.form_variants}")
     if parser.care_downloads != len(TRACKERS):
-        raise AssertionError(f"Expected {len(TRACKERS)} personalizable download links, found {parser.care_downloads}")
-    if parser.photo_inputs != 1:
-        raise AssertionError(f"Expected one optional family-photo input, found {parser.photo_inputs}")
-    if parser.family_choices < 13:
-        raise AssertionError(f"Expected broad family-member picker, found {parser.family_choices} choices")
+        raise AssertionError(f"Expected {len(TRACKERS)} PDF links, found {parser.care_downloads}")
+    if parser.accessible_links != len(TRACKERS):
+        raise AssertionError(f"Expected {len(TRACKERS)} accessible worksheet links, found {parser.accessible_links}")
+    if parser.photo_inputs != 1 or parser.family_choices < 13:
+        raise AssertionError("Family picker or optional photo personalization is incomplete")
 
     for item in TRACKERS:
-        expected = f'/downloads/{item["filename"]}'
-        if expected not in html:
-            raise AssertionError(f"Homepage missing tailored care-form link: {expected}")
+        for expected in (f'/downloads/{item["filename"]}', f'/care/{Path(item["filename"]).stem}.html'):
+            if expected not in html:
+                raise AssertionError(f"Homepage missing tailored resource link: {expected}")
 
     for target in parser.targets:
         parsed = urlparse(target)
@@ -165,58 +186,72 @@ def assert_homepage() -> None:
         clean = parsed.path.lstrip("/")
         if clean and not (ROOT / clean).exists():
             raise AssertionError(f"Broken local reference: {target}")
-    LOGGER.info("Unique concerns, private personalization, guided picker, and versioned assets: PASS")
+    LOGGER.info("Homepage SEO, progressive enhancement, dedupe, and resource links: PASS")
 
 
-def assert_styles_and_personalization() -> None:
-    base = (ROOT / "styles/base.css").read_text(encoding="utf-8")
-    components = (ROOT / "styles/components.css").read_text(encoding="utf-8")
-    family = (ROOT / "styles/family.css").read_text(encoding="utf-8")
-    site_js = (ROOT / "assets/site.js").read_text(encoding="utf-8")
-    tracker_builder = (ROOT / "scripts/build_trackers.py").read_text(encoding="utf-8")
+def assert_accessible_care_pages() -> None:
+    for item in TRACKERS:
+        path = care_page_path(item)
+        html = path.read_text(encoding="utf-8")
+        concern = condition_name(item)
+        required = (
+            'lang="en"', 'name="viewport"', 'name="description"',
+            'name="robots" content="index, follow, max-image-preview:large"',
+            f'rel="canonical" href="{care_page_url(item)}"',
+            f'rel="alternate" type="application/pdf" href="/downloads/{item["filename"]}"',
+            '<main id="main"', '<fieldset', '<legend>', '<caption id="daily-caption">', '<th scope="col">',
+            "Other conditions they're living with", "Questions for their veterinary team",
+            concern, item["species"], '/accessibility.html', '/privacy.html',
+        )
+        missing = [marker for marker in required if marker not in html]
+        if missing:
+            raise AssertionError(f"Accessible page markers missing from {path.name}: {missing}")
+        if "style=" in html or "<script" in html:
+            raise AssertionError(f"Accessible page should not require inline styles or JavaScript: {path.name}")
+    LOGGER.info("72 semantic keyboard/screen-reader worksheet alternatives: PASS")
 
-    for marker in ("--brand: #55756c;", "--cream: #fffdf9;", "--rose: #f7ece9;"):
-        if marker not in base:
-            raise AssertionError(f"Soft care palette marker missing: {marker}")
-    for marker in (".family-choice {", ".family-choice.is-selected", ".family-grid {", ".personalize-card {", ".photo-preview {"):
-        if marker not in components:
-            raise AssertionError(f"Core family/personalization style missing from components.css: {marker}")
-    for marker in (".family-more {", ".family-grid-primary", ".family-grid-more", ".tracker-variant {", ".condition-kicker"):
-        if marker not in family:
-            raise AssertionError(f"Family/condition style missing from family.css: {marker}")
 
-    for marker in (
-        "window.PDFLib", "makeSquareJpeg", "photoJpegBytes", "Personalize & get their care paperwork",
-        "Steady Paws PDF personalization failed", "PHOTO_IMAGE_BOX = { x: 490, y: 607, width: 82, height: 82 }",
-        "NAME_POSITION = { x: 96, y: 666, maxWidth: 190 }",
-    ):
-        if marker not in site_js:
-            raise AssertionError(f"Browser personalization behavior missing: {marker}")
-    for marker in (
-        'PHOTO_IMAGE_BOX = (490, 607, 82, 82)', 'NAME_TEXT_POSITION = (96, 666)',
-        'BRAND = HexColor("#55756C")', 'draw_photo_placeholder(c)',
-    ):
-        if marker not in tracker_builder:
-            raise AssertionError(f"PDF personalization/palette marker missing: {marker}")
-
+def assert_security_and_cache_policy() -> None:
     netlify = (ROOT / "netlify.toml").read_text(encoding="utf-8")
-    if 'for = "/styles/*"' not in netlify or 'for = "/assets/*"' not in netlify:
-        raise AssertionError("Netlify cache rules for styles/assets are missing")
-    if netlify.count('Cache-Control = "public, max-age=0, must-revalidate"') < 2:
-        raise AssertionError("CSS/JS must revalidate so deploys cannot mix stale and new UI assets")
-    if 'script-src \'self\' https://cdn.jsdelivr.net' not in netlify:
-        raise AssertionError("Pinned PDF personalization helper is not allowed by CSP")
-    LOGGER.info("Soft palette, private photo personalization, and deployment policy: PASS")
+    required = (
+        "python scripts/fetch_vendor.py", "python scripts/build_accessible_pages.py",
+        "Strict-Transport-Security", 'X-Frame-Options = "DENY"',
+        'Cross-Origin-Opener-Policy = "same-origin"', 'Cross-Origin-Resource-Policy = "same-origin"',
+        "script-src 'self'", "connect-src 'self'", "img-src 'self' data: blob:",
+        "object-src 'none'", "frame-ancestors 'none'", "upgrade-insecure-requests",
+        'for = "/styles/*"', 'for = "/assets/*"',
+    )
+    missing = [marker for marker in required if marker not in netlify]
+    if missing:
+        raise AssertionError(f"Security/build policy markers missing: {missing}")
+    if "cdn.jsdelivr.net" in netlify:
+        raise AssertionError("Runtime CSP still permits the former third-party PDF library")
+    if netlify.count('Cache-Control = "public, max-age=31536000, immutable"') < 2:
+        raise AssertionError("Versioned CSS/JS assets are not immutable-cached")
+    LOGGER.info("Hardened CSP, privacy boundary, and immutable versioned assets: PASS")
 
 
-def assert_search_files() -> None:
+def assert_sitemap_and_robots() -> None:
     robots = (ROOT / "robots.txt").read_text(encoding="utf-8")
-    sitemap = (ROOT / "sitemap.xml").read_text(encoding="utf-8")
     if f"Sitemap: {EXPECTED_SITE_URL}sitemap.xml" not in robots:
         raise AssertionError("robots.txt does not advertise the production sitemap")
-    if f"<loc>{EXPECTED_SITE_URL}</loc>" not in sitemap:
-        raise AssertionError("sitemap.xml does not contain production homepage URL")
-    LOGGER.info("Canonical crawler files: PASS")
+
+    root = ET.parse(ROOT / "sitemap.xml").getroot()
+    namespace = {"s": "http://www.sitemaps.org/schemas/sitemap/0.9"}
+    urls = [node.text for node in root.findall("s:url/s:loc", namespace) if node.text]
+    expected = {
+        EXPECTED_SITE_URL,
+        f"{EXPECTED_SITE_URL}accessibility.html",
+        f"{EXPECTED_SITE_URL}privacy.html",
+        *(care_page_url(item) for item in TRACKERS),
+    }
+    if len(urls) != 75 or len(set(urls)) != 75:
+        raise AssertionError(f"Expected 75 unique sitemap URLs, found {len(urls)} / {len(set(urls))} unique")
+    if set(urls) != expected:
+        missing = sorted(expected - set(urls))[:5]
+        extra = sorted(set(urls) - expected)[:5]
+        raise AssertionError(f"Sitemap mismatch; missing={missing}, extra={extra}")
+    LOGGER.info("75-URL canonical sitemap and robots.txt: PASS")
 
 
 def assert_pdfs() -> None:
@@ -236,24 +271,32 @@ def assert_pdfs() -> None:
             "THEIR PHOTO", "optional", condition_name(item),
         ):
             if marker not in first_page:
-                raise AssertionError(f"Primary/photo/multi-condition wording missing from {item['filename']}: {marker}")
+                raise AssertionError(f"Printable PDF marker missing from {item['filename']}: {marker}")
         if "How they did this week" not in second_page:
-            raise AssertionError(f"Family-first weekly wording missing: {item['filename']}")
-    LOGGER.info("All 72 tailored PDFs include primary concern + other conditions + optional photo space (144 pages): PASS")
+            raise AssertionError(f"Weekly wording missing: {item['filename']}")
+        if str(reader.root_object.get("/Lang")) != "en-US":
+            raise AssertionError(f"PDF language metadata missing: {item['filename']}")
+        if not reader.metadata or not reader.metadata.title:
+            raise AssertionError(f"PDF title metadata missing: {item['filename']}")
+        if len(reader.outline) < 2:
+            raise AssertionError(f"PDF navigation bookmarks missing: {item['filename']}")
+    LOGGER.info("72 two-page print PDFs with language metadata + bookmarks (144 pages): PASS")
 
 
 def main() -> int:
     try:
         assert_catalog()
         assert_required_files()
+        assert_vendor_integrity()
         assert_homepage()
-        assert_styles_and_personalization()
-        assert_search_files()
+        assert_accessible_care_pages()
+        assert_security_and_cache_policy()
+        assert_sitemap_and_robots()
         assert_pdfs()
-        LOGGER.info("STEADY PAWS QUALITY GATE: PASS")
+        LOGGER.info("STEADY PAWS PRODUCTION QUALITY GATE: PASS")
         return 0
     except Exception as exc:
-        LOGGER.exception("STEADY PAWS QUALITY GATE: FAIL: %s", exc)
+        LOGGER.exception("STEADY PAWS PRODUCTION QUALITY GATE: FAIL: %s", exc)
         return 1
 
 
