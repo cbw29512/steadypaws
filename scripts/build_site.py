@@ -11,7 +11,7 @@ from tracker_catalog import CONDITION_NAMES, GROUP_LABELS, TRACKERS, condition_k
 ROOT = Path(__file__).resolve().parents[1]
 TEMPLATE = ROOT / "templates" / "index.template.html"
 OUTPUT = ROOT / "index.html"
-ASSET_REV = "20260901-primary1"
+ASSET_REV = "20260901-familysoft1"
 
 
 def grouped_conditions() -> list[tuple[str, list[dict]]]:
@@ -55,12 +55,14 @@ def badge_label(item: dict) -> str:
 
 def render_variant(item: dict) -> str:
     search = escape(f'{item["species"]} {item["search"]} {item["description"]}', quote=True)
+    filename = escape(item["filename"], quote=True)
     return (
         f'<div class="tracker-variant" data-group="{escape(item["group"], quote=True)}" '
         f'data-species="{escape(item["species"], quote=True)}" data-search="{search}">'
         f'<span class="species-badge {badge_class(item["group"])}">{escape(badge_label(item))}</span>'
         f'<p>{escape(item["description"])}</p>'
-        f'<a class="download-link" href="/downloads/{escape(item["filename"], quote=True)}" download>'
+        f'<a class="download-link care-download" href="/downloads/{filename}" '
+        f'data-pdf-url="/downloads/{filename}" data-download-name="{filename}" download>'
         f'Get their care paperwork <span aria-hidden="true">↓</span></a></div>'
     )
 
