@@ -30,5 +30,8 @@ jobs:
       - name: Build static homepage
         run: python scripts/build_site.py
 
+      - name: Check browser JavaScript syntax
+        run: node --check assets/site.js
+
       - name: Verify production site
         run: python scripts/verify_site.py
