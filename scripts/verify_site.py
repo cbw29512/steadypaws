@@ -108,8 +108,8 @@ def assert_catalog() -> None:
 def assert_required_files() -> None:
     required = (
         "index.html", "404.html", "accessibility.html", "privacy.html",
-        "styles/base.css", "styles/components.css", "styles/family.css", "styles/care.css",
-        "assets/paw.svg", "assets/site.js", "assets/personalization-bridge-print1.js",
+        "styles/base.css", "styles/components.css", "styles/family.css", "styles/care.css", "styles/launch-polish-1.css",
+        "assets/paw.svg", "assets/site.js", "assets/launch-polish-1.js", "assets/personalization-bridge-print1.js",
         "assets/care-personalization-print1.js", "assets/vendor/pdf-lib-1.17.1.min.js",
         "netlify.toml", "robots.txt", "sitemap.xml", "requirements.txt",
         "templates/index.template.html", "scripts/tracker_catalog.py", "scripts/fetch_vendor.py",
@@ -140,20 +140,25 @@ def assert_vendor_and_paw() -> None:
 def assert_homepage() -> None:
     html = (ROOT / "index.html").read_text(encoding="utf-8")
     required = (
-        '<title>Free Pet Health Trackers & Care Paperwork | Steady Paws</title>',
+        '<title>Free Pet Health Tracker Printables | Steady Paws</title>',
         'name="robots" content="index, follow, max-image-preview:large"',
         f'rel="canonical" href="{EXPECTED_SITE_URL}"', f'property="og:url" content="{EXPECTED_SITE_URL}"',
-        EXPECTED_SUPPORT_URL, "Your family member's care paperwork", "Pick your family member.",
-        "What is the biggest health concern right now?", "Make their paperwork feel like theirs.",
-        "Private by design", "Accessible web worksheet", "Someone else", "View all concerns",
+        EXPECTED_SUPPORT_URL, "Free printable pet health trackers", "Keep track of your pet's health when they need you most.",
+        "Who are we caring for?", "What pet health concern are you tracking?", "Make their tracker feel like theirs.",
+        "Private by design", "Accessible web worksheet", "Another pet", "Browse all", "Care &amp; safety",
+        'id="support-after-download"', "Help keep every pet health tracker free.",
         'id="family-name"', 'id="family-photo"', 'type="file"', 'accept="image/*"',
         f'/assets/paw.svg?v={EXPECTED_ASSET_REV}', f'/assets/site.js?v={EXPECTED_ASSET_REV}',
+        '/styles/launch-polish-1.css?v=1', '/assets/launch-polish-1.js?v=1',
         '/assets/personalization-bridge-print1.js',
     )
     missing = [marker for marker in required if marker not in html]
     if missing:
         raise AssertionError(f"Homepage production markers missing: {missing}")
-    for forbidden in ("In development", "buymeacoffee.com/yourname", "cdn.jsdelivr.net", "<script>", "style="):
+    for forbidden in (
+        "In development", "buymeacoffee.com/yourname", "cdn.jsdelivr.net", "<script>", "style=",
+        "Your family member's care paperwork", "Pick your family member.", "View all concerns",
+    ):
         if forbidden in html:
             raise AssertionError(f"Homepage contains forbidden marker: {forbidden}")
 
@@ -166,7 +171,7 @@ def assert_homepage() -> None:
     if parser.form_variants != len(TRACKERS) or parser.care_downloads != len(TRACKERS) or parser.accessible_links != len(TRACKERS):
         raise AssertionError("Homepage resource count does not match catalog")
     if parser.photo_inputs != 1 or parser.family_choices < 13 or parser.brand_logos != 1:
-        raise AssertionError("Family picker, paw branding, or photo personalization is incomplete")
+        raise AssertionError("Pet picker, paw branding, or photo personalization is incomplete")
     for target in parser.targets:
         parsed = urlparse(target)
         if parsed.scheme or target.startswith("#"):
@@ -174,11 +179,12 @@ def assert_homepage() -> None:
         clean = parsed.path.lstrip("/")
         if clean and not (ROOT / clean).exists():
             raise AssertionError(f"Broken local reference: {target}")
-    LOGGER.info("Homepage SEO, dedupe, family picker, photo flow, and links: PASS")
+    LOGGER.info("Homepage pet-first SEO, dedupe, picker, photo flow, support timing, and links: PASS")
 
 
 def assert_personalization_source() -> None:
     site_js = (ROOT / "assets/site.js").read_text(encoding="utf-8")
+    launch_js = (ROOT / "assets/launch-polish-1.js").read_text(encoding="utf-8")
     bridge_js = (ROOT / "assets/personalization-bridge-print1.js").read_text(encoding="utf-8")
     care_js = (ROOT / "assets/care-personalization-print1.js").read_text(encoding="utf-8")
     for marker in (
@@ -188,6 +194,9 @@ def assert_personalization_source() -> None:
     ):
         if marker not in site_js:
             raise AssertionError(f"Homepage personalization marker missing: {marker}")
+    for marker in ("What pet health concern are you tracking?", "Browse pet health concerns", "support-after-download"):
+        if marker not in launch_js:
+            raise AssertionError(f"Launch polish marker missing: {marker}")
     for marker in ("sessionStorage", "steadypaws.personalization.v1", "accessibleLinks", "MutationObserver"):
         if marker not in bridge_js:
             raise AssertionError(f"Personalization bridge marker missing: {marker}")
@@ -197,7 +206,7 @@ def assert_personalization_source() -> None:
     ):
         if marker not in care_js:
             raise AssertionError(f"Care-page personalization marker missing: {marker}")
-    LOGGER.info("Local photo/name personalization across PDF + browser print paths: PASS")
+    LOGGER.info("Local photo/name personalization + pet-first interactive copy: PASS")
 
 
 def assert_print_design_source() -> None:
