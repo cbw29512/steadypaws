@@ -74,8 +74,8 @@ def draw_disclaimer(c: canvas.Canvas) -> None:
     c.setFillColor(WARN_INK)
     c.setFont("Helvetica", 6.8)
     text = (
-        "Organizational tool only - not diagnosis or treatment. Record only measurements, medications, "
-        "and husbandry targets your veterinary team asks you to use. Contact a veterinarian for concerning or urgent changes."
+        "Care organizer only - not diagnosis or treatment. Record only measurements, medicines, and care targets "
+        "their veterinary team asks you to use. Contact a veterinarian for concerning or urgent changes."
     )
     for index, line in enumerate(wrap_text(text, "Helvetica", 6.8, width - 94)[:2]):
         c.drawString(47, y + 22 - index * 10, line)
@@ -86,7 +86,7 @@ def draw_identity(c: canvas.Canvas) -> None:
     y = height - 116
     c.setFillColor(INK)
     c.setFont("Helvetica-Bold", 8)
-    entries = (("Pet / animal name", 36, 174), ("Week of", 220, 130), ("Veterinarian", 360, 216))
+    entries = (("Their name", 36, 174), ("Week of", 220, 130), ("Their veterinarian", 360, 216))
     for label, x, width in entries:
         c.drawString(x, y, label)
         c.setStrokeColor(LINE)
@@ -134,10 +134,10 @@ def draw_summary(c: canvas.Canvas, items: list[str]) -> None:
     x0, y = 36, height - 135
     c.setFillColor(INK)
     c.setFont("Helvetica-Bold", 16)
-    c.drawString(x0, y, "Weekly summary")
+    c.drawString(x0, y, "How they did this week")
     c.setFillColor(MUTED)
     c.setFont("Helvetica", 8.5)
-    c.drawString(x0, y - 18, "Use patterns and notes to make the next veterinary conversation easier.")
+    c.drawString(x0, y - 18, "Use the little patterns you noticed to make their next veterinary conversation easier.")
     y -= 52
 
     for index, item in enumerate(items):
@@ -157,7 +157,7 @@ def draw_summary(c: canvas.Canvas, items: list[str]) -> None:
     y2 = y - 4 * 58 - 18
     c.setFillColor(INK)
     c.setFont("Helvetica-Bold", 10)
-    c.drawString(x0, y2, "Changes since last visit")
+    c.drawString(x0, y2, "What changed since their last visit")
     c.setStrokeColor(LINE)
     for i in range(3):
         c.line(x0, y2 - 18 - i * 22, width - 36, y2 - 18 - i * 22)
@@ -165,14 +165,14 @@ def draw_summary(c: canvas.Canvas, items: list[str]) -> None:
     y3 = y2 - 92
     c.setFillColor(INK)
     c.setFont("Helvetica-Bold", 10)
-    c.drawString(x0, y3, "Questions for the veterinary team")
+    c.drawString(x0, y3, "Questions for their veterinary team")
     for i in range(4):
         c.line(x0, y3 - 18 - i * 22, width - 36, y3 - 18 - i * 22)
 
     y4 = y3 - 118
     c.setFillColor(INK)
     c.setFont("Helvetica-Bold", 10)
-    c.drawString(x0, y4, "Veterinarian plan / next steps")
+    c.drawString(x0, y4, "Their veterinary plan / next steps")
     for i in range(3):
         c.line(x0, y4 - 18 - i * 22, width - 36, y4 - 18 - i * 22)
 
@@ -182,7 +182,7 @@ def make_pdf(spec: dict) -> Path:
     c = canvas.Canvas(str(path), pagesize=letter, pageCompression=1)
     c.setTitle(spec["title"])
     c.setAuthor("Steady Paws")
-    c.setSubject(f"Printable {spec['species']} chronic-care observation tracker")
+    c.setSubject(f"Printable {spec['species']} care tracker for veterinary conversations")
 
     draw_header(c, spec, 1)
     draw_identity(c)
@@ -190,7 +190,7 @@ def make_pdf(spec: dict) -> Path:
     draw_disclaimer(c)
     c.showPage()
 
-    draw_header(c, spec, 2, "Weekly summary and veterinary appointment prep")
+    draw_header(c, spec, 2, "How they did this week + veterinary visit notes")
     draw_summary(c, spec["summary"])
     draw_disclaimer(c)
     c.save()
