@@ -7,6 +7,7 @@ from html import escape
 from pathlib import Path
 
 from build_site import ASSET_REV
+from build_trackers import display_field
 from tracker_catalog import TRACKERS, condition_name
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -29,7 +30,6 @@ def field_id(prefix: str, value: str) -> str:
 
 
 def seo_title(item: dict) -> str:
-    """Keep titles descriptive and comfortably below the 70-character release gate."""
     concern = condition_name(item)
     species = item["species"]
     title = f"{concern} tracker for {species} | Steady Paws"
@@ -40,7 +40,6 @@ def seo_title(item: dict) -> str:
 
 
 def seo_description(item: dict) -> str:
-    """Use a consistent, useful search description that never bloats with catalog copy."""
     concern = condition_name(item).lower()
     species = item["species"].lower()
     description = (
@@ -54,18 +53,18 @@ def seo_description(item: dict) -> str:
 
 
 def render_daily_table(item: dict) -> str:
-    headers = "".join(f'<th scope="col">{escape(field)}</th>' for field in item["fields"])
+    headers = "".join(f'<th scope="col">{escape(display_field(field))}</th>' for field in item["fields"])
     rows: list[str] = []
     for row_number in range(1, 12):
         cells = "".join(
-            f'<td><input type="text" aria-label="{escape(field, quote=True)}, entry {row_number}" autocomplete="off"></td>'
+            f'<td><input type="text" aria-label="{escape(display_field(field), quote=True)}, entry {row_number}" autocomplete="off"></td>'
             for field in item["fields"]
         )
         rows.append(f"<tr>{cells}</tr>")
     return (
         '<div class="table-wrap" role="region" aria-labelledby="daily-caption" tabindex="0">'
         '<table class="care-table">'
-        '<caption id="daily-caption">Daily observations — 11 entries</caption>'
+        '<caption id="daily-caption">Daily care log — use one row each time you check or give care.</caption>'
         f"<thead><tr>{headers}</tr></thead><tbody>{''.join(rows)}</tbody></table></div>"
     )
 
@@ -73,10 +72,11 @@ def render_daily_table(item: dict) -> str:
 def render_summary(item: dict) -> str:
     blocks: list[str] = []
     for index, summary in enumerate(item["summary"], start=1):
-        control_id = field_id(f"summary-{index}", summary)
+        label = display_field(summary)
+        control_id = field_id(f"summary-{index}", label)
         blocks.append(
             '<div class="summary-item">'
-            f'<label for="{control_id}">{escape(summary)}</label>'
+            f'<label for="{control_id}">{escape(label)}</label>'
             f'<textarea id="{control_id}" rows="3"></textarea></div>'
         )
     return "".join(blocks)
@@ -119,44 +119,44 @@ def render_page(item: dict) -> str:
     <header class="care-header">
       <p class="eyebrow">Accessible web worksheet · {escape(species)}</p>
       <h1 itemprop="name">{escape(concern)} care paperwork</h1>
-      <p class="lede" itemprop="description">{escape(item['description'])} This web version is designed for keyboard and screen-reader use and can also be printed.</p>
+      <p class="lede" itemprop="description">Keep the important details in one place. This web version works with a keyboard or screen reader and can also be printed.</p>
       <div class="care-actions">
         <a class="button" href="{pdf_url}" download>Download printable PDF</a>
         <button id="care-print-personalized" class="button care-print-button" type="button">Print this worksheet</button>
         <a class="text-link" href="/#finder">Choose different paperwork <span aria-hidden="true">→</span></a>
       </div>
       <p id="care-personalization-status" class="care-personalization-status" role="status">Tip: add a name or photo on the Steady Paws finder page before opening this worksheet if you want it included when printing.</p>
-      <p class="care-note" id="care-safety"><strong>Care organizer only.</strong> This worksheet does not diagnose disease or recommend treatment. Record only measurements, medicines, and care targets their veterinary team asks you to use.</p>
+      <p class="care-note" id="care-safety"><strong>For organizing care, not medical advice.</strong> Follow their veterinarian's plan and contact a veterinarian for urgent or concerning changes.</p>
     </header>
 
     <div class="care-form" aria-describedby="care-safety">
       <fieldset class="care-fieldset">
-        <legend>About your family member</legend>
+        <legend>Care details</legend>
         <div class="identity-grid">
           <label class="field">Their name<input id="care-family-name" type="text" autocomplete="off"></label>
           <label class="field">Week of<input type="date"></label>
-          <label class="field field-wide">Their veterinarian<input type="text" autocomplete="off"></label>
-          <label class="field field-wide">Primary health concern<input type="text" value="{escape(concern, quote=True)}" readonly></label>
-          <label class="field field-wide">Other conditions they're living with<textarea rows="3"></textarea></label>
+          <label class="field field-wide">Veterinarian<input type="text" autocomplete="off"></label>
+          <label class="field field-wide">Main health concern<input type="text" value="{escape(concern, quote=True)}" readonly></label>
+          <label class="field field-wide">Other health conditions<textarea rows="3"></textarea></label>
         </div>
       </fieldset>
 
       <fieldset class="care-fieldset">
-        <legend>Daily observations</legend>
+        <legend>Daily care log</legend>
         {render_daily_table(item)}
       </fieldset>
 
       <fieldset class="care-fieldset">
-        <legend>How they did this week</legend>
-        <p>Use the patterns you noticed to make their next veterinary conversation easier.</p>
+        <legend>This week at a glance</legend>
+        <p>Note the changes or patterns that matter most.</p>
         <div class="summary-grid">{render_summary(item)}</div>
       </fieldset>
 
       <fieldset class="care-fieldset">
-        <legend>Veterinary visit notes</legend>
-        <label class="field">What changed since their last visit<textarea rows="5"></textarea></label>
-        <label class="field">Questions for their veterinary team<textarea rows="5"></textarea></label>
-        <label class="field">Their veterinary plan / next steps<textarea rows="5"></textarea></label>
+        <legend>Vet visit notes</legend>
+        <label class="field">Since the last vet visit<textarea rows="5"></textarea></label>
+        <label class="field">Questions for the vet<textarea rows="5"></textarea></label>
+        <label class="field">Plan / next steps from the vet<textarea rows="5"></textarea></label>
       </fieldset>
     </div>
 
