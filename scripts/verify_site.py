@@ -16,6 +16,7 @@ LOGGER = logging.getLogger(__name__)
 ROOT = Path(__file__).resolve().parents[1]
 EXPECTED_SITE_URL = "https://steadypaws.netlify.app/"
 EXPECTED_SUPPORT_URL = "https://buymeacoffee.com/divclass016"
+EXPECTED_ASSET_REV = "20260901-family2"
 
 
 class LinkParser(HTMLParser):
@@ -80,7 +81,10 @@ def assert_homepage() -> None:
         "What tough time are they going through?",
         "Get their care paperwork",
         "Someone else",
-        "/styles/family.css",
+        f'/styles/base.css?v={EXPECTED_ASSET_REV}',
+        f'/styles/components.css?v={EXPECTED_ASSET_REV}',
+        f'/styles/family.css?v={EXPECTED_ASSET_REV}',
+        f'/assets/site.js?v={EXPECTED_ASSET_REV}',
     )
     missing = [marker for marker in required_markers if marker not in html]
     if missing:
@@ -109,7 +113,27 @@ def assert_homepage() -> None:
         clean = parsed.path.lstrip("/")
         if clean and not (ROOT / clean).exists():
             raise AssertionError(f"Broken local reference: {target}")
-    LOGGER.info("Family-first homepage, guided picker, and local references: PASS")
+    LOGGER.info("Family-first homepage, guided picker, and versioned assets: PASS")
+
+
+def assert_family_picker_styles() -> None:
+    components = (ROOT / "styles/components.css").read_text(encoding="utf-8")
+    family = (ROOT / "styles/family.css").read_text(encoding="utf-8")
+    for marker in (".family-choice {", ".family-choice.is-selected", ".family-grid {"):
+        if marker not in components:
+            raise AssertionError(f"Core family picker style missing from components.css: {marker}")
+    for marker in (".family-more {", ".family-grid-primary", ".family-grid-more"):
+        if marker not in family:
+            raise AssertionError(f"Family picker extension style missing from family.css: {marker}")
+
+    netlify = (ROOT / "netlify.toml").read_text(encoding="utf-8")
+    if 'for = "/styles/*"' not in netlify or 'for = "/assets/*"' not in netlify:
+        raise AssertionError("Netlify cache rules for styles/assets are missing")
+    if netlify.count('Cache-Control = "public, max-age=0, must-revalidate"') < 2:
+        raise AssertionError("CSS/JS must revalidate so deploys cannot mix stale and new UI assets")
+    if 'for = "/styles/*"\n  [headers.values]\n    Cache-Control = "public, max-age=604800"' in netlify:
+        raise AssertionError("Styles are still configured for week-long stale caching")
+    LOGGER.info("Family picker CSS and deployment cache policy: PASS")
 
 
 def assert_search_files() -> None:
@@ -146,6 +170,7 @@ def main() -> int:
         assert_catalog()
         assert_required_files()
         assert_homepage()
+        assert_family_picker_styles()
         assert_search_files()
         assert_pdfs()
         LOGGER.info("STEADY PAWS QUALITY GATE: PASS")
