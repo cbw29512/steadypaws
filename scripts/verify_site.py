@@ -188,11 +188,12 @@ def assert_styles_and_personalization() -> None:
     for marker in (
         "window.PDFLib", "makeSquareJpeg", "photoJpegBytes", "Personalize & get their care paperwork",
         "Steady Paws PDF personalization failed", "PHOTO_IMAGE_BOX = { x: 490, y: 607, width: 82, height: 82 }",
+        "NAME_POSITION = { x: 96, y: 666, maxWidth: 190 }",
     ):
         if marker not in site_js:
             raise AssertionError(f"Browser personalization behavior missing: {marker}")
     for marker in (
-        'PHOTO_IMAGE_BOX = (490, 607, 82, 82)', 'NAME_TEXT_POSITION = (96, 663)',
+        'PHOTO_IMAGE_BOX = (490, 607, 82, 82)', 'NAME_TEXT_POSITION = (96, 666)',
         'BRAND = HexColor("#55756C")', 'draw_photo_placeholder(c)',
     ):
         if marker not in tracker_builder:
