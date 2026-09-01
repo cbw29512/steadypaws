@@ -47,7 +47,17 @@ def form_title(spec: dict) -> str:
     concern = condition_name(spec)
     if spec["group"] == "universal":
         return concern
+    if concern.endswith("Care"):
+        return f"{concern} Tracker"
     return f"{concern} Care Tracker"
+
+
+def draw_fitted_title(c: canvas.Canvas, text: str, x: float, y: float, max_width: float) -> None:
+    size = 20.0
+    while size > 13 and stringWidth(text, "Helvetica-Bold", size) > max_width:
+        size -= 0.5
+    c.setFont("Helvetica-Bold", size)
+    c.drawString(x, y, text)
 
 
 def draw_header(c: canvas.Canvas, spec: dict, page: int, subtitle: str | None = None) -> None:
@@ -63,8 +73,7 @@ def draw_header(c: canvas.Canvas, spec: dict, page: int, subtitle: str | None = 
     c.setFont("Helvetica-Bold", 8)
     c.drawRightString(width - 36, height - 30, spec["species"].upper())
     c.setFillColor(white)
-    c.setFont("Helvetica-Bold", 20)
-    c.drawString(36, height - 56, form_title(spec))
+    draw_fitted_title(c, form_title(spec), 36, height - 56, width - 72)
     c.setFillColor(HexColor("#D7E9E2"))
     c.setFont("Helvetica", 8.3)
     c.drawString(36, height - 73, subtitle or spec["subtitle"])
