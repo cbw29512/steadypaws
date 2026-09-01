@@ -1,0 +1,57 @@
+[
+  {
+    "filename": "rabbit-dental-disease-tracker.pdf",
+    "species": "Rabbit",
+    "group": "small-mammal",
+    "title": "Rabbit Dental Disease Tracker",
+    "subtitle": "Eating, chewing, drooling, fecal output, weight and dental-care notes",
+    "description": "Eating, chewing, drooling, fecal output, weight and dental-care notes.",
+    "search": "rabbit bunny dental malocclusion teeth tooth abscess",
+    "fields": ["Time", "Food eaten", "Chewing difficulty", "Drooling", "Droppings", "Weight*", "Dental / notes"],
+    "summary": ["Appetite trend", "Food preference changes", "Drooling/wet chin", "Dropping size/amount", "Weight trend", "Facial swelling/discharge", "Dental procedures recorded", "Questions for exotic veterinarian"]
+  },
+  {
+    "filename": "rabbit-gi-stasis-tracker.pdf",
+    "species": "Rabbit",
+    "group": "small-mammal",
+    "title": "Rabbit GI Stasis / Motility Tracker",
+    "subtitle": "Appetite, hay intake, water, droppings, activity and vet-directed supportive care",
+    "description": "Appetite, hay intake, water, droppings, activity and supportive-care notes.",
+    "search": "rabbit bunny gi gastrointestinal stasis motility appetite droppings poop",
+    "fields": ["Time", "Food/hay", "Water", "Droppings", "Activity/posture", "Medication*", "Supportive care* / notes"],
+    "summary": ["Appetite recovery", "Hay intake", "Dropping amount/size", "Water intake", "Activity/posture", "Bloating/discomfort observed", "Vet-directed care recorded", "Follow-up questions"]
+  },
+  {
+    "filename": "rabbit-arthritis-mobility-tracker.pdf",
+    "species": "Rabbit",
+    "group": "small-mammal",
+    "title": "Rabbit Arthritis & Mobility Tracker",
+    "subtitle": "Hopping, posture, grooming, litter access, appetite and comfort",
+    "description": "Hopping, posture, grooming, litter access, appetite and comfort.",
+    "search": "rabbit bunny arthritis osteoarthritis mobility pain joints senior",
+    "fields": ["Time", "Hopping", "Getting up", "Litter access", "Grooming", "Appetite", "Comfort / notes"],
+    "summary": ["Mobility trend", "Getting up/resting", "Litter box access", "Grooming ability", "Sore hocks/feet", "Appetite/weight", "Home modifications", "Pain/mobility questions"]
+  },
+  {
+    "filename": "rabbit-urinary-kidney-tracker.pdf",
+    "species": "Rabbit",
+    "group": "small-mammal",
+    "title": "Rabbit Urinary / Kidney Tracker",
+    "subtitle": "Urination, water, appetite, weight, mobility and medication notes",
+    "description": "Urination, water, appetite, weight, mobility and medication notes.",
+    "search": "rabbit bunny urinary kidney renal sludge stones urolith",
+    "fields": ["Time", "Water", "Urination", "Urine appearance", "Appetite", "Weight*", "Medication* / notes"],
+    "summary": ["Water intake trend", "Urination frequency", "Straining/discomfort", "Urine color/residue", "Appetite/weight", "Mobility/posture", "Medication doses recorded", "Urine/lab questions"]
+  },
+  {
+    "filename": "rabbit-respiratory-tracker.pdf",
+    "species": "Rabbit",
+    "group": "small-mammal",
+    "title": "Rabbit Chronic Respiratory Tracker",
+    "subtitle": "Sneezing, nasal/eye discharge, breathing, appetite, weight and medication notes",
+    "description": "Sneezing, discharge, breathing, appetite, weight and medication notes.",
+    "search": "rabbit bunny respiratory chronic rhinitis snuffles breathing nasal discharge",
+    "fields": ["Time", "Sneezing", "Nasal discharge", "Eye discharge", "Breathing effort", "Appetite", "Medication* / notes"],
+    "summary": ["Sneezing frequency", "Discharge changes", "Breathing effort", "Appetite/weight", "Activity", "Environmental changes", "Medication doses recorded", "Respiratory follow-up questions"]
+  }
+]
