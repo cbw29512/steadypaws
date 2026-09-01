@@ -1,62 +1,51 @@
 # Steady Paws
 
-Steady Paws is a free, privacy-conscious chronic-care tracker library for dog and cat owners. The site provides printable organizational tools designed to make day-to-day observations easier to record and discuss with a veterinary team.
+Steady Paws is a privacy-conscious static resource library of free printable chronic-care and veterinary observation trackers for companion animals.
 
-Live site: https://steadypaws.netlify.app/
+## Current production library
 
-## Current library
+The shared catalog contains **72 two-page printable tools** across:
 
-The production library contains **22 two-page printable PDFs**:
+- Cats — 10
+- Dogs — 10
+- Small mammals — 26 (rabbits, guinea pigs, ferrets, chinchillas, hamsters, rats and mice)
+- Birds — 6
+- Reptiles — 6
+- Horses — 6
+- Aquarium fish and amphibians — 6
+- Universal pet-care tools — 2
 
-- 10 cat trackers
-- 10 dog trackers
-- 2 universal chronic-care tools
+The forms are organizational aids. They do not diagnose disease, prescribe medication, or establish species-specific medical/husbandry targets. Those decisions belong with an appropriate veterinarian or qualified animal-health professional.
 
-Every tracker includes a daily log plus a weekly summary / veterinary appointment-prep page. The site does not diagnose, prescribe, recommend medication doses, or replace veterinary care.
+## Architecture
 
-## Production design
+`data/trackers/*.json` is the source of truth for the tracker library. `scripts/tracker_catalog.py` loads the catalog. `scripts/build_trackers.py` generates every PDF. `scripts/build_site.py` generates the searchable homepage from the same catalog. `scripts/verify_site.py` certifies the catalog, homepage links, crawler files, PDF signatures, and exact two-page count.
 
-- Responsive, keyboard-accessible interface
-- Searchable tracker library with Cat / Dog / Universal filters
-- No account or email wall
-- No analytics or pet-health log collection in the current version
-- Direct PDF downloads
-- Canonical URL, sitemap, crawler configuration and social metadata
-- Netlify security and cache headers
-- Buy Me a Coffee support link
+This keeps the displayed download count, search cards, generated files, and CI requirements synchronized as the library grows.
 
-## Reproducible PDF generation
-
-Tracker PDFs are generated from version-controlled specifications in `scripts/build_trackers.py` using ReportLab. This keeps the entire library consistent and makes global fixes reproducible instead of maintaining dozens of unrelated binary files by hand.
-
-Generate locally:
+## Local production check
 
 ```bash
 python -m pip install -r requirements.txt
 python scripts/build_trackers.py
+python scripts/build_site.py
 python scripts/verify_site.py
 ```
 
-## Quality gate
+## Netlify
 
-GitHub Actions regenerates the complete library on every push and pull request, then verifies:
+Netlify reads `netlify.toml` and runs the tracker generator and homepage builder before publishing the repository root. The production URL is `https://steadypaws.netlify.app/`.
 
-- all required production files
-- all 22 homepage download links
-- valid two-page PDF output
-- internal links
-- canonical production URL
-- robots / sitemap configuration
-- required support link
+## Product principles
 
-## Netlify deployment
-
-`netlify.toml` installs the pinned PDF dependency and runs the tracker generator during each deployment. The repository root is published after generation, so every production deploy contains the complete current tracker library.
-
-## Important boundary
-
-Steady Paws provides organizational tools, not diagnosis or treatment. Pet owners should follow their veterinary team's instructions and seek veterinary or emergency veterinary care for urgent or concerning changes.
+- No account or email wall
+- No health-log collection in the current version
+- Mobile-first, keyboard-accessible static UI
+- Lightweight HTML/CSS/JavaScript
+- Printable Letter-size PDF resources
+- Species-specific observation fields where physiology or husbandry differs
+- Clear boundary between organization and veterinary medical advice
 
 ## Support
 
-Support Steady Paws at https://buymeacoffee.com/divclass016.
+The site support link points to `https://buymeacoffee.com/divclass016`.
