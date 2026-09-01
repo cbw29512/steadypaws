@@ -11,7 +11,7 @@ from tracker_catalog import CONDITION_NAMES, GROUP_LABELS, TRACKERS, condition_k
 ROOT = Path(__file__).resolve().parents[1]
 TEMPLATE = ROOT / "templates" / "index.template.html"
 OUTPUT = ROOT / "index.html"
-ASSET_REV = "20260901-a11yseo1"
+ASSET_REV = "20260901-pawphoto1"
 
 
 def grouped_conditions() -> list[tuple[str, list[dict]]]:
@@ -106,6 +106,7 @@ def main() -> int:
         .replace('href="/styles/base.css"', f'href="/styles/base.css?v={ASSET_REV}"')
         .replace('href="/styles/components.css"', f'href="/styles/components.css?v={ASSET_REV}"')
         .replace('href="/assets/paw.svg"', f'href="/assets/paw.svg?v={ASSET_REV}"')
+        .replace('src="/assets/paw.svg"', f'src="/assets/paw.svg?v={ASSET_REV}"')
         .replace('src="/assets/site.js"', f'src="/assets/site.js?v={ASSET_REV}"')
         .replace("</head>", f'  <link rel="stylesheet" href="/styles/family.css?v={ASSET_REV}">\n</head>')
     )
