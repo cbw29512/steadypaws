@@ -42,8 +42,8 @@ GROUP_ACCENTS = {
     "universal": HexColor("#E9DFC5"),
 }
 
-# These coordinates are also used by assets/site.js when an optional photo/name
-# is added in the browser. Keep them stable or update both places together.
+# These coordinates are also used by assets/site.js and care personalization JS.
+# Keep them stable or update every browser personalization path at the same time.
 PHOTO_BOX = (486, 603, 90, 90)
 PHOTO_IMAGE_BOX = (490, 607, 82, 82)
 NAME_TEXT_POSITION = (96, 666)
@@ -170,16 +170,17 @@ def draw_identity(c: canvas.Canvas, spec: dict) -> None:
     c.setFillColor(IDENTITY_BG)
     c.setStrokeColor(accent)
     c.setLineWidth(1.0)
-    c.roundRect(28, height - 228, width - 56, 126, 14, stroke=1, fill=1)
+    c.roundRect(28, 558, width - 56, 150, 14, stroke=1, fill=1)
     c.setFillColor(accent)
-    c.roundRect(36, height - 117, 106, 18, 9, stroke=0, fill=1)
+    c.roundRect(36, 688, 106, 15, 7.5, stroke=0, fill=1)
     c.setFillColor(INK)
-    c.setFont("Helvetica-Bold", 7.1)
-    c.drawString(47, height - 111, "ABOUT YOUR FAMILY MEMBER")
+    c.setFont("Helvetica-Bold", 6.7)
+    c.drawString(47, 693, "ABOUT YOUR FAMILY MEMBER")
 
+    # Keep these original baselines aligned with the browser PDF-stamping coordinates.
     c.setFillColor(INK)
     c.setFont("Helvetica-Bold", 8)
-    name_y = height - 132
+    name_y = height - 116
     c.drawString(36, name_y, "Their name")
     c.setStrokeColor(LINE)
     c.line(94, name_y - 13, 290, name_y - 13)
@@ -189,13 +190,13 @@ def draw_identity(c: canvas.Canvas, spec: dict) -> None:
     c.setStrokeColor(LINE)
     c.line(348, name_y - 13, 466, name_y - 13)
 
-    vet_y = height - 161
+    vet_y = height - 150
     c.setFillColor(INK)
     c.drawString(36, vet_y, "Their veterinarian")
     c.setStrokeColor(LINE)
     c.line(126, vet_y - 13, 466, vet_y - 13)
 
-    primary_y = height - 190
+    primary_y = height - 183
     c.setFillColor(INK)
     c.setFont("Helvetica-Bold", 7.7)
     c.drawString(36, primary_y, "Primary health concern")
@@ -204,7 +205,7 @@ def draw_identity(c: canvas.Canvas, spec: dict) -> None:
     c.setStrokeColor(LINE)
     c.line(148, primary_y - 13, 466, primary_y - 13)
 
-    other_y = height - 218
+    other_y = height - 214
     c.setFillColor(INK)
     c.setFont("Helvetica-Bold", 7.7)
     c.drawString(36, other_y, "Other conditions they're living with")
@@ -275,7 +276,7 @@ def draw_summary(c: canvas.Canvas, spec: dict) -> None:
     c.setFillColor(MUTED)
     c.setFont("Helvetica", 8.5)
     c.drawString(x0, y - 26, "Use the little patterns you noticed to make their next veterinary conversation easier.")
-    y -= 58
+    y -= 52
 
     for index, item in enumerate(items):
         col, row = index % 2, index // 2
