@@ -8,6 +8,18 @@
 .more-family { margin-top:28px; padding:26px; border:1px solid var(--line); border-radius:22px; background:#f8faf8; }
 .more-family-title { margin:0 0 18px; color:var(--ink); font-weight:850; }
 .family-grid-more { grid-template-columns:repeat(5,minmax(0,1fr)); }
+.condition-card { min-height:0; }
+.condition-kicker { color:var(--brand); font-size:.69rem; font-weight:900; letter-spacing:.08em; text-transform:uppercase; }
+.condition-card h3 { margin-top:10px; }
+.condition-help { margin:0 0 16px; font-size:.88rem; line-height:1.5; }
+.tracker-variants { display:grid; gap:10px; margin-top:auto; }
+.tracker-variant { padding-top:14px; border-top:1px solid var(--line); }
+.tracker-variant[hidden] { display:none; }
+.tracker-variant .species-badge { margin-bottom:8px; }
+.tracker-variant p { margin:0 0 12px; font-size:.84rem; line-height:1.45; }
+.tracker-variant .download-link { display:inline-flex; margin-top:0; padding-top:0; border-top:0; }
+.condition-card.has-multiple-variants .tracker-variants { gap:12px; }
+.condition-card.has-multiple-variants .tracker-variant { padding:14px; border:1px solid var(--line); border-radius:14px; background:#fbfcfb; }
 .browse-tools { margin-top:30px; border:1px solid var(--line); border-radius:18px; background:rgba(255,255,255,.72); }
 .browse-tools summary { padding:18px 20px; color:var(--brand); font-weight:850; cursor:pointer; }
 .browse-tools summary:hover { text-decoration:underline; text-underline-offset:4px; }
@@ -15,4 +27,4 @@
 @media (max-width:1100px) { .family-grid-more { grid-template-columns:repeat(3,minmax(0,1fr)); } }
 @media (max-width:980px) { .family-grid-primary { grid-template-columns:repeat(2,minmax(0,1fr)); } }
 @media (max-width:760px) { .family-grid-more { grid-template-columns:repeat(2,minmax(0,1fr)); } .family-more { min-height:148px; } }
-@media (max-width:620px) { .family-grid-primary,.family-grid-more { grid-template-columns:1fr; } .family-more { min-height:132px; } .more-family { padding:18px; } }
+@media (max-width:620px) { .family-grid-primary,.family-grid-more { grid-template-columns:1fr; } .family-more { min-height:132px; } .more-family { padding:18px; } .condition-card.has-multiple-variants .tracker-variant { padding:12px; } }
