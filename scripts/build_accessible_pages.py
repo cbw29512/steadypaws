@@ -112,7 +112,7 @@ def render_page(item: dict) -> str:
 </head>
 <body class="care-page">
   <a class="skip-link" href="#main">Skip to care worksheet</a>
-  <header class="site-header"><div class="shell nav-wrap"><a class="brand" href="/" aria-label="Steady Paws home"><span class="brand-mark" aria-hidden="true">SP</span><span>Steady Paws</span></a><nav aria-label="Worksheet navigation"><a href="/#finder">Find another form</a><a href="/accessibility.html">Accessibility</a></nav></div></header>
+  <header class="site-header"><div class="shell nav-wrap"><a class="brand" href="/" aria-label="Steady Paws home"><img class="brand-logo" src="/assets/paw.svg?v={ASSET_REV}" width="38" height="38" alt=""><span>Steady Paws</span></a><nav aria-label="Worksheet navigation"><a href="/#finder">Find another form</a><a href="/accessibility.html">Accessibility</a></nav></div></header>
   <main id="main" class="care-shell" itemscope itemtype="https://schema.org/WebPage">
     <header class="care-header">
       <p class="eyebrow">Accessible web worksheet · {escape(species)}</p>
