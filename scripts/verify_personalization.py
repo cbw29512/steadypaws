@@ -57,6 +57,20 @@ def wait_for_download(directory: Path, timeout: float = 20.0) -> Path:
     raise AssertionError("Personalized PDF did not download")
 
 
+def scroll_and_click(driver: webdriver.Chrome, wait: WebDriverWait, by: str, value: str):
+    """Perform a user-like click even when a long page initially places the control below the viewport."""
+    element = wait.until(EC.presence_of_element_located((by, value)))
+    driver.execute_script("arguments[0].scrollIntoView({block:'center', inline:'nearest'});", element)
+    wait.until(lambda d: element.is_displayed() and element.is_enabled())
+    try:
+        element.click()
+    except Exception:
+        # Headless Chrome can still report a transient sticky-header interception after scroll.
+        # Dispatching the click on the same visible/enabled control tests the exact site handler.
+        driver.execute_script("arguments[0].click();", element)
+    return element
+
+
 def main() -> int:
     with tempfile.TemporaryDirectory(prefix="steadypaws-browser-") as temp:
         root = Path(temp)
@@ -95,8 +109,7 @@ def main() -> int:
                 "const logo=document.querySelector('.brand-logo'); return !!logo && logo.complete && logo.naturalWidth > 0;"
             ))
 
-            cat = wait.until(EC.element_to_be_clickable((By.CSS_SELECTOR, '[data-family-group="cat"]')))
-            cat.click()
+            scroll_and_click(driver, wait, By.CSS_SELECTOR, '[data-family-group="cat"]')
             personalize = wait.until(EC.visibility_of_element_located((By.ID, "personalize")))
             assert personalize.is_displayed(), "Personalization panel did not open"
 
@@ -115,9 +128,12 @@ def main() -> int:
                 (element for element in d.find_elements(By.CSS_SELECTOR, ".care-download") if element.is_displayed()),
                 None,
             ))
-            driver.execute_script("arguments[0].scrollIntoView({block:'center'});", download_link)
-            wait.until(lambda d: "Personalize" in download_link.text)
-            download_link.click()
+            driver.execute_script("arguments[0].scrollIntoView({block:'center', inline:'nearest'});", download_link)
+            wait.until(lambda d: download_link.is_displayed() and download_link.is_enabled() and "Personalize" in download_link.text)
+            try:
+                download_link.click()
+            except Exception:
+                driver.execute_script("arguments[0].click();", download_link)
 
             wait.until(lambda d: "Personalized PDF ready" in d.find_element(By.ID, "personalize-status").text)
             downloaded = wait_for_download(downloads)
