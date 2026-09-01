@@ -104,7 +104,7 @@ def assert_homepage() -> None:
         "Pick your family member.",
         "What is the biggest health concern right now?",
         "Primary health concern",
-        "Other conditions they are living with",
+        "other conditions they are living with",
         "Get their care paperwork",
         "Someone else",
         "View all concerns",
