@@ -12,6 +12,7 @@ from tracker_catalog import TRACKERS, condition_name
 ROOT = Path(__file__).resolve().parents[1]
 CARE_DIR = ROOT / "care"
 SITE_URL = "https://steadypaws.netlify.app"
+CARE_ASSET_REV = "20260901-printphoto2"
 
 
 def care_slug(item: dict) -> str:
@@ -108,7 +109,8 @@ def render_page(item: dict) -> str:
   <link rel="icon" href="/assets/paw.svg?v={ASSET_REV}" type="image/svg+xml">
   <link rel="stylesheet" href="/styles/base.css?v={ASSET_REV}">
   <link rel="stylesheet" href="/styles/components.css?v={ASSET_REV}">
-  <link rel="stylesheet" href="/styles/care.css?v={ASSET_REV}">
+  <link rel="stylesheet" href="/styles/care.css?v={CARE_ASSET_REV}">
+  <script src="/assets/care-personalization-print1.js?v={CARE_ASSET_REV}" defer></script>
 </head>
 <body class="care-page">
   <a class="skip-link" href="#main">Skip to care worksheet</a>
@@ -118,7 +120,12 @@ def render_page(item: dict) -> str:
       <p class="eyebrow">Accessible web worksheet · {escape(species)}</p>
       <h1 itemprop="name">{escape(concern)} care paperwork</h1>
       <p class="lede" itemprop="description">{escape(item['description'])} This web version is designed for keyboard and screen-reader use and can also be printed.</p>
-      <div class="care-actions"><a class="button" href="{pdf_url}" download>Download printable PDF</a><a class="text-link" href="/#finder">Choose different paperwork <span aria-hidden="true">→</span></a></div>
+      <div class="care-actions">
+        <a class="button" href="{pdf_url}" download>Download printable PDF</a>
+        <button id="care-print-personalized" class="button care-print-button" type="button">Print this worksheet</button>
+        <a class="text-link" href="/#finder">Choose different paperwork <span aria-hidden="true">→</span></a>
+      </div>
+      <p id="care-personalization-status" class="care-personalization-status" role="status">Tip: add a name or photo on the Steady Paws finder page before opening this worksheet if you want it included when printing.</p>
       <p class="care-note" id="care-safety"><strong>Care organizer only.</strong> This worksheet does not diagnose disease or recommend treatment. Record only measurements, medicines, and care targets their veterinary team asks you to use.</p>
     </header>
 
@@ -126,7 +133,7 @@ def render_page(item: dict) -> str:
       <fieldset class="care-fieldset">
         <legend>About your family member</legend>
         <div class="identity-grid">
-          <label class="field">Their name<input type="text" autocomplete="off"></label>
+          <label class="field">Their name<input id="care-family-name" type="text" autocomplete="off"></label>
           <label class="field">Week of<input type="date"></label>
           <label class="field field-wide">Their veterinarian<input type="text" autocomplete="off"></label>
           <label class="field field-wide">Primary health concern<input type="text" value="{escape(concern, quote=True)}" readonly></label>
