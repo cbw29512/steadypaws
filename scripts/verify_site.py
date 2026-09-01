@@ -16,7 +16,8 @@ LOGGER = logging.getLogger(__name__)
 ROOT = Path(__file__).resolve().parents[1]
 EXPECTED_SITE_URL = "https://steadypaws.netlify.app/"
 EXPECTED_SUPPORT_URL = "https://buymeacoffee.com/divclass016"
-EXPECTED_ASSET_REV = "20260901-primary1"
+EXPECTED_ASSET_REV = "20260901-familysoft1"
+EXPECTED_PDF_LIB = "https://cdn.jsdelivr.net/npm/pdf-lib@1.17.1/dist/pdf-lib.min.js"
 
 
 class LinkParser(HTMLParser):
@@ -28,6 +29,8 @@ class LinkParser(HTMLParser):
         self.condition_keys: list[str] = []
         self.form_variants = 0
         self.family_choices = 0
+        self.care_downloads = 0
+        self.photo_inputs = 0
 
     def handle_starttag(self, tag: str, attrs: list[tuple[str, str | None]]) -> None:
         values = dict(attrs)
@@ -43,6 +46,10 @@ class LinkParser(HTMLParser):
             self.form_variants += 1
         if tag == "button" and "family-choice" in classes:
             self.family_choices += 1
+        if tag == "a" and "care-download" in classes:
+            self.care_downloads += 1
+        if tag == "input" and values.get("id") == "family-photo" and values.get("type") == "file":
+            self.photo_inputs += 1
         for key in ("href", "src"):
             value = values.get(key)
             if value:
@@ -96,15 +103,23 @@ def assert_homepage() -> None:
     html = (ROOT / "index.html").read_text(encoding="utf-8")
     required_markers = (
         'lang="en"', 'name="viewport"', 'name="description"',
-        'name="robots" content="index, follow"',
+        'name="robots" content="index, follow"', 'name="theme-color" content="#55756c"',
         f'rel="canonical" href="{EXPECTED_SITE_URL}"',
         f'property="og:url" content="{EXPECTED_SITE_URL}"',
         EXPECTED_SUPPORT_URL,
+        EXPECTED_PDF_LIB,
+        'integrity="sha512-z8IYLHO8bTgFqj+yrPyIJnzBDf7DDhWwiEsk4sY+Oe6J2M+WQequeGS7qioI5vT6rXgVRb4K1UVQC5ER7MKzKQ=="',
         "Your family member's care paperwork",
         "Pick your family member.",
         "What is the biggest health concern right now?",
         "Primary health concern",
         "other conditions they are living with",
+        "Make their paperwork feel like theirs.",
+        "Private by design",
+        "Steady Paws does not upload them",
+        'id="family-name"',
+        'id="family-photo"',
+        'accept="image/*"',
         "Get their care paperwork",
         "Someone else",
         "View all concerns",
@@ -131,6 +146,10 @@ def assert_homepage() -> None:
         raise AssertionError("Duplicate primary health-concern cards rendered on homepage")
     if parser.form_variants != len(TRACKERS):
         raise AssertionError(f"Expected {len(TRACKERS)} tailored form variants, found {parser.form_variants}")
+    if parser.care_downloads != len(TRACKERS):
+        raise AssertionError(f"Expected {len(TRACKERS)} personalizable download links, found {parser.care_downloads}")
+    if parser.photo_inputs != 1:
+        raise AssertionError(f"Expected one optional family-photo input, found {parser.photo_inputs}")
     if parser.family_choices < 13:
         raise AssertionError(f"Expected broad family-member picker, found {parser.family_choices} choices")
 
@@ -146,27 +165,47 @@ def assert_homepage() -> None:
         clean = parsed.path.lstrip("/")
         if clean and not (ROOT / clean).exists():
             raise AssertionError(f"Broken local reference: {target}")
-    LOGGER.info("Unique health concerns, tailored variants, guided picker, and versioned assets: PASS")
+    LOGGER.info("Unique concerns, private personalization, guided picker, and versioned assets: PASS")
 
 
-def assert_family_picker_styles() -> None:
+def assert_styles_and_personalization() -> None:
+    base = (ROOT / "styles/base.css").read_text(encoding="utf-8")
     components = (ROOT / "styles/components.css").read_text(encoding="utf-8")
     family = (ROOT / "styles/family.css").read_text(encoding="utf-8")
-    for marker in (".family-choice {", ".family-choice.is-selected", ".family-grid {"):
+    site_js = (ROOT / "assets/site.js").read_text(encoding="utf-8")
+    tracker_builder = (ROOT / "scripts/build_trackers.py").read_text(encoding="utf-8")
+
+    for marker in ("--brand: #55756c;", "--cream: #fffdf9;", "--rose: #f7ece9;"):
+        if marker not in base:
+            raise AssertionError(f"Soft care palette marker missing: {marker}")
+    for marker in (".family-choice {", ".family-choice.is-selected", ".family-grid {", ".personalize-card {", ".photo-preview {"):
         if marker not in components:
-            raise AssertionError(f"Core family picker style missing from components.css: {marker}")
+            raise AssertionError(f"Core family/personalization style missing from components.css: {marker}")
     for marker in (".family-more {", ".family-grid-primary", ".family-grid-more", ".tracker-variant {", ".condition-kicker"):
         if marker not in family:
             raise AssertionError(f"Family/condition style missing from family.css: {marker}")
+
+    for marker in (
+        "window.PDFLib", "makeSquareJpeg", "photoJpegBytes", "Personalize & get their care paperwork",
+        "Steady Paws PDF personalization failed", "PHOTO_IMAGE_BOX = { x: 490, y: 607, width: 82, height: 82 }",
+    ):
+        if marker not in site_js:
+            raise AssertionError(f"Browser personalization behavior missing: {marker}")
+    for marker in (
+        'PHOTO_IMAGE_BOX = (490, 607, 82, 82)', 'NAME_TEXT_POSITION = (96, 663)',
+        'BRAND = HexColor("#55756C")', 'draw_photo_placeholder(c)',
+    ):
+        if marker not in tracker_builder:
+            raise AssertionError(f"PDF personalization/palette marker missing: {marker}")
 
     netlify = (ROOT / "netlify.toml").read_text(encoding="utf-8")
     if 'for = "/styles/*"' not in netlify or 'for = "/assets/*"' not in netlify:
         raise AssertionError("Netlify cache rules for styles/assets are missing")
     if netlify.count('Cache-Control = "public, max-age=0, must-revalidate"') < 2:
         raise AssertionError("CSS/JS must revalidate so deploys cannot mix stale and new UI assets")
-    if 'for = "/styles/*"\n  [headers.values]\n    Cache-Control = "public, max-age=604800"' in netlify:
-        raise AssertionError("Styles are still configured for week-long stale caching")
-    LOGGER.info("Family picker, condition variants, and deployment cache policy: PASS")
+    if 'script-src \'self\' https://cdn.jsdelivr.net' not in netlify:
+        raise AssertionError("Pinned PDF personalization helper is not allowed by CSP")
+    LOGGER.info("Soft palette, private photo personalization, and deployment policy: PASS")
 
 
 def assert_search_files() -> None:
@@ -191,12 +230,15 @@ def assert_pdfs() -> None:
             raise AssertionError(f"Expected 2 pages, found {len(reader.pages)}: {item['filename']}")
         first_page = reader.pages[0].extract_text() or ""
         second_page = reader.pages[1].extract_text() or ""
-        for marker in ("Their name", "Primary health concern", "Other conditions they're living with", condition_name(item)):
+        for marker in (
+            "Their name", "Primary health concern", "Other conditions they're living with",
+            "THEIR PHOTO", "optional", condition_name(item),
+        ):
             if marker not in first_page:
-                raise AssertionError(f"Primary/multi-condition wording missing from {item['filename']}: {marker}")
+                raise AssertionError(f"Primary/photo/multi-condition wording missing from {item['filename']}: {marker}")
         if "How they did this week" not in second_page:
             raise AssertionError(f"Family-first weekly wording missing: {item['filename']}")
-    LOGGER.info("All 72 tailored PDFs include primary + other-condition context (144 pages): PASS")
+    LOGGER.info("All 72 tailored PDFs include primary concern + other conditions + optional photo space (144 pages): PASS")
 
 
 def main() -> int:
@@ -204,7 +246,7 @@ def main() -> int:
         assert_catalog()
         assert_required_files()
         assert_homepage()
-        assert_family_picker_styles()
+        assert_styles_and_personalization()
         assert_search_files()
         assert_pdfs()
         LOGGER.info("STEADY PAWS QUALITY GATE: PASS")
