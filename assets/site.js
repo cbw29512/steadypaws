@@ -29,11 +29,13 @@
   let photoJpegBytes = null;
   let photoDataUrl = '';
   let preparingDownload = false;
+  let pdfLibPromise = null;
   const normalize = value => value.trim().toLowerCase();
 
   // Must match scripts/build_trackers.py.
   const PHOTO_IMAGE_BOX = { x: 490, y: 607, width: 82, height: 82 };
   const NAME_POSITION = { x: 96, y: 666, maxWidth: 190 };
+  const PDF_LIB_URL = '/assets/vendor/pdf-lib-1.17.1.min.js?v=1.17.1';
 
   function cardText(card) {
     return `${card.dataset.search || ''} ${card.textContent}`.toLowerCase();
@@ -90,7 +92,7 @@
       });
 
       if (!browsing) {
-        count.textContent = 'Pick your family member above to see their primary health concerns.';
+        count.textContent = 'Pick your family member above to narrow the care paperwork, or browse everything below.';
         empty.hidden = true;
         return;
       }
@@ -148,9 +150,10 @@
       }
 
       applyFilters();
-      if (library) {
+      const target = personalize && !personalize.hidden ? personalize : library;
+      if (target) {
         const behavior = window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth';
-        library.scrollIntoView({ behavior, block: 'start' });
+        target.scrollIntoView({ behavior, block: 'center' });
       }
     } catch (error) {
       console.error('Steady Paws family picker failed:', error);
@@ -230,12 +233,29 @@
     return cleanName ? `${cleanName}-${filename}` : filename;
   }
 
+  function loadPdfLib() {
+    if (window.PDFLib) return Promise.resolve(window.PDFLib);
+    if (pdfLibPromise) return pdfLibPromise;
+
+    pdfLibPromise = new Promise((resolve, reject) => {
+      const script = document.createElement('script');
+      script.src = PDF_LIB_URL;
+      script.async = true;
+      script.onload = () => window.PDFLib
+        ? resolve(window.PDFLib)
+        : reject(new Error('The personalization helper could not start.'));
+      script.onerror = () => reject(new Error('The personalization helper could not be loaded.'));
+      document.head.appendChild(script);
+    });
+    return pdfLibPromise;
+  }
+
   async function personalizePdf(link) {
     const name = (familyName?.value || '').trim();
     if (!name && !photoJpegBytes) return false;
-    if (!window.PDFLib) throw new Error('The personalization helper did not load. Please try again or download the plain form.');
 
-    const { PDFDocument, StandardFonts, rgb } = window.PDFLib;
+    const pdfLib = await loadPdfLib();
+    const { PDFDocument, StandardFonts, rgb } = pdfLib;
     const sourceUrl = link.dataset.pdfUrl || link.getAttribute('href');
     const response = await fetch(sourceUrl, { cache: 'no-store' });
     if (!response.ok) throw new Error('The care form could not be opened for personalization.');
@@ -279,6 +299,15 @@
     download.remove();
     window.setTimeout(() => URL.revokeObjectURL(url), 1000);
     return true;
+  }
+
+  function downloadPlainPdf(link) {
+    const download = document.createElement('a');
+    download.href = link.dataset.pdfUrl || link.getAttribute('href');
+    download.download = link.dataset.downloadName || 'steady-paws-care-paperwork.pdf';
+    document.body.appendChild(download);
+    download.click();
+    download.remove();
   }
 
   familyChoices.forEach(choice => {
@@ -352,7 +381,8 @@
       setPersonalizeStatus('Their personalized care paperwork is ready. Nothing was uploaded or stored by Steady Paws.');
     } catch (error) {
       console.error('Steady Paws PDF personalization failed:', error);
-      setPersonalizeStatus(error instanceof Error ? error.message : 'Their PDF could not be personalized. The plain form is still available.', true);
+      setPersonalizeStatus('Personalization could not finish, so the plain care form is downloading instead.', true);
+      downloadPlainPdf(link);
     } finally {
       preparingDownload = false;
       delete link.dataset.busy;
