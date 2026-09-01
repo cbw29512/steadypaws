@@ -155,8 +155,12 @@ def require_contrast(label: str, foreground: str, background: str, minimum: floa
 
 def assert_wcag_palette() -> None:
     pairs = (
-        ("body muted copy", "#687772", "#fffdf9", 4.5),
-        ("eyebrow copy", "#5f776f", "#fffdf9", 4.5),
+        ("body muted on cream", "#62716c", "#fffdf9", 4.5),
+        ("body muted on soft", "#62716c", "#f3f7f5", 4.5),
+        ("body muted on sand", "#62716c", "#faf6f0", 4.5),
+        ("eyebrow on cream", "#5a7169", "#fffdf9", 4.5),
+        ("eyebrow on soft", "#5a7169", "#f3f7f5", 4.5),
+        ("eyebrow on safety", "#5a7169", "#fbf3e9", 4.5),
         ("primary button", "#fffefa", "#55756c", 4.5),
         ("button hover", "#fffefa", "#5f776f", 4.5),
         ("heart strip copy", "#7b6a5f", "#fbf2eb", 4.5),
@@ -175,6 +179,8 @@ def assert_wcag_palette() -> None:
     family = (ROOT / "styles/family.css").read_text(encoding="utf-8")
     care = (ROOT / "styles/care.css").read_text(encoding="utf-8")
     required_markers = (
+        (base, "--muted: #62716c;"),
+        (base, "--brand-2: #5a7169;"),
         (base, "--focus: #976a40;"),
         (base, ":where(a,button,input,textarea,summary):focus-visible"),
         (base, "@media (prefers-reduced-motion: reduce)"),
