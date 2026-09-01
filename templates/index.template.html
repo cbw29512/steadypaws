@@ -22,7 +22,9 @@
   <link rel="icon" href="/assets/paw.svg" type="image/svg+xml">
   <link rel="stylesheet" href="/styles/base.css">
   <link rel="stylesheet" href="/styles/components.css">
+  <link rel="stylesheet" href="/styles/launch-polish-1.css">
   <script src="/assets/site.js" defer></script>
+  <script src="/assets/launch-polish-1.js" defer></script>
 </head>
 <body itemscope itemtype="https://schema.org/WebSite">
   <link itemprop="url" href="https://steadypaws.netlify.app/">
@@ -30,7 +32,7 @@
   <header class="site-header">
     <div class="shell nav-wrap">
       <a class="brand" href="/" aria-label="Steady Paws home" itemprop="name"><img class="brand-logo" src="/assets/paw.svg" width="38" height="38" alt=""><span>Steady Paws</span></a>
-      <nav aria-label="Primary navigation"><a href="#finder">Find their paperwork</a><a href="#how">How it helps</a><a href="#safety">Important</a></nav>
+      <nav aria-label="Primary navigation"><a href="#finder">Find their paperwork</a><a href="#how">How it helps</a><a href="#safety">Care &amp; safety</a></nav>
       <a class="button button-small" href="https://buymeacoffee.com/divclass016" target="_blank" rel="noopener noreferrer">Buy me a coffee</a>
     </div>
   </header>
@@ -67,7 +69,7 @@
           <button class="family-choice family-choice-primary" type="button" data-family-group="cat" data-family-label="cat"><span class="family-icon" aria-hidden="true">🐱</span><strong>Cat</strong><span>Your small furry shadow</span></button>
           <button class="family-choice family-choice-primary" type="button" data-family-group="dog" data-family-label="dog"><span class="family-icon" aria-hidden="true">🐶</span><strong>Dog</strong><span>Your always-there companion</span></button>
           <button class="family-more family-choice-primary" type="button" aria-expanded="false" aria-controls="more-family"><span class="family-icon" aria-hidden="true">♥</span><strong>Someone else</strong><span>Rabbit, bird, horse, reptile, and more</span></button>
-          <button class="family-choice family-choice-primary family-choice-all" type="button" data-family-group="all" data-family-label="family member"><span class="family-icon" aria-hidden="true">∞</span><strong>View all concerns</strong><span>See each health concern once</span></button>
+          <button class="family-choice family-choice-primary family-choice-all" type="button" data-family-group="all" data-family-label="family member"><span class="family-icon" aria-hidden="true">∞</span><strong>Browse all</strong><span>See every health concern once</span></button>
         </div>
 
         <div id="more-family" class="more-family" hidden>
@@ -117,9 +119,9 @@
     <section id="library" class="section section-soft">
       <div class="shell">
         <div class="section-heading"><div><p class="eyebrow">Step 2</p><h2 id="journey-heading">What is the biggest health concern right now?</h2></div><p id="journey-copy">Pick the main issue you most need to keep up with. Their care form includes space for other conditions they are living with too.</p></div>
-        <p id="result-count" class="result-count" aria-live="polite">Pick your family member above to narrow the care paperwork, or browse everything below.</p>
+        <p id="result-count" class="result-count" aria-live="polite">Pick your family member above to narrow the care paperwork, or browse all health concerns.</p>
         <div class="tracker-grid" id="tracker-grid">{{TRACKER_CARDS}}</div>
-        <div id="no-results" class="no-results" hidden><strong>We do not have that paperwork yet.</strong><p>Try a broader word below, or choose View all concerns to look through the complete collection.</p></div>
+        <div id="no-results" class="no-results" hidden><strong>We do not have that paperwork yet.</strong><p>Try a broader word below, or choose Browse all to look through the complete collection.</p></div>
 
         <details class="browse-tools">
           <summary>Prefer to browse or search all health concerns?</summary>
@@ -128,6 +130,11 @@
             <label class="search-box"><span class="sr-only">Search health concerns</span><input id="tracker-search" type="search" placeholder="Search kidney, arthritis, dental, breathing..." autocomplete="off"></label>
           </div>
         </details>
+
+        <aside id="support-after-download" class="support-after-download" aria-label="Support Steady Paws" hidden>
+          <div><p class="support-kicker">Only if this helped</p><strong>Help keep every care form free.</strong><p class="support-copy">Steady Paws has no account wall or paywall. If this made a hard day a little easier, you can help us keep it that way.</p></div>
+          <a class="button button-small" href="https://buymeacoffee.com/divclass016" target="_blank" rel="noopener noreferrer">Buy me a coffee</a>
+        </aside>
       </div>
     </section>
 
@@ -138,7 +145,7 @@
     <section class="section library-note"><div class="shell resource-grid"><div><p class="eyebrow">Built with care</p><h2>The paperwork should fit your family member — not the other way around.</h2><p class="lede compact">The health concern may have the same name across species, but what is useful to observe can be different. Steady Paws lists each concern once, then gives you the version built for your family member.</p></div><div class="principles"><p><strong>Focused:</strong> each sheet centers one primary health concern so the daily record stays useful.</p><p><strong>Whole-picture:</strong> every sheet has room to note other conditions they are living with.</p><p><strong>Personal:</strong> you can optionally add their name and photo before downloading.</p><p><strong>Accessible:</strong> every tailored form also has a keyboard- and screen-reader-friendly web worksheet.</p><p><strong>Free:</strong> every care form can be used without an account or email address.</p></div></div></section>
 
     <section id="safety" class="section">
-      <div class="shell safety"><div><p class="eyebrow">One important thing</p><h2>You know them. Their veterinary team knows the medicine.</h2></div><p>Steady Paws helps you organize what you notice between visits. Choosing one primary concern for a tracker does not mean their other conditions are less important. It does not diagnose disease, recommend medication doses, or set medical or husbandry targets. Use the plan given by a veterinarian experienced with their species, and seek prompt veterinary care for urgent or concerning changes.</p></div>
+      <div class="shell safety"><div><p class="eyebrow">Care &amp; safety</p><h2>You know them. Their veterinary team knows the medicine.</h2></div><p>Steady Paws helps you organize what you notice between visits. Choosing one primary concern for a tracker does not mean their other conditions are less important. It does not diagnose disease, recommend medication doses, or set medical or husbandry targets. Use the plan given by a veterinarian experienced with their species, and seek prompt veterinary care for urgent or concerning changes.</p></div>
     </section>
   </main>
 
