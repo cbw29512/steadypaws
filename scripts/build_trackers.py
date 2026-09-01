@@ -81,7 +81,7 @@ def display_field(field: str) -> str:
     """Make catalog labels calmer and easier to scan on a printed form."""
     cleaned = field.replace("*", "").strip()
     lowered = cleaned.lower().replace(" ", "")
-    if lowered in {"time", "date/time", "datetime"}:
+    if lowered in {"date", "time", "date/time", "datetime"}:
         return "Date / time"
     replacements = {
         "Medication": "Medicine",
