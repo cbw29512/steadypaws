@@ -11,6 +11,7 @@ from tracker_catalog import GROUP_LABELS, TRACKERS
 ROOT = Path(__file__).resolve().parents[1]
 TEMPLATE = ROOT / "templates" / "index.template.html"
 OUTPUT = ROOT / "index.html"
+ASSET_REV = "20260901-family2"
 
 
 def group_counts() -> Counter:
@@ -75,12 +76,15 @@ def main() -> int:
         template.replace("{{TOTAL}}", str(len(TRACKERS)))
         .replace("{{FILTERS}}", render_filters())
         .replace("{{TRACKER_CARDS}}", render_cards())
-        .replace("</head>", '  <link rel="stylesheet" href="/styles/family.css">\n</head>')
+        .replace('href="/styles/base.css"', f'href="/styles/base.css?v={ASSET_REV}"')
+        .replace('href="/styles/components.css"', f'href="/styles/components.css?v={ASSET_REV}"')
+        .replace('src="/assets/site.js"', f'src="/assets/site.js?v={ASSET_REV}"')
+        .replace("</head>", f'  <link rel="stylesheet" href="/styles/family.css?v={ASSET_REV}">\n</head>')
     )
     if "{{" in html or "}}" in html:
         raise RuntimeError("Unresolved homepage template placeholder")
     OUTPUT.write_text(html, encoding="utf-8")
-    print(f"Built {OUTPUT} with {len(TRACKERS)} care-paperwork cards")
+    print(f"Built {OUTPUT} with {len(TRACKERS)} care-paperwork cards using asset revision {ASSET_REV}")
     return 0
 
 
