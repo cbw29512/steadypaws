@@ -1,6 +1,6 @@
 .family-grid-primary { grid-template-columns:repeat(4,minmax(0,1fr)); }
-.family-more { min-height:166px; padding:22px; border:1px solid #dedbd5; border-radius:20px; background:linear-gradient(145deg,#fbf2eb,#fffefa); color:var(--ink); text-align:left; font:inherit; cursor:pointer; box-shadow:0 8px 24px rgba(53,72,66,.035); transition:transform .16s ease,border-color .16s ease,box-shadow .16s ease,background .16s ease; }
-.family-more:hover,.family-more.is-open { transform:translateY(-3px); border-color:#c9b8a9; box-shadow:0 14px 30px rgba(53,72,66,.065); }
+.family-more { min-height:166px; padding:22px; border:1px solid #9d897a; border-radius:20px; background:linear-gradient(145deg,#fbf2eb,#fffefa); color:var(--ink); text-align:left; font:inherit; cursor:pointer; box-shadow:0 8px 24px rgba(53,72,66,.035); transition:transform .16s ease,border-color .16s ease,box-shadow .16s ease,background .16s ease; }
+.family-more:hover,.family-more.is-open { transform:translateY(-3px); border-color:#907c6e; box-shadow:0 14px 30px rgba(53,72,66,.065); }
 .family-more:focus-visible { outline-color:var(--focus); outline-offset:3px; }
 .family-more > strong,.family-more > span { display:block; }
 .family-more > strong { margin:12px 0 5px; font-size:1.08rem; }
