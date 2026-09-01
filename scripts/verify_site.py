@@ -11,6 +11,13 @@ logging.basicConfig(level=logging.INFO, format="%(levelname)s | %(message)s")
 LOGGER = logging.getLogger(__name__)
 ROOT = Path(__file__).resolve().parents[1]
 
+TRACKER_FILES = (
+    "downloads/diabetic-cat-tracker.pdf",
+    "downloads/ckd-cat-tracker.pdf",
+    "downloads/hyperthyroid-cat-tracker.pdf",
+    "downloads/feline-asthma-tracker.pdf",
+)
+
 # Data schema: files that define the minimum deployable product.
 REQUIRED_FILES = (
     "index.html",
@@ -18,7 +25,7 @@ REQUIRED_FILES = (
     "styles/base.css",
     "styles/components.css",
     "assets/paw.svg",
-    "downloads/diabetic-cat-tracker.pdf",
+    *TRACKER_FILES,
     "netlify.toml",
     "robots.txt",
     "sitemap.xml",
@@ -71,13 +78,15 @@ def assert_homepage() -> None:
             f'rel="canonical" href="{EXPECTED_SITE_URL}"',
             f'property="og:url" content="{EXPECTED_SITE_URL}"',
             EXPECTED_SUPPORT_URL,
-            "/downloads/diabetic-cat-tracker.pdf",
+            *[f"/{path}" for path in TRACKER_FILES],
         )
         missing = [marker for marker in required_markers if marker not in html]
         if missing:
             raise AssertionError(f"Homepage markers missing: {missing}")
         if "buymeacoffee.com/yourname" in html:
             raise AssertionError("Placeholder Buy Me a Coffee URL is still present")
+        if "In development" in html:
+            raise AssertionError("A condition card is still marked In development")
 
         parser = LinkParser()
         parser.feed(html)
@@ -114,14 +123,15 @@ def assert_search_files() -> None:
         raise
 
 
-def assert_pdf() -> None:
+def assert_pdfs() -> None:
     try:
-        pdf = ROOT / "downloads/diabetic-cat-tracker.pdf"
-        if pdf.stat().st_size < 1000:
-            raise AssertionError("Tracker PDF is unexpectedly small")
-        if pdf.read_bytes()[:5] != b"%PDF-":
-            raise AssertionError("Tracker download is not a valid PDF signature")
-        LOGGER.info("Printable tracker PDF: PASS")
+        for relative_path in TRACKER_FILES:
+            pdf = ROOT / relative_path
+            if pdf.stat().st_size < 1000:
+                raise AssertionError(f"Tracker PDF is unexpectedly small: {relative_path}")
+            if pdf.read_bytes()[:5] != b"%PDF-":
+                raise AssertionError(f"Tracker download is not a valid PDF: {relative_path}")
+        LOGGER.info("All four printable tracker PDFs: PASS")
     except Exception as exc:
         LOGGER.exception("PDF validation failed: %s", exc)
         raise
@@ -132,7 +142,7 @@ def main() -> int:
         assert_required_files()
         assert_homepage()
         assert_search_files()
-        assert_pdf()
+        assert_pdfs()
         LOGGER.info("STEADY PAWS QUALITY GATE: PASS")
         return 0
     except Exception:
