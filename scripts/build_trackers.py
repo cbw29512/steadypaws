@@ -42,8 +42,8 @@ GROUP_ACCENTS = {
     "universal": HexColor("#E9DFC5"),
 }
 
-# These coordinates are also used by assets/site.js and care personalization JS.
-# Keep them stable or update every browser personalization path at the same time.
+# These coordinates are also used by browser personalization code.
+# Keep them stable or update every personalization path at the same time.
 PHOTO_BOX = (486, 603, 90, 90)
 PHOTO_IMAGE_BOX = (490, 607, 82, 82)
 NAME_TEXT_POSITION = (96, 666)
@@ -70,21 +70,34 @@ def form_title(spec: dict) -> str:
     concern = condition_name(spec)
     if spec["group"] == "universal":
         return concern
-    if concern.endswith("Care"):
-        return f"{concern} Tracker"
-    return f"{concern} Care Tracker"
+    return f"{concern} Care Log"
 
 
 def accent_for(spec: dict):
     return GROUP_ACCENTS.get(spec.get("group"), GROUP_ACCENTS["universal"])
 
 
+def display_field(field: str) -> str:
+    """Make catalog labels calmer and easier to scan on a printed form."""
+    cleaned = field.replace("*", "").strip()
+    lowered = cleaned.lower().replace(" ", "")
+    if lowered in {"date", "time", "date/time", "datetime"}:
+        return "Date / time"
+    replacements = {
+        "Medication": "Medicine",
+        "Medication given": "Medicine",
+        "Insulin given": "Insulin",
+        "Medication/fluids": "Medicine / fluids",
+        "Food/appetite": "Food / appetite",
+    }
+    return replacements.get(cleaned, cleaned)
+
+
 def draw_paw_mark(c: canvas.Canvas, x: float, y: float, scale: float = 1.0, color=white) -> None:
-    """Draw a compact four-toe paw without relying on an external image asset."""
     c.saveState()
     c.setFillColor(color)
-    c.ellipse(x + 6 * scale, y + 0 * scale, x + 20 * scale, y + 12 * scale, stroke=0, fill=1)
-    c.ellipse(x + 0 * scale, y + 12 * scale, x + 7 * scale, y + 21 * scale, stroke=0, fill=1)
+    c.ellipse(x + 6 * scale, y, x + 20 * scale, y + 12 * scale, stroke=0, fill=1)
+    c.ellipse(x, y + 12 * scale, x + 7 * scale, y + 21 * scale, stroke=0, fill=1)
     c.ellipse(x + 7 * scale, y + 18 * scale, x + 14 * scale, y + 27 * scale, stroke=0, fill=1)
     c.ellipse(x + 16 * scale, y + 18 * scale, x + 23 * scale, y + 27 * scale, stroke=0, fill=1)
     c.ellipse(x + 23 * scale, y + 11 * scale, x + 30 * scale, y + 20 * scale, stroke=0, fill=1)
@@ -139,12 +152,12 @@ def draw_disclaimer(c: canvas.Canvas) -> None:
     c.setStrokeColor(HexColor("#E7D6C7"))
     c.roundRect(36, y, width - 72, 35, 6, stroke=1, fill=1)
     c.setFillColor(WARN_INK)
-    c.setFont("Helvetica", 6.8)
+    c.setFont("Helvetica", 7)
     text = (
-        "Care organizer only - not diagnosis or treatment. Record only measurements, medicines, and care targets "
-        "their veterinary team asks you to use. Contact a veterinarian for concerning or urgent changes."
+        "For organizing care, not medical advice. Follow their veterinarian's plan and contact a veterinarian "
+        "for urgent or concerning changes."
     )
-    for index, line in enumerate(wrap_text(text, "Helvetica", 6.8, width - 94)[:2]):
+    for index, line in enumerate(wrap_text(text, "Helvetica", 7, width - 94)[:2]):
         c.drawString(47, y + 22 - index * 10, line)
 
 
@@ -166,18 +179,17 @@ def draw_identity(c: canvas.Canvas, spec: dict) -> None:
     width, height = letter
     accent = accent_for(spec)
 
-    # Warm identity card: visually groups the person, primary concern, and photo.
     c.setFillColor(IDENTITY_BG)
     c.setStrokeColor(accent)
     c.setLineWidth(1.0)
     c.roundRect(28, 558, width - 56, 150, 14, stroke=1, fill=1)
     c.setFillColor(accent)
-    c.roundRect(36, 688, 106, 15, 7.5, stroke=0, fill=1)
+    c.roundRect(36, 688, 70, 15, 7.5, stroke=0, fill=1)
     c.setFillColor(INK)
-    c.setFont("Helvetica-Bold", 6.7)
-    c.drawString(47, 693, "ABOUT YOUR FAMILY MEMBER")
+    c.setFont("Helvetica-Bold", 6.8)
+    c.drawString(48, 693, "CARE DETAILS")
 
-    # Keep these original baselines aligned with the browser PDF-stamping coordinates.
+    # Name baseline stays aligned with browser PDF personalization coordinates.
     c.setFillColor(INK)
     c.setFont("Helvetica-Bold", 8)
     name_y = height - 116
@@ -192,46 +204,43 @@ def draw_identity(c: canvas.Canvas, spec: dict) -> None:
 
     vet_y = height - 150
     c.setFillColor(INK)
-    c.drawString(36, vet_y, "Their veterinarian")
+    c.drawString(36, vet_y, "Veterinarian")
     c.setStrokeColor(LINE)
-    c.line(126, vet_y - 13, 466, vet_y - 13)
+    c.line(96, vet_y - 13, 466, vet_y - 13)
 
     primary_y = height - 183
     c.setFillColor(INK)
     c.setFont("Helvetica-Bold", 7.7)
-    c.drawString(36, primary_y, "Primary health concern")
+    c.drawString(36, primary_y, "Main health concern")
     c.setFont("Helvetica", 8)
-    c.drawString(148, primary_y, condition_name(spec))
+    c.drawString(135, primary_y, condition_name(spec))
     c.setStrokeColor(LINE)
-    c.line(148, primary_y - 13, 466, primary_y - 13)
+    c.line(135, primary_y - 13, 466, primary_y - 13)
 
     other_y = height - 214
     c.setFillColor(INK)
     c.setFont("Helvetica-Bold", 7.7)
-    c.drawString(36, other_y, "Other conditions they're living with")
+    c.drawString(36, other_y, "Other health conditions")
     c.setStrokeColor(LINE)
-    c.line(194, other_y - 13, 466, other_y - 13)
+    c.line(143, other_y - 13, 466, other_y - 13)
 
     draw_photo_placeholder(c, accent)
 
 
 def draw_daily_table(c: canvas.Canvas, spec: dict) -> None:
     width, height = letter
-    fields = spec["fields"]
-    accent = accent_for(spec)
-    x0, y_top, table_width, row_height = 36, height - 258, width - 72, 35
-    weights = [0.95] + [1] * (len(fields) - 2) + [1.5]
+    fields = [display_field(field) for field in spec["fields"]]
+    x0, y_top, table_width, row_height = 36, height - 266, width - 72, 34
+    weights = [1.1] + [1] * (len(fields) - 2) + [1.5]
     total = sum(weights)
     widths = [table_width * weight / total for weight in weights]
 
     c.setFillColor(INK)
-    c.setFont("Helvetica-Bold", 9)
-    c.drawString(x0, y_top + 13, "Daily observations")
-    c.setFillColor(accent)
-    c.roundRect(x0 + 96, y_top + 6, 62, 13, 6.5, stroke=0, fill=1)
-    c.setFillColor(INK)
-    c.setFont("Helvetica-Bold", 6.5)
-    c.drawCentredString(x0 + 127, y_top + 10, "11 ENTRIES")
+    c.setFont("Helvetica-Bold", 10)
+    c.drawString(x0, y_top + 14, "Daily care log")
+    c.setFillColor(MUTED)
+    c.setFont("Helvetica", 7.2)
+    c.drawString(x0 + 80, y_top + 14, "Use one row each time you check or give care.")
 
     c.setFillColor(BRAND)
     c.roundRect(x0, y_top - 24, table_width, 24, 5, stroke=0, fill=1)
@@ -262,58 +271,61 @@ def draw_daily_table(c: canvas.Canvas, spec: dict) -> None:
     c.rect(x0, y_top - 24 - row_height * 11, table_width, row_height * 11 + 24, stroke=1, fill=0)
 
 
+def draw_summary_prompt(c: canvas.Canvas, label: str, x: float, y: float, fill) -> None:
+    c.setFillColor(fill)
+    c.setStrokeColor(LINE)
+    c.roundRect(x - 6, y - 36, 258, 43, 8, stroke=1, fill=1)
+    c.setFillColor(INK)
+    c.setFont("Helvetica-Bold", 7.8)
+    lines = wrap_text(display_field(label), "Helvetica-Bold", 7.8, 225)[:2]
+    for index, line in enumerate(lines):
+        c.drawString(x, y - 3 - index * 10, line)
+    writing_top = y - 16 if len(lines) == 1 else y - 23
+    c.setStrokeColor(LINE)
+    c.line(x, writing_top, x + 244, writing_top)
+    c.line(x, y - 31, x + 244, y - 31)
+
+
 def draw_summary(c: canvas.Canvas, spec: dict) -> None:
     width, height = letter
     items = spec["summary"]
     accent = accent_for(spec)
-    x0, y = 36, height - 135
+    x0, y = 36, height - 138
 
     c.setFillColor(accent)
-    c.roundRect(x0, y - 9, 190, 30, 15, stroke=0, fill=1)
+    c.roundRect(x0, y - 9, 170, 30, 15, stroke=0, fill=1)
     c.setFillColor(INK)
-    c.setFont("Helvetica-Bold", 16)
-    c.drawString(x0 + 14, y, "How they did this week")
+    c.setFont("Helvetica-Bold", 15)
+    c.drawString(x0 + 14, y, "This week at a glance")
     c.setFillColor(MUTED)
-    c.setFont("Helvetica", 8.5)
-    c.drawString(x0, y - 26, "Use the little patterns you noticed to make their next veterinary conversation easier.")
-    y -= 52
+    c.setFont("Helvetica", 8.3)
+    c.drawString(x0, y - 25, "Note the changes or patterns that matter most. Bring this page to the next visit.")
+    y -= 48
 
     for index, item in enumerate(items):
         col, row = index % 2, index // 2
-        x, yy = x0 + col * 270, y - row * 58
-        c.setFillColor(SOFT if row % 2 == 0 else IDENTITY_BG)
-        c.setStrokeColor(LINE)
-        c.roundRect(x - 6, yy - 37, 258, 45, 8, stroke=1, fill=1)
-        c.setStrokeColor(BRAND2)
-        c.setLineWidth(1)
-        c.roundRect(x, yy - 11, 12, 12, 2, stroke=1, fill=0)
-        c.setFillColor(INK)
-        c.setFont("Helvetica-Bold", 8)
-        label = wrap_text(item, "Helvetica-Bold", 8, 222)[0]
-        c.drawString(x + 20, yy - 3, label)
-        c.setStrokeColor(LINE)
-        c.line(x + 20, yy - 17, x + 245, yy - 17)
-        c.line(x + 20, yy - 30, x + 245, yy - 30)
+        x, yy = x0 + col * 270, y - row * 54
+        draw_summary_prompt(c, item, x, yy, SOFT if row % 2 == 0 else IDENTITY_BG)
 
-    y2 = y - 4 * 58 - 18
+    y2 = y - 4 * 54 - 18
     c.setFillColor(INK)
     c.setFont("Helvetica-Bold", 10)
-    c.drawString(x0, y2, "What changed since their last visit")
+    c.drawString(x0, y2, "Since the last vet visit")
     c.setStrokeColor(LINE)
     for i in range(3):
         c.line(x0, y2 - 18 - i * 22, width - 36, y2 - 18 - i * 22)
 
-    y3 = y2 - 92
+    y3 = y2 - 88
     c.setFillColor(INK)
     c.setFont("Helvetica-Bold", 10)
-    c.drawString(x0, y3, "Questions for their veterinary team")
-    for i in range(4):
+    c.drawString(x0, y3, "Questions for the vet")
+    for i in range(3):
         c.line(x0, y3 - 18 - i * 22, width - 36, y3 - 18 - i * 22)
 
-    y4 = y3 - 118
+    y4 = y3 - 94
     c.setFillColor(INK)
     c.setFont("Helvetica-Bold", 10)
-    c.drawString(x0, y4, "Their veterinary plan / next steps")
+    c.drawString(x0, y4, "Plan / next steps from the vet")
     for i in range(3):
         c.line(x0, y4 - 18 - i * 22, width - 36, y4 - 18 - i * 22)
 
@@ -339,8 +351,8 @@ def enhance_pdf(path: Path, spec: dict) -> None:
             ),
         }
     )
-    writer.add_outline_item("Daily care tracker", 0)
-    writer.add_outline_item("Weekly notes and veterinary visit prep", 1)
+    writer.add_outline_item("Daily care log", 0)
+    writer.add_outline_item("Weekly notes and vet visit prep", 1)
     temp = path.with_suffix(".tmp.pdf")
     with temp.open("wb") as handle:
         writer.write(handle)
@@ -360,7 +372,7 @@ def make_pdf(spec: dict) -> Path:
     draw_disclaimer(c)
     c.showPage()
 
-    draw_header(c, spec, 2, "How they did this week + veterinary visit notes")
+    draw_header(c, spec, 2, "Weekly notes + vet visit prep")
     draw_summary(c, spec)
     draw_disclaimer(c)
     c.save()
