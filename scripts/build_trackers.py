@@ -4,6 +4,8 @@ from __future__ import annotations
 
 from pathlib import Path
 
+from pypdf import PdfReader, PdfWriter
+from pypdf.generic import BooleanObject, DictionaryObject, NameObject, TextStringObject
 from reportlab.lib.colors import HexColor, white
 from reportlab.lib.pagesizes import letter
 from reportlab.pdfbase.pdfmetrics import stringWidth
@@ -16,17 +18,17 @@ OUT = ROOT / "downloads"
 OUT.mkdir(parents=True, exist_ok=True)
 
 BRAND = HexColor("#55756C")
-BRAND2 = HexColor("#78938B")
+BRAND2 = HexColor("#5F776F")
 CREAM = HexColor("#FFFDF9")
 INK = HexColor("#354842")
-MUTED = HexColor("#71807B")
+MUTED = HexColor("#687772")
 LINE = HexColor("#DDE6E2")
 SOFT = HexColor("#F5F8F6")
 PHOTO_SOFT = HexColor("#FBF2ED")
-PHOTO_INK = HexColor("#9A8174")
+PHOTO_INK = HexColor("#7B695F")
 WARN = HexColor("#FBF3E9")
 WARN_INK = HexColor("#746457")
-HEADER_LIGHT = HexColor("#E4EFEB")
+HEADER_LIGHT = HexColor("#EDF6F3")
 
 # These coordinates are also used by assets/site.js when an optional photo/name
 # is added in the browser. Keep them stable or update both places together.
@@ -109,7 +111,7 @@ def draw_disclaimer(c: canvas.Canvas) -> None:
 def draw_photo_placeholder(c: canvas.Canvas) -> None:
     x, y, box_w, box_h = PHOTO_BOX
     c.setFillColor(PHOTO_SOFT)
-    c.setStrokeColor(HexColor("#D8C9C0"))
+    c.setStrokeColor(HexColor("#9D897A"))
     c.setLineWidth(0.8)
     c.roundRect(x, y, box_w, box_h, 14, stroke=1, fill=1)
     c.setFillColor(PHOTO_INK)
@@ -243,6 +245,35 @@ def draw_summary(c: canvas.Canvas, items: list[str]) -> None:
         c.line(x0, y4 - 18 - i * 22, width - 36, y4 - 18 - i * 22)
 
 
+def enhance_pdf(path: Path, spec: dict) -> None:
+    """Add language, display-title metadata, and simple page bookmarks."""
+    reader = PdfReader(str(path))
+    writer = PdfWriter()
+    writer.append_pages_from_reader(reader)
+    writer.add_metadata(
+        {
+            "/Title": form_title(spec),
+            "/Author": "Steady Paws",
+            "/Subject": f"Printable {condition_name(spec)} care paperwork for {spec['species'].lower()} veterinary conversations",
+        }
+    )
+    writer._root_object.update(
+        {
+            NameObject("/Lang"): TextStringObject("en-US"),
+            NameObject("/PageMode"): NameObject("/UseOutlines"),
+            NameObject("/ViewerPreferences"): DictionaryObject(
+                {NameObject("/DisplayDocTitle"): BooleanObject(True)}
+            ),
+        }
+    )
+    writer.add_outline_item("Daily care tracker", 0)
+    writer.add_outline_item("Weekly notes and veterinary visit prep", 1)
+    temp = path.with_suffix(".tmp.pdf")
+    with temp.open("wb") as handle:
+        writer.write(handle)
+    temp.replace(path)
+
+
 def make_pdf(spec: dict) -> Path:
     path = OUT / spec["filename"]
     c = canvas.Canvas(str(path), pagesize=letter, pageCompression=1)
@@ -260,6 +291,7 @@ def make_pdf(spec: dict) -> Path:
     draw_summary(c, spec["summary"])
     draw_disclaimer(c)
     c.save()
+    enhance_pdf(path, spec)
     return path
 
 
