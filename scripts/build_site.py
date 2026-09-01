@@ -35,15 +35,9 @@ def badge_class(group: str) -> str:
 
 
 def friendly_title(item: dict) -> str:
-    """Remove clinical species prefixes from the user-facing card title."""
+    """Keep medical accuracy without leading with clinical species labels."""
     title = item["title"].strip()
-    prefixes = (
-        f'{item["species"]} ',
-        "Feline ",
-        "Canine ",
-        "Equine ",
-        "Avian ",
-    )
+    prefixes = (f'{item["species"]} ', "Feline ", "Canine ", "Equine ", "Avian ")
     for prefix in prefixes:
         if title.lower().startswith(prefix.lower()):
             title = title[len(prefix):]
@@ -56,7 +50,7 @@ def friendly_title(item: dict) -> str:
 def badge_label(item: dict) -> str:
     species = item["species"].strip()
     if item["group"] == "universal" or species.lower() in {"all pets", "all"}:
-        return "For any pet"
+        return "For any family member"
     return f"For {species.lower()}"
 
 
@@ -70,7 +64,7 @@ def render_cards() -> str:
             f'<span class="species-badge {badge_class(item["group"])}">{escape(badge_label(item))}</span>'
             f'<h3>{escape(friendly_title(item))}</h3><p>{escape(item["description"])}</p>'
             f'<a class="download-link" href="/downloads/{escape(item["filename"], quote=True)}" download>'
-            f'Get their tracker <span aria-hidden="true">↓</span></a></article>'
+            f'Get their care paperwork <span aria-hidden="true">↓</span></a></article>'
         )
     return "\n          ".join(cards)
 
@@ -81,11 +75,12 @@ def main() -> int:
         template.replace("{{TOTAL}}", str(len(TRACKERS)))
         .replace("{{FILTERS}}", render_filters())
         .replace("{{TRACKER_CARDS}}", render_cards())
+        .replace("</head>", '  <link rel="stylesheet" href="/styles/family.css">\n</head>')
     )
     if "{{" in html or "}}" in html:
         raise RuntimeError("Unresolved homepage template placeholder")
     OUTPUT.write_text(html, encoding="utf-8")
-    print(f"Built {OUTPUT} with {len(TRACKERS)} tracker cards")
+    print(f"Built {OUTPUT} with {len(TRACKERS)} care-paperwork cards")
     return 0
 
 
