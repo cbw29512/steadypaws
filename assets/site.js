@@ -3,6 +3,8 @@
 
   const chips = [...document.querySelectorAll('[data-filter]')];
   const familyChoices = [...document.querySelectorAll('.family-choice')];
+  const moreButton = document.querySelector('.family-more');
+  const moreFamily = document.querySelector('#more-family');
   const cards = [...document.querySelectorAll('.tracker-card')];
   const search = document.querySelector('#tracker-search');
   const count = document.querySelector('#result-count');
@@ -44,15 +46,17 @@
       });
 
       if (!browsing) {
-        count.textContent = 'Choose a family member above to see their care paperwork.';
+        count.textContent = 'Pick your family member above to see their care paperwork.';
         empty.hidden = true;
         return;
       }
 
-      count.textContent = `Showing ${visible} care tracker${visible === 1 ? '' : 's'}`;
+      count.textContent = visible === 1
+        ? '1 care form ready for you'
+        : `${visible} care forms ready for you`;
       empty.hidden = visible !== 0;
     } catch (error) {
-      console.error('Steady Paws tracker filtering failed:', error);
+      console.error('Steady Paws care-paperwork filtering failed:', error);
     }
   }
 
@@ -64,28 +68,33 @@
     });
   }
 
+  function clearFamilySelection() {
+    familyChoices.forEach(item => {
+      item.classList.remove('is-selected');
+      item.setAttribute('aria-pressed', 'false');
+    });
+  }
+
   function selectFamily(choice) {
     try {
       activeGroup = choice.dataset.familyGroup || 'all';
       familyLabel = choice.dataset.familyLabel || 'family member';
       familyTerms = normalize(choice.dataset.familyTerm || '')
-        .split(/\s*\|\s*|\s+/)
+        .split(/\s*\|\s*/)
         .filter(Boolean);
       journeyStarted = true;
       search.value = '';
 
-      familyChoices.forEach(item => {
-        const selected = item === choice;
-        item.classList.toggle('is-selected', selected);
-        item.setAttribute('aria-pressed', String(selected));
-      });
+      clearFamilySelection();
+      choice.classList.add('is-selected');
+      choice.setAttribute('aria-pressed', 'true');
       setActiveChip(activeGroup);
 
       if (journeyHeading) journeyHeading.textContent = 'What tough time are they going through?';
       if (journeyCopy) {
         journeyCopy.textContent = activeGroup === 'all'
-          ? 'Here is the whole Steady Paws care library. Choose the form that best matches what their veterinary team is helping them through.'
-          : `We are showing the care paperwork that fits your ${familyLabel}. Choose what their veterinary team is helping them manage.`;
+          ? 'Here is every Steady Paws care form. Choose the one that best matches what your family member and veterinary team are working through.'
+          : `Here is the care paperwork that fits your ${familyLabel}. Choose what their veterinary team is helping them manage.`;
       }
 
       applyFilters();
@@ -103,17 +112,24 @@
     choice.addEventListener('click', () => selectFamily(choice));
   });
 
+  if (moreButton && moreFamily) {
+    moreButton.addEventListener('click', () => {
+      const opening = moreFamily.hidden;
+      moreFamily.hidden = !opening;
+      moreButton.setAttribute('aria-expanded', String(opening));
+      moreButton.classList.toggle('is-open', opening);
+      if (opening) moreFamily.querySelector('.family-choice')?.focus();
+    });
+  }
+
   chips.forEach(chip => chip.addEventListener('click', () => {
     activeGroup = chip.dataset.filter || 'all';
     familyLabel = '';
     familyTerms = [];
     journeyStarted = true;
-    familyChoices.forEach(item => {
-      item.classList.remove('is-selected');
-      item.setAttribute('aria-pressed', 'false');
-    });
+    clearFamilySelection();
     setActiveChip(activeGroup);
-    if (journeyCopy) journeyCopy.textContent = 'Browse the full library or search for the health problem or care challenge you have in mind.';
+    if (journeyCopy) journeyCopy.textContent = 'Browse the complete care-paperwork collection or search for what your family member is going through.';
     applyFilters();
   }));
 
