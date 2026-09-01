@@ -15,15 +15,24 @@ ROOT = Path(__file__).resolve().parents[1]
 OUT = ROOT / "downloads"
 OUT.mkdir(parents=True, exist_ok=True)
 
-BRAND = HexColor("#163A33")
-BRAND2 = HexColor("#255C50")
-CREAM = HexColor("#FBFAF6")
-INK = HexColor("#18312C")
-MUTED = HexColor("#5F706B")
-LINE = HexColor("#D7E1DC")
-SOFT = HexColor("#F6F8F7")
-WARN = HexColor("#FFF5DF")
-WARN_INK = HexColor("#5B513C")
+BRAND = HexColor("#55756C")
+BRAND2 = HexColor("#78938B")
+CREAM = HexColor("#FFFDF9")
+INK = HexColor("#354842")
+MUTED = HexColor("#71807B")
+LINE = HexColor("#DDE6E2")
+SOFT = HexColor("#F5F8F6")
+PHOTO_SOFT = HexColor("#FBF2ED")
+PHOTO_INK = HexColor("#9A8174")
+WARN = HexColor("#FBF3E9")
+WARN_INK = HexColor("#746457")
+HEADER_LIGHT = HexColor("#E4EFEB")
+
+# These coordinates are also used by assets/site.js when an optional photo/name
+# is added in the browser. Keep them stable or update both places together.
+PHOTO_BOX = (486, 603, 90, 90)
+PHOTO_IMAGE_BOX = (490, 607, 82, 82)
+NAME_TEXT_POSITION = (96, 663)
 
 
 def wrap_text(text: str, font: str, size: float, max_width: float) -> list[str]:
@@ -69,12 +78,12 @@ def draw_header(c: canvas.Canvas, spec: dict, page: int, subtitle: str | None = 
     c.setFillColor(white)
     c.setFont("Helvetica-Bold", 10)
     c.drawString(36, height - 30, "STEADY PAWS")
-    c.setFillColor(HexColor("#D7E9E2"))
+    c.setFillColor(HEADER_LIGHT)
     c.setFont("Helvetica-Bold", 8)
     c.drawRightString(width - 36, height - 30, spec["species"].upper())
     c.setFillColor(white)
     draw_fitted_title(c, form_title(spec), 36, height - 56, width - 72)
-    c.setFillColor(HexColor("#D7E9E2"))
+    c.setFillColor(HEADER_LIGHT)
     c.setFont("Helvetica", 8.3)
     c.drawString(36, height - 73, subtitle or spec["subtitle"])
     c.setFillColor(MUTED)
@@ -97,37 +106,62 @@ def draw_disclaimer(c: canvas.Canvas) -> None:
         c.drawString(47, y + 22 - index * 10, line)
 
 
+def draw_photo_placeholder(c: canvas.Canvas) -> None:
+    x, y, box_w, box_h = PHOTO_BOX
+    c.setFillColor(PHOTO_SOFT)
+    c.setStrokeColor(HexColor("#D8C9C0"))
+    c.setLineWidth(0.8)
+    c.roundRect(x, y, box_w, box_h, 14, stroke=1, fill=1)
+    c.setFillColor(PHOTO_INK)
+    c.setFont("Helvetica-Bold", 7.2)
+    c.drawCentredString(x + box_w / 2, y + 44, "THEIR PHOTO")
+    c.setFont("Helvetica", 6.6)
+    c.drawCentredString(x + box_w / 2, y + 31, "optional")
+
+
 def draw_identity(c: canvas.Canvas, spec: dict) -> None:
     width, height = letter
-    y = height - 116
     c.setFillColor(INK)
     c.setFont("Helvetica-Bold", 8)
-    entries = (("Their name", 36, 174), ("Week of", 220, 130), ("Their veterinarian", 360, 216))
-    for label, x, line_width in entries:
-        c.drawString(x, y, label)
-        c.setStrokeColor(LINE)
-        c.line(x, y - 13, x + line_width, y - 13)
 
-    primary_y = height - 148
+    name_y = height - 116
+    c.drawString(36, name_y, "Their name")
+    c.setStrokeColor(LINE)
+    c.line(94, name_y - 13, 290, name_y - 13)
+
+    c.setFillColor(INK)
+    c.drawString(306, name_y, "Week of")
+    c.setStrokeColor(LINE)
+    c.line(348, name_y - 13, 466, name_y - 13)
+
+    vet_y = height - 150
+    c.setFillColor(INK)
+    c.drawString(36, vet_y, "Their veterinarian")
+    c.setStrokeColor(LINE)
+    c.line(126, vet_y - 13, 466, vet_y - 13)
+
+    primary_y = height - 183
     c.setFillColor(INK)
     c.setFont("Helvetica-Bold", 7.7)
     c.drawString(36, primary_y, "Primary health concern")
     c.setFont("Helvetica", 8)
     c.drawString(148, primary_y, condition_name(spec))
     c.setStrokeColor(LINE)
-    c.line(148, primary_y - 13, width - 36, primary_y - 13)
+    c.line(148, primary_y - 13, 466, primary_y - 13)
 
-    other_y = height - 172
+    other_y = height - 214
     c.setFillColor(INK)
     c.setFont("Helvetica-Bold", 7.7)
     c.drawString(36, other_y, "Other conditions they're living with")
     c.setStrokeColor(LINE)
-    c.line(194, other_y - 13, width - 36, other_y - 13)
+    c.line(194, other_y - 13, 466, other_y - 13)
+
+    draw_photo_placeholder(c)
 
 
 def draw_daily_table(c: canvas.Canvas, fields: list[str]) -> None:
     width, height = letter
-    x0, y_top, table_width, row_height = 36, height - 198, width - 72, 40
+    x0, y_top, table_width, row_height = 36, height - 244, width - 72, 36
     weights = [0.95] + [1] * (len(fields) - 2) + [1.5]
     total = sum(weights)
     widths = [table_width * weight / total for weight in weights]
