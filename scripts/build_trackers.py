@@ -1,4 +1,4 @@
-"""Generate every Steady Paws printable tracker from the shared catalog."""
+"""Generate every Steady Paws printable care form from the shared catalog."""
 
 from __future__ import annotations
 
@@ -9,7 +9,7 @@ from reportlab.lib.pagesizes import letter
 from reportlab.pdfbase.pdfmetrics import stringWidth
 from reportlab.pdfgen import canvas
 
-from tracker_catalog import TRACKERS
+from tracker_catalog import TRACKERS, condition_name
 
 ROOT = Path(__file__).resolve().parents[1]
 OUT = ROOT / "downloads"
@@ -43,6 +43,13 @@ def wrap_text(text: str, font: str, size: float, max_width: float) -> list[str]:
     return lines
 
 
+def form_title(spec: dict) -> str:
+    concern = condition_name(spec)
+    if spec["group"] == "universal":
+        return concern
+    return f"{concern} Care Tracker"
+
+
 def draw_header(c: canvas.Canvas, spec: dict, page: int, subtitle: str | None = None) -> None:
     width, height = letter
     c.setFillColor(CREAM)
@@ -57,7 +64,7 @@ def draw_header(c: canvas.Canvas, spec: dict, page: int, subtitle: str | None = 
     c.drawRightString(width - 36, height - 30, spec["species"].upper())
     c.setFillColor(white)
     c.setFont("Helvetica-Bold", 20)
-    c.drawString(36, height - 56, spec["title"])
+    c.drawString(36, height - 56, form_title(spec))
     c.setFillColor(HexColor("#D7E9E2"))
     c.setFont("Helvetica", 8.3)
     c.drawString(36, height - 73, subtitle or spec["subtitle"])
@@ -81,21 +88,37 @@ def draw_disclaimer(c: canvas.Canvas) -> None:
         c.drawString(47, y + 22 - index * 10, line)
 
 
-def draw_identity(c: canvas.Canvas) -> None:
-    _, height = letter
+def draw_identity(c: canvas.Canvas, spec: dict) -> None:
+    width, height = letter
     y = height - 116
     c.setFillColor(INK)
     c.setFont("Helvetica-Bold", 8)
     entries = (("Their name", 36, 174), ("Week of", 220, 130), ("Their veterinarian", 360, 216))
-    for label, x, width in entries:
+    for label, x, line_width in entries:
         c.drawString(x, y, label)
         c.setStrokeColor(LINE)
-        c.line(x, y - 13, x + width, y - 13)
+        c.line(x, y - 13, x + line_width, y - 13)
+
+    primary_y = height - 148
+    c.setFillColor(INK)
+    c.setFont("Helvetica-Bold", 7.7)
+    c.drawString(36, primary_y, "Primary health concern")
+    c.setFont("Helvetica", 8)
+    c.drawString(148, primary_y, condition_name(spec))
+    c.setStrokeColor(LINE)
+    c.line(148, primary_y - 13, width - 36, primary_y - 13)
+
+    other_y = height - 172
+    c.setFillColor(INK)
+    c.setFont("Helvetica-Bold", 7.7)
+    c.drawString(36, other_y, "Other conditions they're living with")
+    c.setStrokeColor(LINE)
+    c.line(194, other_y - 13, width - 36, other_y - 13)
 
 
 def draw_daily_table(c: canvas.Canvas, fields: list[str]) -> None:
     width, height = letter
-    x0, y_top, table_width, row_height = 36, height - 158, width - 72, 42
+    x0, y_top, table_width, row_height = 36, height - 198, width - 72, 40
     weights = [0.95] + [1] * (len(fields) - 2) + [1.5]
     total = sum(weights)
     widths = [table_width * weight / total for weight in weights]
@@ -180,12 +203,12 @@ def draw_summary(c: canvas.Canvas, items: list[str]) -> None:
 def make_pdf(spec: dict) -> Path:
     path = OUT / spec["filename"]
     c = canvas.Canvas(str(path), pagesize=letter, pageCompression=1)
-    c.setTitle(spec["title"])
+    c.setTitle(form_title(spec))
     c.setAuthor("Steady Paws")
-    c.setSubject(f"Printable {spec['species']} care tracker for veterinary conversations")
+    c.setSubject(f"Printable {condition_name(spec)} care paperwork for {spec['species'].lower()} veterinary conversations")
 
     draw_header(c, spec, 1)
-    draw_identity(c)
+    draw_identity(c, spec)
     draw_daily_table(c, spec["fields"])
     draw_disclaimer(c)
     c.showPage()
