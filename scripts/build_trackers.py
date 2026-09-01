@@ -32,7 +32,7 @@ HEADER_LIGHT = HexColor("#E4EFEB")
 # is added in the browser. Keep them stable or update both places together.
 PHOTO_BOX = (486, 603, 90, 90)
 PHOTO_IMAGE_BOX = (490, 607, 82, 82)
-NAME_TEXT_POSITION = (96, 663)
+NAME_TEXT_POSITION = (96, 666)
 
 
 def wrap_text(text: str, font: str, size: float, max_width: float) -> list[str]:
