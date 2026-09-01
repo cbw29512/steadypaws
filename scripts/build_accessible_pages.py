@@ -27,6 +27,31 @@ def field_id(prefix: str, value: str) -> str:
     return f"{prefix}-{cleaned.strip('-')}"
 
 
+def seo_title(item: dict) -> str:
+    """Keep titles descriptive and comfortably below the 70-character release gate."""
+    concern = condition_name(item)
+    species = item["species"]
+    title = f"{concern} tracker for {species} | Steady Paws"
+    if len(title) <= 70:
+        return title
+    compact = f"{concern} tracker | Steady Paws"
+    return compact[:70].rstrip()
+
+
+def seo_description(item: dict) -> str:
+    """Use a consistent, useful search description that never bloats with catalog copy."""
+    concern = condition_name(item).lower()
+    species = item["species"].lower()
+    description = (
+        f"Free accessible {concern} care worksheet for {species}. "
+        "Track daily changes, other conditions, and questions for their veterinary team."
+    )
+    if len(description) <= 180:
+        return description
+    short = f"Free accessible {concern} care worksheet for {species}. Track daily changes and veterinary visit notes."
+    return short[:180].rstrip(" ,.;") + "."
+
+
 def render_daily_table(item: dict) -> str:
     headers = "".join(f'<th scope="col">{escape(field)}</th>' for field in item["fields"])
     rows: list[str] = []
@@ -59,11 +84,8 @@ def render_summary(item: dict) -> str:
 def render_page(item: dict) -> str:
     concern = condition_name(item)
     species = item["species"]
-    title = f"{concern} care paperwork for {species} | Steady Paws"
-    description = (
-        f"Free accessible {concern.lower()} care worksheet for {species.lower()}. "
-        f"Track {item['description'].rstrip('.').lower()} and prepare for veterinary visits."
-    )
+    title = seo_title(item)
+    description = seo_description(item)
     canonical = care_url(item)
     pdf_url = f"/downloads/{escape(item['filename'], quote=True)}"
     return f'''<!doctype html>
