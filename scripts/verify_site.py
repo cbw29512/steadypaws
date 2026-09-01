@@ -31,7 +31,7 @@ class LinkParser(HTMLParser):
 
     def handle_starttag(self, tag: str, attrs: list[tuple[str, str | None]]) -> None:
         values = dict(attrs)
-        classes = values.get("class") or ""
+        classes = set((values.get("class") or "").split())
         if tag == "h1":
             self.h1_count += 1
         if tag == "article" and "condition-card" in classes:
