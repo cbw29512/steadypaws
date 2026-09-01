@@ -34,6 +34,20 @@ jobs:
       - name: Generate printable care library
         run: python scripts/build_trackers.py
 
+      - name: Upload representative print proofs
+        uses: actions/upload-artifact@v4
+        with:
+          name: steady-paws-print-proofs
+          retention-days: 14
+          path: |
+            downloads/diabetic-cat-tracker.pdf
+            downloads/dog-diabetes-tracker.pdf
+            downloads/rabbit-dental-disease-tracker.pdf
+            downloads/bird-respiratory-tracker.pdf
+            downloads/reptile-metabolic-bone-tracker.pdf
+            downloads/horse-ppid-tracker.pdf
+            downloads/fish-water-quality-health-log.pdf
+
       - name: Build static homepage
         run: python scripts/build_site.py
 
