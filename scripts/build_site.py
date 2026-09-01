@@ -11,7 +11,7 @@ from tracker_catalog import CONDITION_NAMES, GROUP_LABELS, TRACKERS, condition_k
 ROOT = Path(__file__).resolve().parents[1]
 TEMPLATE = ROOT / "templates" / "index.template.html"
 OUTPUT = ROOT / "index.html"
-ASSET_REV = "20260901-familysoft1"
+ASSET_REV = "20260901-a11yseo1"
 
 
 def grouped_conditions() -> list[tuple[str, list[dict]]]:
@@ -53,17 +53,26 @@ def badge_label(item: dict) -> str:
     return f"For {species.lower()}"
 
 
-def render_variant(item: dict) -> str:
+def care_page(item: dict) -> str:
+    return f'/care/{Path(item["filename"]).stem}.html'
+
+
+def render_variant(item: dict, concern: str) -> str:
     search = escape(f'{item["species"]} {item["search"]} {item["description"]}', quote=True)
     filename = escape(item["filename"], quote=True)
+    species = item["species"].strip()
+    download_label = escape(f"Download {concern} printable care paperwork for {species}", quote=True)
+    accessible_label = escape(f"Open accessible {concern} web worksheet for {species}", quote=True)
     return (
         f'<div class="tracker-variant" data-group="{escape(item["group"], quote=True)}" '
-        f'data-species="{escape(item["species"], quote=True)}" data-search="{search}">'
+        f'data-species="{escape(species, quote=True)}" data-search="{search}">'
         f'<span class="species-badge {badge_class(item["group"])}">{escape(badge_label(item))}</span>'
         f'<p>{escape(item["description"])}</p>'
-        f'<a class="download-link care-download" href="/downloads/{filename}" '
+        f'<a class="download-link care-download" href="/downloads/{filename}" aria-label="{download_label}" '
         f'data-pdf-url="/downloads/{filename}" data-download-name="{filename}" download>'
-        f'Get their care paperwork <span aria-hidden="true">↓</span></a></div>'
+        f'Get their care paperwork <span aria-hidden="true">↓</span></a>'
+        f'<a class="accessible-link" href="{care_page(item)}" aria-label="{accessible_label}">Accessible web worksheet</a>'
+        f'</div>'
     )
 
 
@@ -75,10 +84,10 @@ def render_cards() -> str:
             " ".join([name] + [f'{item["species"]} {item["search"]}' for item in variants]),
             quote=True,
         )
-        rendered_variants = "".join(render_variant(item) for item in variants)
+        rendered_variants = "".join(render_variant(item, name) for item in variants)
         cards.append(
             f'<article class="tracker-card condition-card" data-condition="{escape(key, quote=True)}" '
-            f'data-search="{search}" hidden>'
+            f'data-search="{search}">'
             f'<span class="condition-kicker">Primary health concern</span>'
             f'<h3>{escape(name)}</h3>'
             f'<p class="condition-help">Choose the version made for your family member. The form also has room to note other conditions they are living with.</p>'
@@ -96,6 +105,7 @@ def main() -> int:
         .replace("{{TRACKER_CARDS}}", render_cards())
         .replace('href="/styles/base.css"', f'href="/styles/base.css?v={ASSET_REV}"')
         .replace('href="/styles/components.css"', f'href="/styles/components.css?v={ASSET_REV}"')
+        .replace('href="/assets/paw.svg"', f'href="/assets/paw.svg?v={ASSET_REV}"')
         .replace('src="/assets/site.js"', f'src="/assets/site.js?v={ASSET_REV}"')
         .replace("</head>", f'  <link rel="stylesheet" href="/styles/family.css?v={ASSET_REV}">\n</head>')
     )
