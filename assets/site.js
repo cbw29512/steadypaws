@@ -15,6 +15,7 @@
   let activeGroup = 'all';
   let familyTerms = [];
   let familyLabel = '';
+  let journeyStarted = false;
   const normalize = value => value.trim().toLowerCase();
 
   function cardText(card) {
@@ -30,21 +31,25 @@
   function applyFilters() {
     try {
       const query = normalize(search.value);
+      const browsing = journeyStarted || Boolean(query) || activeGroup !== 'all';
       let visible = 0;
 
       cards.forEach(card => {
         const cardGroup = card.dataset.group || '';
         const groupMatch = activeGroup === 'all' || cardGroup === activeGroup;
         const searchMatch = !query || cardText(card).includes(query);
-        const show = groupMatch && familyMatches(card) && searchMatch;
+        const show = browsing && groupMatch && familyMatches(card) && searchMatch;
         card.hidden = !show;
         if (show) visible += 1;
       });
 
-      const guided = Boolean(familyLabel);
-      count.textContent = guided || query || activeGroup !== 'all'
-        ? `Showing ${visible} care tracker${visible === 1 ? '' : 's'}`
-        : `Showing all ${cards.length} trackers`;
+      if (!browsing) {
+        count.textContent = 'Choose a family member above to see their care paperwork.';
+        empty.hidden = true;
+        return;
+      }
+
+      count.textContent = `Showing ${visible} care tracker${visible === 1 ? '' : 's'}`;
       empty.hidden = visible !== 0;
     } catch (error) {
       console.error('Steady Paws tracker filtering failed:', error);
@@ -66,6 +71,7 @@
       familyTerms = normalize(choice.dataset.familyTerm || '')
         .split(/\s*\|\s*|\s+/)
         .filter(Boolean);
+      journeyStarted = true;
       search.value = '';
 
       familyChoices.forEach(item => {
@@ -78,8 +84,8 @@
       if (journeyHeading) journeyHeading.textContent = 'What tough time are they going through?';
       if (journeyCopy) {
         journeyCopy.textContent = activeGroup === 'all'
-          ? 'Here is the whole Steady Paws library. Choose the form that best matches what your veterinary team is helping them through.'
-          : `We are showing the care forms that fit your ${familyLabel}. Choose what their veterinary team is helping them manage.`;
+          ? 'Here is the whole Steady Paws care library. Choose the form that best matches what their veterinary team is helping them through.'
+          : `We are showing the care paperwork that fits your ${familyLabel}. Choose what their veterinary team is helping them manage.`;
       }
 
       applyFilters();
@@ -101,6 +107,7 @@
     activeGroup = chip.dataset.filter || 'all';
     familyLabel = '';
     familyTerms = [];
+    journeyStarted = true;
     familyChoices.forEach(item => {
       item.classList.remove('is-selected');
       item.setAttribute('aria-pressed', 'false');
@@ -110,6 +117,10 @@
     applyFilters();
   }));
 
-  search.addEventListener('input', applyFilters);
+  search.addEventListener('input', () => {
+    if (normalize(search.value)) journeyStarted = true;
+    applyFilters();
+  });
+
   applyFilters();
 })();
