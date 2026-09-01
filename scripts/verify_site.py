@@ -24,13 +24,17 @@ class LinkParser(HTMLParser):
         self.targets: list[str] = []
         self.h1_count = 0
         self.tracker_cards = 0
+        self.family_choices = 0
 
     def handle_starttag(self, tag: str, attrs: list[tuple[str, str | None]]) -> None:
         values = dict(attrs)
+        classes = values.get("class") or ""
         if tag == "h1":
             self.h1_count += 1
-        if tag == "article" and "tracker-card" in (values.get("class") or ""):
+        if tag == "article" and "tracker-card" in classes:
             self.tracker_cards += 1
+        if tag == "button" and "family-choice" in classes:
+            self.family_choices += 1
         for key in ("href", "src"):
             value = values.get(key)
             if value:
@@ -71,7 +75,10 @@ def assert_homepage() -> None:
         f'rel="canonical" href="{EXPECTED_SITE_URL}"',
         f'property="og:url" content="{EXPECTED_SITE_URL}"',
         EXPECTED_SUPPORT_URL,
-        "Browse 72 free trackers",
+        "Care paperwork for someone you love",
+        "Who are we caring for today?",
+        "What tough time are they going through?",
+        "Get their tracker",
     )
     missing = [marker for marker in required_markers if marker not in html]
     if missing:
@@ -85,6 +92,8 @@ def assert_homepage() -> None:
         raise AssertionError(f"Expected exactly one h1, found {parser.h1_count}")
     if parser.tracker_cards != len(TRACKERS):
         raise AssertionError(f"Expected {len(TRACKERS)} tracker cards, found {parser.tracker_cards}")
+    if parser.family_choices < 13:
+        raise AssertionError(f"Expected broad family-member picker, found {parser.family_choices} choices")
 
     for item in TRACKERS:
         expected = f'/downloads/{item["filename"]}'
@@ -98,7 +107,7 @@ def assert_homepage() -> None:
         clean = parsed.path.lstrip("/")
         if clean and not (ROOT / clean).exists():
             raise AssertionError(f"Broken local reference: {target}")
-    LOGGER.info("Homepage metadata, cards, and local references: PASS")
+    LOGGER.info("Family-first homepage, cards, and local references: PASS")
 
 
 def assert_search_files() -> None:
