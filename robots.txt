@@ -1,2 +1,4 @@
 User-agent: *
 Allow: /
+
+Sitemap: https://steadypaws.netlify.app/sitemap.xml
