@@ -49,9 +49,6 @@ jobs:
       - name: Verify SEO, downloads, security, and production integrity
         run: python scripts/verify_site.py
 
-      - name: Add local personalization to printable web worksheets
-        run: python scripts/enhance_accessible_pages.py
-
       - name: Verify WCAG 2.2 AA static requirements
         run: python scripts/verify_accessibility.py
 
