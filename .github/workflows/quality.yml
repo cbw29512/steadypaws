@@ -12,6 +12,7 @@ permissions:
 jobs:
   production-checks:
     runs-on: ubuntu-latest
+    timeout-minutes: 15
     steps:
       - name: Check out repository
         uses: actions/checkout@v4
@@ -24,11 +25,68 @@ jobs:
       - name: Install PDF dependencies
         run: python -m pip install -r requirements.txt
 
-      - name: Generate tracker library
+      - name: Fetch and verify pinned browser vendor asset
+        run: python scripts/fetch_vendor.py
+
+      - name: Generate printable care library
         run: python scripts/build_trackers.py
 
       - name: Build static homepage
         run: python scripts/build_site.py
 
-      - name: Verify production site
+      - name: Build accessible care worksheets and sitemap
+        run: python scripts/build_accessible_pages.py
+
+      - name: Check browser JavaScript syntax
+        run: node --check assets/site.js
+
+      - name: Verify SEO, downloads, security, and production integrity
         run: python scripts/verify_site.py
+
+      - name: Verify WCAG 2.2 AA static requirements
+        run: python scripts/verify_accessibility.py
+
+      - name: Start production-like static server
+        run: |
+          nohup python scripts/serve_ci.py > /tmp/steadypaws-http.log 2>&1 &
+          python - <<'PY'
+          import time
+          import urllib.request
+
+          request = urllib.request.Request(
+              "http://127.0.0.1:4173/",
+              headers={"Accept-Encoding": "gzip"},
+          )
+          for _ in range(30):
+              try:
+                  with urllib.request.urlopen(request, timeout=2) as response:
+                      if response.status == 200 and response.headers.get("Content-Encoding") == "gzip":
+                          print("Production-like compressed server ready")
+                          break
+              except Exception:
+                  time.sleep(0.25)
+          else:
+              raise SystemExit("Production-like static server did not become ready")
+          PY
+
+      - name: Lighthouse mobile 100 / 100 / 100 / 100
+        uses: treosh/lighthouse-ci-action@v12
+        with:
+          urls: |
+            http://127.0.0.1:4173/
+            http://127.0.0.1:4173/care/diabetic-cat-tracker.html
+            http://127.0.0.1:4173/accessibility.html
+          configPath: ./.lighthouserc.mobile.json
+          uploadArtifacts: true
+          temporaryPublicStorage: false
+
+      - name: Lighthouse desktop 100 / 100 / 100 / 100
+        uses: treosh/lighthouse-ci-action@v12
+        with:
+          urls: |
+            http://127.0.0.1:4173/
+            http://127.0.0.1:4173/care/diabetic-cat-tracker.html
+            http://127.0.0.1:4173/accessibility.html
+          configPath: ./.lighthouserc.desktop.json
+          uploadArtifacts: false
+          temporaryPublicStorage: false

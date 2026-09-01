@@ -3,47 +3,53 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Steady Paws | Your Family Member's Care Paperwork</title>
-  <meta name="description" content="Free printable care paperwork for the animals you love. Choose your family member, choose what they are going through, and get the right form for their veterinary care.">
-  <meta name="robots" content="index, follow">
-  <meta name="theme-color" content="#163a33">
+  <title>Free Pet Health Trackers & Care Paperwork | Steady Paws</title>
+  <meta name="description" content="Free printable pet health trackers for dogs, cats, rabbits, birds, reptiles, horses and more. Focus on one main condition and bring clearer notes to your vet.">
+  <meta name="robots" content="index, follow, max-image-preview:large">
+  <meta name="author" content="Steady Paws">
+  <meta name="theme-color" content="#55756c">
+  <meta name="color-scheme" content="light">
   <link rel="canonical" href="https://steadypaws.netlify.app/">
   <meta property="og:type" content="website">
+  <meta property="og:site_name" content="Steady Paws">
+  <meta property="og:locale" content="en_US">
   <meta property="og:url" content="https://steadypaws.netlify.app/">
-  <meta property="og:title" content="Steady Paws | Your Family Member's Care Paperwork">
-  <meta property="og:description" content="When someone you love is going through a hard time, Steady Paws helps keep the little details together for their veterinary team.">
+  <meta property="og:title" content="Free Pet Health Trackers & Care Paperwork | Steady Paws">
+  <meta property="og:description" content="Family-first care paperwork for the animals you love. Choose who needs you, focus on their biggest health concern, and bring organized notes to their veterinary team.">
   <meta name="twitter:card" content="summary">
-  <meta name="twitter:title" content="Steady Paws | Your Family Member's Care Paperwork">
-  <meta name="twitter:description" content="{{TOTAL}} free printable care forms. No account. No email wall.">
+  <meta name="twitter:title" content="Free Pet Health Trackers & Care Paperwork | Steady Paws">
+  <meta name="twitter:description" content="{{TOTAL}} tailored care forms across {{CONDITION_TOTAL}} primary health concerns. No account. No email wall.">
   <link rel="icon" href="/assets/paw.svg" type="image/svg+xml">
   <link rel="stylesheet" href="/styles/base.css">
   <link rel="stylesheet" href="/styles/components.css">
   <script src="/assets/site.js" defer></script>
 </head>
-<body>
+<body itemscope itemtype="https://schema.org/WebSite">
+  <link itemprop="url" href="https://steadypaws.netlify.app/">
   <a class="skip-link" href="#main">Skip to main content</a>
   <header class="site-header">
     <div class="shell nav-wrap">
-      <a class="brand" href="/" aria-label="Steady Paws home"><span class="brand-mark" aria-hidden="true">SP</span><span>Steady Paws</span></a>
+      <a class="brand" href="/" aria-label="Steady Paws home" itemprop="name"><span class="brand-mark" aria-hidden="true">SP</span><span>Steady Paws</span></a>
       <nav aria-label="Primary navigation"><a href="#finder">Find their paperwork</a><a href="#how">How it helps</a><a href="#safety">Important</a></nav>
       <a class="button button-small" href="https://buymeacoffee.com/divclass016" target="_blank" rel="noopener noreferrer">Buy me a coffee</a>
     </div>
   </header>
 
-  <main id="main">
+  <main id="main" itemprop="mainEntity" itemscope itemtype="https://schema.org/CollectionPage">
+    <link itemprop="url" href="https://steadypaws.netlify.app/">
     <section class="hero">
       <div class="shell hero-grid">
         <div>
           <p class="eyebrow">Your family member's care paperwork</p>
-          <h1>When someone you love is going through a hard time, keeping track of everything should not make it harder.</h1>
-          <p class="lede">Steady Paws gives you simple care paperwork for the furry, feathered, scaled, finned, and hooved members of your family — so you can keep the important details together and focus on them.</p>
+          <h1 itemprop="name">When someone you love is going through a hard time, keeping track of everything should not make it harder.</h1>
+          <p class="lede" itemprop="description">Steady Paws gives you simple care paperwork for the furry, feathered, scaled, finned, and hooved members of your family — so you can focus on the biggest health concern without losing sight of everything else they are living with.</p>
           <div class="button-row"><a class="button" href="#finder">Find their care paperwork</a><a class="text-link" href="#how">How Steady Paws helps <span aria-hidden="true">→</span></a></div>
           <p class="microcopy">No account. No email. No paywall. Just something useful for you and the family member who needs you.</p>
         </div>
         <aside class="hero-card" aria-label="What Steady Paws helps you remember">
           <p class="card-kicker">Made for the person who knows them best</p>
-          <h2>You notice the things a chart cannot.</h2>
-          <ul class="check-list"><li>What they ate, drank, and enjoyed</li><li>How they moved, breathed, rested, or played</li><li>What changed since yesterday</li><li>Medicines or measurements their veterinarian asked you to track</li><li>The questions you do not want to forget at the next visit</li></ul>
+          <h2>One main concern. Room for the whole picture.</h2>
+          <ul class="check-list"><li>Track the health issue that needs the most attention right now</li><li>Write down other conditions they are living with</li><li>Notice what changed since yesterday</li><li>Record medicines or measurements their veterinarian asked you to track</li><li>Keep questions together for the next visit</li></ul>
           <p class="microcopy">Steady Paws keeps the notes organized. Their veterinary team still makes the medical decisions.</p>
         </aside>
       </div>
@@ -55,13 +61,13 @@
 
     <section id="finder" class="section family-finder">
       <div class="shell">
-        <div class="finder-intro"><p class="eyebrow">Step 1</p><h2>Pick your family member.</h2><p>Start with who needs you today. We will only show care paperwork that makes sense for them.</p></div>
+        <div class="finder-intro"><p class="eyebrow">Step 1</p><h2>Pick your family member.</h2><p id="finder-help">Start with who needs you today. We will only show care paperwork that makes sense for them.</p></div>
 
-        <div class="family-grid family-grid-primary" role="group" aria-label="Pick your family member">
+        <div class="family-grid family-grid-primary" role="group" aria-label="Pick your family member" aria-describedby="finder-help">
           <button class="family-choice family-choice-primary" type="button" data-family-group="cat" data-family-label="cat"><span class="family-icon" aria-hidden="true">🐱</span><strong>Cat</strong><span>Your small furry shadow</span></button>
           <button class="family-choice family-choice-primary" type="button" data-family-group="dog" data-family-label="dog"><span class="family-icon" aria-hidden="true">🐶</span><strong>Dog</strong><span>Your always-there companion</span></button>
           <button class="family-more family-choice-primary" type="button" aria-expanded="false" aria-controls="more-family"><span class="family-icon" aria-hidden="true">♥</span><strong>Someone else</strong><span>Rabbit, bird, horse, reptile, and more</span></button>
-          <button class="family-choice family-choice-primary family-choice-all" type="button" data-family-group="all" data-family-label="family member"><span class="family-icon" aria-hidden="true">∞</span><strong>View all</strong><span>See every care form we have</span></button>
+          <button class="family-choice family-choice-primary family-choice-all" type="button" data-family-group="all" data-family-label="family member"><span class="family-icon" aria-hidden="true">∞</span><strong>View all concerns</strong><span>See each health concern once</span></button>
         </div>
 
         <div id="more-family" class="more-family" hidden>
@@ -79,37 +85,59 @@
             <button class="family-choice" type="button" data-family-group="aquatic" data-family-label="fish or amphibian"><span class="family-icon" aria-hidden="true">🐠</span><strong>Fish or amphibian</strong><span>Your water-loving family member</span></button>
           </div>
         </div>
+
+        <div class="personalize-wrap">
+          <section id="personalize" class="personalize-card" aria-labelledby="personalize-title" aria-describedby="personalize-status" hidden>
+            <div class="photo-preview" aria-hidden="true">
+              <img id="photo-preview" alt="" hidden>
+              <span id="photo-placeholder" class="photo-placeholder"><span>♡<small>Their photo</small></span></span>
+            </div>
+            <div class="personalize-copy">
+              <p class="eyebrow">Optional</p>
+              <h3 id="personalize-title">Make their paperwork feel like theirs.</h3>
+              <p>Add their name and a favorite picture. When you choose a care form, Steady Paws can place both directly on their PDF before it downloads.</p>
+              <div class="personalize-fields">
+                <label>Their name<input id="family-name" type="text" maxlength="48" autocomplete="off" placeholder="Their name" aria-describedby="personalize-status"></label>
+                <label class="photo-upload">Add their photo<input id="family-photo" type="file" accept="image/*" aria-describedby="personalize-status"></label>
+                <button id="photo-remove" class="photo-remove" type="button" hidden>Remove photo</button>
+              </div>
+              <p id="personalize-status" class="personalize-privacy" role="status">Private by design: their name and photo stay in this browser and are added to the PDF on this device. Steady Paws does not upload them.</p>
+              <a class="text-link continue-link" href="#library">Continue to their health concern <span aria-hidden="true">→</span></a>
+            </div>
+          </section>
+        </div>
+        <noscript><p class="care-note">JavaScript is optional for the care library. All care forms are listed below, and every PDF can still be downloaded without personalization.</p></noscript>
       </div>
     </section>
 
     <section id="library" class="section section-soft">
       <div class="shell">
-        <div class="section-heading"><div><p class="eyebrow">Step 2</p><h2 id="journey-heading">What tough time are they going through?</h2></div><p id="journey-copy">Pick your family member above, then choose the health problem or care challenge their veterinary team is helping them manage.</p></div>
-        <p id="result-count" class="result-count" aria-live="polite">Pick your family member above to see their care paperwork.</p>
+        <div class="section-heading"><div><p class="eyebrow">Step 2</p><h2 id="journey-heading">What is the biggest health concern right now?</h2></div><p id="journey-copy">Pick the main issue you most need to keep up with. Their care form includes space for other conditions they are living with too.</p></div>
+        <p id="result-count" class="result-count" aria-live="polite">Pick your family member above to narrow the care paperwork, or browse everything below.</p>
         <div class="tracker-grid" id="tracker-grid">{{TRACKER_CARDS}}</div>
-        <div id="no-results" class="no-results" hidden><strong>We do not have that paperwork yet.</strong><p>Try a broader word below, or choose View all to look through the complete care library.</p></div>
+        <div id="no-results" class="no-results" hidden><strong>We do not have that paperwork yet.</strong><p>Try a broader word below, or choose View all concerns to look through the complete collection.</p></div>
 
         <details class="browse-tools">
-          <summary>Prefer to browse or search all care paperwork?</summary>
+          <summary>Prefer to browse or search all health concerns?</summary>
           <div class="library-tools" role="search">
-            <div class="filter-group" aria-label="Browse the complete care paperwork library">{{FILTERS}}</div>
-            <label class="search-box"><span class="sr-only">Search care paperwork</span><input id="tracker-search" type="search" placeholder="Search kidney, arthritis, dental, breathing..." autocomplete="off"></label>
+            <div class="filter-group" aria-label="Browse primary health concerns">{{FILTERS}}</div>
+            <label class="search-box"><span class="sr-only">Search health concerns</span><input id="tracker-search" type="search" placeholder="Search kidney, arthritis, dental, breathing..." autocomplete="off"></label>
           </div>
         </details>
       </div>
     </section>
 
     <section id="how" class="section">
-      <div class="shell"><p class="eyebrow">How Steady Paws helps</p><h2>Less trying to remember. More time being there for them.</h2><div class="steps"><article><span>1</span><h3>Choose who needs you</h3><p>Start with your family member, then choose what they are going through.</p></article><article><span>2</span><h3>Notice and record</h3><p>Write down the changes you see and only the measurements or medicines their veterinary team asks you to track.</p></article><article><span>3</span><h3>Walk in prepared</h3><p>Bring their care paperwork to the next visit so you can spend less time trying to remember and more time talking about what they need.</p></article></div></div>
+      <div class="shell"><p class="eyebrow">How Steady Paws helps</p><h2>Less trying to remember. More time being there for them.</h2><div class="steps"><article><span aria-hidden="true">1</span><h3>Choose who needs you</h3><p>Start with your family member so the paperwork fits the kind of care they need.</p></article><article><span aria-hidden="true">2</span><h3>Focus on the biggest concern</h3><p>Track the health issue that matters most right now, while keeping room on the sheet for their other conditions.</p></article><article><span aria-hidden="true">3</span><h3>Walk in prepared</h3><p>Bring their care paperwork to the next visit so you can spend less time trying to remember and more time talking about what they need.</p></article></div></div>
     </section>
 
-    <section class="section library-note"><div class="shell resource-grid"><div><p class="eyebrow">Built with care</p><h2>The paperwork should fit your family member — not the other way around.</h2><p class="lede compact">A rabbit is not a small dog. A bird is not a cat with feathers. A reptile, horse, fish, or guinea pig has different things worth noticing. Steady Paws keeps those differences in the forms while keeping the experience simple for the person doing the caring.</p></div><div class="principles"><p><strong>Personal:</strong> start with who you love, not a medical catalog.</p><p><strong>Specific:</strong> observation fields change when the species and health problem change.</p><p><strong>Free:</strong> every care form can be downloaded without an account or email address.</p></div></div></section>
+    <section class="section library-note"><div class="shell resource-grid"><div><p class="eyebrow">Built with care</p><h2>The paperwork should fit your family member — not the other way around.</h2><p class="lede compact">The health concern may have the same name across species, but what is useful to observe can be different. Steady Paws lists each concern once, then gives you the version built for your family member.</p></div><div class="principles"><p><strong>Focused:</strong> each sheet centers one primary health concern so the daily record stays useful.</p><p><strong>Whole-picture:</strong> every sheet has room to note other conditions they are living with.</p><p><strong>Personal:</strong> you can optionally add their name and photo before downloading.</p><p><strong>Accessible:</strong> every tailored form also has a keyboard- and screen-reader-friendly web worksheet.</p><p><strong>Free:</strong> every care form can be used without an account or email address.</p></div></div></section>
 
     <section id="safety" class="section">
-      <div class="shell safety"><div><p class="eyebrow">One important thing</p><h2>You know them. Their veterinary team knows the medicine.</h2></div><p>Steady Paws helps you organize what you notice between visits. It does not diagnose disease, recommend medication doses, or set medical or husbandry targets. Use the plan given by a veterinarian experienced with their species, and seek prompt veterinary care for urgent or concerning changes.</p></div>
+      <div class="shell safety"><div><p class="eyebrow">One important thing</p><h2>You know them. Their veterinary team knows the medicine.</h2></div><p>Steady Paws helps you organize what you notice between visits. Choosing one primary concern for a tracker does not mean their other conditions are less important. It does not diagnose disease, recommend medication doses, or set medical or husbandry targets. Use the plan given by a veterinarian experienced with their species, and seek prompt veterinary care for urgent or concerning changes.</p></div>
     </section>
   </main>
 
-  <footer class="site-footer"><div class="shell footer-wrap"><div><strong>Steady Paws</strong><p>Care paperwork for the little details that matter when someone you love is not feeling like themselves.</p></div><div><a href="#finder">Find their paperwork</a><a href="https://buymeacoffee.com/divclass016" target="_blank" rel="noopener noreferrer">Support Steady Paws</a></div></div></footer>
+  <footer class="site-footer"><div class="shell footer-wrap"><div><strong>Steady Paws</strong><p>Care paperwork for the little details that matter when someone you love is not feeling like themselves.</p></div><div><a href="/accessibility.html">Accessibility</a><a href="/privacy.html">Privacy</a><a href="https://buymeacoffee.com/divclass016" target="_blank" rel="noopener noreferrer">Support Steady Paws</a></div></div></footer>
 </body>
 </html>

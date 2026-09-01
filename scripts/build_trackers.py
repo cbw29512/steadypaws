@@ -1,29 +1,40 @@
-"""Generate every Steady Paws printable tracker from the shared catalog."""
+"""Generate every Steady Paws printable care form from the shared catalog."""
 
 from __future__ import annotations
 
 from pathlib import Path
 
+from pypdf import PdfReader, PdfWriter
+from pypdf.generic import BooleanObject, DictionaryObject, NameObject, TextStringObject
 from reportlab.lib.colors import HexColor, white
 from reportlab.lib.pagesizes import letter
 from reportlab.pdfbase.pdfmetrics import stringWidth
 from reportlab.pdfgen import canvas
 
-from tracker_catalog import TRACKERS
+from tracker_catalog import TRACKERS, condition_name
 
 ROOT = Path(__file__).resolve().parents[1]
 OUT = ROOT / "downloads"
 OUT.mkdir(parents=True, exist_ok=True)
 
-BRAND = HexColor("#163A33")
-BRAND2 = HexColor("#255C50")
-CREAM = HexColor("#FBFAF6")
-INK = HexColor("#18312C")
-MUTED = HexColor("#5F706B")
-LINE = HexColor("#D7E1DC")
-SOFT = HexColor("#F6F8F7")
-WARN = HexColor("#FFF5DF")
-WARN_INK = HexColor("#5B513C")
+BRAND = HexColor("#55756C")
+BRAND2 = HexColor("#5F776F")
+CREAM = HexColor("#FFFDF9")
+INK = HexColor("#354842")
+MUTED = HexColor("#687772")
+LINE = HexColor("#DDE6E2")
+SOFT = HexColor("#F5F8F6")
+PHOTO_SOFT = HexColor("#FBF2ED")
+PHOTO_INK = HexColor("#7B695F")
+WARN = HexColor("#FBF3E9")
+WARN_INK = HexColor("#746457")
+HEADER_LIGHT = HexColor("#EDF6F3")
+
+# These coordinates are also used by assets/site.js when an optional photo/name
+# is added in the browser. Keep them stable or update both places together.
+PHOTO_BOX = (486, 603, 90, 90)
+PHOTO_IMAGE_BOX = (490, 607, 82, 82)
+NAME_TEXT_POSITION = (96, 666)
 
 
 def wrap_text(text: str, font: str, size: float, max_width: float) -> list[str]:
@@ -43,6 +54,23 @@ def wrap_text(text: str, font: str, size: float, max_width: float) -> list[str]:
     return lines
 
 
+def form_title(spec: dict) -> str:
+    concern = condition_name(spec)
+    if spec["group"] == "universal":
+        return concern
+    if concern.endswith("Care"):
+        return f"{concern} Tracker"
+    return f"{concern} Care Tracker"
+
+
+def draw_fitted_title(c: canvas.Canvas, text: str, x: float, y: float, max_width: float) -> None:
+    size = 20.0
+    while size > 13 and stringWidth(text, "Helvetica-Bold", size) > max_width:
+        size -= 0.5
+    c.setFont("Helvetica-Bold", size)
+    c.drawString(x, y, text)
+
+
 def draw_header(c: canvas.Canvas, spec: dict, page: int, subtitle: str | None = None) -> None:
     width, height = letter
     c.setFillColor(CREAM)
@@ -52,13 +80,12 @@ def draw_header(c: canvas.Canvas, spec: dict, page: int, subtitle: str | None = 
     c.setFillColor(white)
     c.setFont("Helvetica-Bold", 10)
     c.drawString(36, height - 30, "STEADY PAWS")
-    c.setFillColor(HexColor("#D7E9E2"))
+    c.setFillColor(HEADER_LIGHT)
     c.setFont("Helvetica-Bold", 8)
     c.drawRightString(width - 36, height - 30, spec["species"].upper())
     c.setFillColor(white)
-    c.setFont("Helvetica-Bold", 20)
-    c.drawString(36, height - 56, spec["title"])
-    c.setFillColor(HexColor("#D7E9E2"))
+    draw_fitted_title(c, form_title(spec), 36, height - 56, width - 72)
+    c.setFillColor(HEADER_LIGHT)
     c.setFont("Helvetica", 8.3)
     c.drawString(36, height - 73, subtitle or spec["subtitle"])
     c.setFillColor(MUTED)
@@ -81,21 +108,62 @@ def draw_disclaimer(c: canvas.Canvas) -> None:
         c.drawString(47, y + 22 - index * 10, line)
 
 
-def draw_identity(c: canvas.Canvas) -> None:
-    _, height = letter
-    y = height - 116
+def draw_photo_placeholder(c: canvas.Canvas) -> None:
+    x, y, box_w, box_h = PHOTO_BOX
+    c.setFillColor(PHOTO_SOFT)
+    c.setStrokeColor(HexColor("#9D897A"))
+    c.setLineWidth(0.8)
+    c.roundRect(x, y, box_w, box_h, 14, stroke=1, fill=1)
+    c.setFillColor(PHOTO_INK)
+    c.setFont("Helvetica-Bold", 7.2)
+    c.drawCentredString(x + box_w / 2, y + 44, "THEIR PHOTO")
+    c.setFont("Helvetica", 6.6)
+    c.drawCentredString(x + box_w / 2, y + 31, "optional")
+
+
+def draw_identity(c: canvas.Canvas, spec: dict) -> None:
+    width, height = letter
     c.setFillColor(INK)
     c.setFont("Helvetica-Bold", 8)
-    entries = (("Their name", 36, 174), ("Week of", 220, 130), ("Their veterinarian", 360, 216))
-    for label, x, width in entries:
-        c.drawString(x, y, label)
-        c.setStrokeColor(LINE)
-        c.line(x, y - 13, x + width, y - 13)
+
+    name_y = height - 116
+    c.drawString(36, name_y, "Their name")
+    c.setStrokeColor(LINE)
+    c.line(94, name_y - 13, 290, name_y - 13)
+
+    c.setFillColor(INK)
+    c.drawString(306, name_y, "Week of")
+    c.setStrokeColor(LINE)
+    c.line(348, name_y - 13, 466, name_y - 13)
+
+    vet_y = height - 150
+    c.setFillColor(INK)
+    c.drawString(36, vet_y, "Their veterinarian")
+    c.setStrokeColor(LINE)
+    c.line(126, vet_y - 13, 466, vet_y - 13)
+
+    primary_y = height - 183
+    c.setFillColor(INK)
+    c.setFont("Helvetica-Bold", 7.7)
+    c.drawString(36, primary_y, "Primary health concern")
+    c.setFont("Helvetica", 8)
+    c.drawString(148, primary_y, condition_name(spec))
+    c.setStrokeColor(LINE)
+    c.line(148, primary_y - 13, 466, primary_y - 13)
+
+    other_y = height - 214
+    c.setFillColor(INK)
+    c.setFont("Helvetica-Bold", 7.7)
+    c.drawString(36, other_y, "Other conditions they're living with")
+    c.setStrokeColor(LINE)
+    c.line(194, other_y - 13, 466, other_y - 13)
+
+    draw_photo_placeholder(c)
 
 
 def draw_daily_table(c: canvas.Canvas, fields: list[str]) -> None:
     width, height = letter
-    x0, y_top, table_width, row_height = 36, height - 158, width - 72, 42
+    x0, y_top, table_width, row_height = 36, height - 244, width - 72, 36
     weights = [0.95] + [1] * (len(fields) - 2) + [1.5]
     total = sum(weights)
     widths = [table_width * weight / total for weight in weights]
@@ -177,15 +245,44 @@ def draw_summary(c: canvas.Canvas, items: list[str]) -> None:
         c.line(x0, y4 - 18 - i * 22, width - 36, y4 - 18 - i * 22)
 
 
+def enhance_pdf(path: Path, spec: dict) -> None:
+    """Add language, display-title metadata, and simple page bookmarks."""
+    reader = PdfReader(str(path))
+    writer = PdfWriter()
+    writer.append_pages_from_reader(reader)
+    writer.add_metadata(
+        {
+            "/Title": form_title(spec),
+            "/Author": "Steady Paws",
+            "/Subject": f"Printable {condition_name(spec)} care paperwork for {spec['species'].lower()} veterinary conversations",
+        }
+    )
+    writer._root_object.update(
+        {
+            NameObject("/Lang"): TextStringObject("en-US"),
+            NameObject("/PageMode"): NameObject("/UseOutlines"),
+            NameObject("/ViewerPreferences"): DictionaryObject(
+                {NameObject("/DisplayDocTitle"): BooleanObject(True)}
+            ),
+        }
+    )
+    writer.add_outline_item("Daily care tracker", 0)
+    writer.add_outline_item("Weekly notes and veterinary visit prep", 1)
+    temp = path.with_suffix(".tmp.pdf")
+    with temp.open("wb") as handle:
+        writer.write(handle)
+    temp.replace(path)
+
+
 def make_pdf(spec: dict) -> Path:
     path = OUT / spec["filename"]
     c = canvas.Canvas(str(path), pagesize=letter, pageCompression=1)
-    c.setTitle(spec["title"])
+    c.setTitle(form_title(spec))
     c.setAuthor("Steady Paws")
-    c.setSubject(f"Printable {spec['species']} care tracker for veterinary conversations")
+    c.setSubject(f"Printable {condition_name(spec)} care paperwork for {spec['species'].lower()} veterinary conversations")
 
     draw_header(c, spec, 1)
-    draw_identity(c)
+    draw_identity(c, spec)
     draw_daily_table(c, spec["fields"])
     draw_disclaimer(c)
     c.showPage()
@@ -194,6 +291,7 @@ def make_pdf(spec: dict) -> Path:
     draw_summary(c, spec["summary"])
     draw_disclaimer(c)
     c.save()
+    enhance_pdf(path, spec)
     return path
 
 
