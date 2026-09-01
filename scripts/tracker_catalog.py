@@ -20,10 +20,10 @@ GROUP_LABELS = {
     "all": "All",
     "cat": "Cats",
     "dog": "Dogs",
-    "small-mammal": "Small mammals",
+    "small-mammal": "Small & furry",
     "bird": "Birds",
     "reptile": "Reptiles",
     "horse": "Horses",
-    "aquatic": "Aquatic & amphibians",
-    "universal": "Universal",
+    "aquatic": "Fish & amphibians",
+    "universal": "Any pet",
 }
