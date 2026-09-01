@@ -1,5 +1,6 @@
 (() => {
   'use strict';
+
   const chips = [...document.querySelectorAll('[data-filter]')];
   const cards = [...document.querySelectorAll('.tracker-card')];
   const search = document.querySelector('#tracker-search');
@@ -14,17 +15,20 @@
     try {
       const query = normalize(search.value);
       let visible = 0;
+
       cards.forEach(card => {
-        const speciesMatch = active === 'all' || card.dataset.species === active;
-        const text = `${card.dataset.search || ''} ${card.textContent}`.toLowerCase();
+        const cardGroup = card.dataset.group || card.dataset.species || '';
+        const groupMatch = active === 'all' || cardGroup === active;
+        const text = `${card.dataset.species || ''} ${card.dataset.search || ''} ${card.textContent}`.toLowerCase();
         const searchMatch = !query || text.includes(query);
-        const show = speciesMatch && searchMatch;
+        const show = groupMatch && searchMatch;
         card.hidden = !show;
         if (show) visible += 1;
       });
+
       count.textContent = query || active !== 'all'
         ? `Showing ${visible} matching tracker${visible === 1 ? '' : 's'}`
-        : 'Showing all 22 trackers';
+        : `Showing all ${cards.length} trackers`;
       empty.hidden = visible !== 0;
     } catch (error) {
       console.error('Steady Paws tracker filtering failed:', error);
