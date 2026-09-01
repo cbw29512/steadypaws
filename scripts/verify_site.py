@@ -6,6 +6,7 @@ import base64
 import hashlib
 import logging
 import xml.etree.ElementTree as ET
+from html import escape
 from html.parser import HTMLParser
 from pathlib import Path
 from urllib.parse import urlparse
@@ -201,7 +202,7 @@ def assert_accessible_care_pages() -> None:
             f'rel="alternate" type="application/pdf" href="/downloads/{item["filename"]}"',
             '<main id="main"', '<fieldset', '<legend>', '<caption id="daily-caption">', '<th scope="col">',
             "Other conditions they're living with", "Questions for their veterinary team",
-            concern, item["species"], '/accessibility.html', '/privacy.html',
+            escape(concern), escape(item["species"]), '/accessibility.html', '/privacy.html',
         )
         missing = [marker for marker in required if marker not in html]
         if missing:
