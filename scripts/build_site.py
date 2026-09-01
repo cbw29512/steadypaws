@@ -49,7 +49,7 @@ def badge_class(group: str) -> str:
 def badge_label(item: dict) -> str:
     species = item["species"].strip()
     if item["group"] == "universal" or species.lower() in {"all pets", "all"}:
-        return "For any family member"
+        return "For any pet"
     return f"For {species.lower()}"
 
 
@@ -61,8 +61,8 @@ def render_variant(item: dict, concern: str) -> str:
     search = escape(f'{item["species"]} {item["search"]} {item["description"]}', quote=True)
     filename = escape(item["filename"], quote=True)
     species = item["species"].strip()
-    download_label = escape(f"Download {concern} printable care paperwork for {species}", quote=True)
-    accessible_label = escape(f"Open accessible {concern} web worksheet for {species}", quote=True)
+    download_label = escape(f"Download free {concern} pet health tracker for {species}", quote=True)
+    accessible_label = escape(f"Open accessible {concern} pet health tracker worksheet for {species}", quote=True)
     return (
         f'<div class="tracker-variant" data-group="{escape(item["group"], quote=True)}" '
         f'data-species="{escape(species, quote=True)}" data-search="{search}">'
@@ -90,7 +90,7 @@ def render_cards() -> str:
             f'data-search="{search}">'
             f'<span class="condition-kicker">Primary health concern</span>'
             f'<h3>{escape(name)}</h3>'
-            f'<p class="condition-help">Choose the version made for your family member. The form also has room to note other conditions they are living with.</p>'
+            f'<p class="condition-help">Choose the version made for your pet. The tracker also has room to note other health conditions.</p>'
             f'<div class="tracker-variants">{rendered_variants}</div></article>'
         )
     return "\n          ".join(cards)
