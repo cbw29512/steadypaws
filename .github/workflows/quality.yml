@@ -48,22 +48,25 @@ jobs:
 
       - name: Start production-like static server
         run: |
-          nohup python -m http.server 4173 --bind 127.0.0.1 > /tmp/steadypaws-http.log 2>&1 &
+          nohup python scripts/serve_ci.py > /tmp/steadypaws-http.log 2>&1 &
           python - <<'PY'
           import time
           import urllib.request
 
-          url = "http://127.0.0.1:4173/"
+          request = urllib.request.Request(
+              "http://127.0.0.1:4173/",
+              headers={"Accept-Encoding": "gzip"},
+          )
           for _ in range(30):
               try:
-                  with urllib.request.urlopen(url, timeout=2) as response:
-                      if response.status == 200:
-                          print("Static server ready")
+                  with urllib.request.urlopen(request, timeout=2) as response:
+                      if response.status == 200 and response.headers.get("Content-Encoding") == "gzip":
+                          print("Production-like compressed server ready")
                           break
               except Exception:
                   time.sleep(0.25)
           else:
-              raise SystemExit("Static server did not become ready")
+              raise SystemExit("Production-like static server did not become ready")
           PY
 
       - name: Lighthouse mobile 100 / 100 / 100 / 100
