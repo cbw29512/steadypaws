@@ -1,5 +1,5 @@
 [build]
-  command = "python -m pip install -r requirements.txt && python scripts/fetch_vendor.py && python scripts/build_trackers.py && python scripts/build_site.py && python scripts/build_accessible_pages.py && python scripts/enhance_accessible_pages.py"
+  command = "python -m pip install -r requirements.txt && python scripts/fetch_vendor.py && python scripts/build_trackers.py && python scripts/build_site.py && python scripts/build_accessible_pages.py"
   publish = "."
 
 [build.environment]
