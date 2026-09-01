@@ -21,7 +21,9 @@ REQUIRED_FILES = (
     "downloads/diabetic-cat-tracker.pdf",
     "netlify.toml",
     "robots.txt",
+    "sitemap.xml",
 )
+EXPECTED_SITE_URL = "https://steadypaws.netlify.app/"
 EXPECTED_SUPPORT_URL = "https://buymeacoffee.com/divclass016"
 
 
@@ -65,6 +67,9 @@ def assert_homepage() -> None:
             'lang="en"',
             'name="viewport"',
             'name="description"',
+            'name="robots" content="index, follow"',
+            f'rel="canonical" href="{EXPECTED_SITE_URL}"',
+            f'property="og:url" content="{EXPECTED_SITE_URL}"',
             EXPECTED_SUPPORT_URL,
             "/downloads/diabetic-cat-tracker.pdf",
         )
@@ -94,6 +99,21 @@ def assert_homepage() -> None:
         raise
 
 
+def assert_search_files() -> None:
+    try:
+        robots = (ROOT / "robots.txt").read_text(encoding="utf-8")
+        sitemap = (ROOT / "sitemap.xml").read_text(encoding="utf-8")
+        expected_sitemap_url = f"{EXPECTED_SITE_URL}sitemap.xml"
+        if f"Sitemap: {expected_sitemap_url}" not in robots:
+            raise AssertionError("robots.txt does not advertise the production sitemap")
+        if f"<loc>{EXPECTED_SITE_URL}</loc>" not in sitemap:
+            raise AssertionError("sitemap.xml does not contain the production homepage URL")
+        LOGGER.info("Canonical crawler files: PASS")
+    except Exception as exc:
+        LOGGER.exception("Search file validation failed: %s", exc)
+        raise
+
+
 def assert_pdf() -> None:
     try:
         pdf = ROOT / "downloads/diabetic-cat-tracker.pdf"
@@ -111,6 +131,7 @@ def main() -> int:
     try:
         assert_required_files()
         assert_homepage()
+        assert_search_files()
         assert_pdf()
         LOGGER.info("STEADY PAWS QUALITY GATE: PASS")
         return 0
