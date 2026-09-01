@@ -1,0 +1,37 @@
+.care-page { background:var(--cream); }
+.care-shell { width:min(1040px,calc(100% - 32px)); margin:0 auto; padding:48px 0 72px; }
+.care-header { margin-bottom:28px; }
+.care-header .eyebrow { margin-bottom:8px; }
+.care-header h1 { max-width:900px; font-size:clamp(2.25rem,5vw,4.6rem); }
+.care-actions { display:flex; gap:12px; flex-wrap:wrap; margin:24px 0 30px; }
+.care-note { padding:18px 20px; border:1px solid #e5d9c9; border-radius:16px; background:#fbf3e9; color:#65584e; }
+.care-form { display:grid; gap:28px; }
+.care-fieldset { min-width:0; margin:0; padding:22px; border:1px solid var(--line); border-radius:18px; background:var(--white); }
+.care-fieldset legend { padding:0 8px; color:var(--ink); font-weight:850; }
+.identity-grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:16px; }
+.field { display:grid; gap:6px; color:var(--ink); font-size:.88rem; font-weight:750; }
+.field-wide { grid-column:1/-1; }
+.field input,.field textarea,.care-table input,.summary-item textarea { width:100%; border:1px solid #cbd9d4; border-radius:10px; background:#fffefa; color:var(--ink); font:inherit; }
+.field input,.care-table input { min-height:44px; padding:8px 10px; }
+.field textarea,.summary-item textarea { min-height:86px; padding:10px; resize:vertical; }
+.table-wrap { overflow-x:auto; border:1px solid var(--line); border-radius:14px; }
+.care-table { width:100%; min-width:760px; border-collapse:collapse; background:var(--white); }
+.care-table caption { padding:14px 16px; color:var(--ink); text-align:left; font-weight:850; }
+.care-table th,.care-table td { padding:7px; border-top:1px solid var(--line); border-right:1px solid var(--line); vertical-align:top; }
+.care-table th:last-child,.care-table td:last-child { border-right:0; }
+.care-table th { background:#edf4f1; color:#415f56; font-size:.78rem; text-align:left; }
+.care-table input { min-width:92px; border-color:#d5e0dc; }
+.summary-grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:14px; }
+.summary-item { display:grid; gap:8px; padding:14px; border:1px solid var(--line); border-radius:12px; }
+.summary-item label { color:var(--ink); font-weight:800; }
+.care-footer { margin-top:34px; padding-top:24px; border-top:1px solid var(--line); color:var(--muted); font-size:.88rem; }
+@media (max-width:700px) { .identity-grid,.summary-grid { grid-template-columns:1fr; } .care-shell { padding-top:32px; } .care-actions .button { width:100%; } }
+@media print {
+  .site-header,.care-actions,.care-footer,.skip-link { display:none !important; }
+  body,.care-page { background:#fff; }
+  .care-shell { width:100%; padding:0; }
+  .care-header h1 { font-size:24pt; }
+  .care-note,.care-fieldset { break-inside:avoid; box-shadow:none; }
+  .care-table { min-width:0; font-size:8pt; }
+  .care-table input,.field input,.field textarea,.summary-item textarea { border-color:#999; }
+}
