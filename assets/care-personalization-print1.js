@@ -79,26 +79,6 @@
     return image;
   }
 
-  function addPrintButton(actions) {
-    const button = document.createElement('button');
-    button.id = 'care-print-personalized';
-    button.className = 'button care-print-button';
-    button.type = 'button';
-    button.textContent = 'Print this worksheet';
-    button.addEventListener('click', () => window.print());
-    actions.appendChild(button);
-    return button;
-  }
-
-  function addStatus(actions) {
-    const status = document.createElement('p');
-    status.id = 'care-personalization-status';
-    status.className = 'care-personalization-status';
-    status.setAttribute('role', 'status');
-    actions.insertAdjacentElement('afterend', status);
-    return status;
-  }
-
   async function downloadPersonalizedPdf(link, personalization) {
     const pdfLib = await loadPdfLib();
     const { PDFDocument, StandardFonts, rgb } = pdfLib;
@@ -150,14 +130,14 @@
   const identityGrid = document.querySelector('.identity-grid');
   const actions = document.querySelector('.care-actions');
   const pdfLink = actions?.querySelector('a.button[href$=".pdf"]');
-  const nameInput = identityGrid?.querySelector('input[type="text"]');
-  if (!identityGrid || !actions || !pdfLink || !nameInput) return;
+  const printButton = document.querySelector('#care-print-personalized');
+  const status = document.querySelector('#care-personalization-status');
+  const nameInput = document.querySelector('#care-family-name');
+  if (!identityGrid || !actions || !pdfLink || !printButton || !status || !nameInput) return;
 
-  nameInput.id = 'care-family-name';
+  printButton.addEventListener('click', () => window.print());
   if (personalization.name) nameInput.value = personalization.name;
   const photoImage = addPhotoToWorksheet(identityGrid, personalization.photoDataUrl, personalization.name);
-  addPrintButton(actions);
-  const status = addStatus(actions);
 
   if (personalization.name || personalization.photoDataUrl) {
     pdfLink.textContent = 'Download personalized PDF';
@@ -182,8 +162,6 @@
         pdfLink.textContent = original;
       }
     });
-  } else {
-    status.textContent = 'Tip: add a name or photo on the Steady Paws finder page before opening this worksheet if you want it included when printing.';
   }
 
   if (photoImage) {
