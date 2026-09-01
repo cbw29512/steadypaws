@@ -29,26 +29,29 @@ def field_id(prefix: str, value: str) -> str:
     return f"{prefix}-{cleaned.strip('-')}"
 
 
-def seo_title(item: dict) -> str:
+def tracker_heading(item: dict) -> str:
     concern = condition_name(item)
-    species = item["species"]
-    title = f"{concern} tracker for {species} | Steady Paws"
+    species = item["species"].strip()
+    if item["group"] == "universal" or species.lower() in {"all pets", "all"}:
+        return f"{concern} Pet Health Tracker"
+    return f"{species} {concern} Tracker"
+
+
+def seo_title(item: dict) -> str:
+    title = f"Free {tracker_heading(item)} | Steady Paws"
     if len(title) <= 70:
         return title
-    compact = f"{concern} tracker | Steady Paws"
+    compact = f"{tracker_heading(item)} | Steady Paws"
     return compact[:70].rstrip()
 
 
 def seo_description(item: dict) -> str:
-    concern = condition_name(item).lower()
-    species = item["species"].lower()
-    description = (
-        f"Free accessible {concern} care worksheet for {species}. "
-        "Track daily changes, other conditions, and questions for their veterinary team."
-    )
+    heading = tracker_heading(item).lower()
+    details = item["description"].strip().rstrip(".")
+    description = f"Free {heading}. Track {details.lower()}. Print the PDF or use the accessible web worksheet for vet-visit notes."
     if len(description) <= 180:
         return description
-    short = f"Free accessible {concern} care worksheet for {species}. Track daily changes and veterinary visit notes."
+    short = f"Free {heading}. Track daily changes and keep organized notes for veterinary visits. Printable PDF and accessible web worksheet."
     return short[:180].rstrip(" ,.;") + "."
 
 
@@ -85,10 +88,12 @@ def render_summary(item: dict) -> str:
 def render_page(item: dict) -> str:
     concern = condition_name(item)
     species = item["species"]
+    heading = tracker_heading(item)
     title = seo_title(item)
     description = seo_description(item)
     canonical = care_url(item)
     pdf_url = f"/downloads/{escape(item['filename'], quote=True)}"
+    intro = item["description"].strip().rstrip(".")
     return f'''<!doctype html>
 <html lang="en">
 <head>
@@ -113,19 +118,19 @@ def render_page(item: dict) -> str:
   <script src="/assets/care-personalization-print1.js?v={CARE_ASSET_REV}" defer></script>
 </head>
 <body class="care-page">
-  <a class="skip-link" href="#main">Skip to care worksheet</a>
-  <header class="site-header"><div class="shell nav-wrap"><a class="brand" href="/" aria-label="Steady Paws home"><img class="brand-logo" src="/assets/paw.svg?v={ASSET_REV}" width="38" height="38" alt=""><span>Steady Paws</span></a><nav aria-label="Worksheet navigation"><a href="/#finder">Find another form</a><a href="/accessibility.html">Accessibility</a></nav></div></header>
+  <a class="skip-link" href="#main">Skip to pet health tracker</a>
+  <header class="site-header"><div class="shell nav-wrap"><a class="brand" href="/" aria-label="Steady Paws home"><img class="brand-logo" src="/assets/paw.svg?v={ASSET_REV}" width="38" height="38" alt=""><span>Steady Paws</span></a><nav aria-label="Tracker navigation"><a href="/#finder">Find another pet health tracker</a><a href="/accessibility.html">Accessibility</a></nav></div></header>
   <main id="main" class="care-shell" itemscope itemtype="https://schema.org/WebPage">
     <header class="care-header">
-      <p class="eyebrow">Accessible web worksheet · {escape(species)}</p>
-      <h1 itemprop="name">{escape(concern)} care paperwork</h1>
-      <p class="lede" itemprop="description">Keep the important details in one place. This web version works with a keyboard or screen reader and can also be printed.</p>
+      <p class="eyebrow">Free pet health tracker · {escape(species)}</p>
+      <h1 itemprop="name">{escape(heading)}</h1>
+      <p class="lede" itemprop="description">Use this simple tracker to record {escape(intro.lower())}. Keep the important details together for the days between veterinary visits.</p>
       <div class="care-actions">
         <a class="button" href="{pdf_url}" download>Download printable PDF</a>
         <button id="care-print-personalized" class="button care-print-button" type="button">Print this worksheet</button>
-        <a class="text-link" href="/#finder">Choose different paperwork <span aria-hidden="true">→</span></a>
+        <a class="text-link" href="/#finder">Choose a different pet health tracker <span aria-hidden="true">→</span></a>
       </div>
-      <p id="care-personalization-status" class="care-personalization-status" role="status">Tip: add a name or photo on the Steady Paws finder page before opening this worksheet if you want it included when printing.</p>
+      <p id="care-personalization-status" class="care-personalization-status" role="status">Tip: add a name or photo on the Steady Paws finder page before opening this tracker if you want it included when printing.</p>
       <p class="care-note" id="care-safety"><strong>For organizing care, not medical advice.</strong> Follow their veterinarian's plan and contact a veterinarian for urgent or concerning changes.</p>
     </header>
 
@@ -160,7 +165,7 @@ def render_page(item: dict) -> str:
       </fieldset>
     </div>
 
-    <footer class="care-footer"><p>Steady Paws · Free family-first care paperwork · <a href="/accessibility.html">Accessibility options</a> · <a href="/privacy.html">Privacy</a></p></footer>
+    <footer class="care-footer"><p>Steady Paws · Free pet health trackers for animals you love · <a href="/accessibility.html">Accessibility options</a> · <a href="/privacy.html">Privacy</a></p></footer>
   </main>
 </body>
 </html>'''
@@ -184,7 +189,7 @@ def main() -> int:
         path = CARE_DIR / f"{care_slug(item)}.html"
         path.write_text(render_page(item), encoding="utf-8")
     write_sitemap()
-    print(f"Built {len(TRACKERS)} accessible care worksheets")
+    print(f"Built {len(TRACKERS)} accessible pet health tracker worksheets")
     return 0
 
 
