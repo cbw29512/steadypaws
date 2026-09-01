@@ -20,7 +20,7 @@ LOGGER = logging.getLogger(__name__)
 ROOT = Path(__file__).resolve().parents[1]
 EXPECTED_SITE_URL = "https://steadypaws.netlify.app/"
 EXPECTED_SUPPORT_URL = "https://buymeacoffee.com/divclass016"
-EXPECTED_ASSET_REV = "20260901-a11yseo1"
+EXPECTED_ASSET_REV = "20260901-pawphoto1"
 EXPECTED_VENDOR_SHA512 = "z8IYLHO8bTgFqj+yrPyIJnzBDf7DDhWwiEsk4sY+Oe6J2M+WQequeGS7qioI5vT6rXgVRb4K1UVQC5ER7MKzKQ=="
 VENDOR_PATH = ROOT / "assets/vendor/pdf-lib-1.17.1.min.js"
 
@@ -37,6 +37,7 @@ class HomeParser(HTMLParser):
         self.care_downloads = 0
         self.accessible_links = 0
         self.photo_inputs = 0
+        self.brand_logos = 0
 
     def handle_starttag(self, tag: str, attrs: list[tuple[str, str | None]]) -> None:
         values = dict(attrs)
@@ -58,6 +59,8 @@ class HomeParser(HTMLParser):
             self.accessible_links += 1
         if tag == "input" and values.get("id") == "family-photo" and values.get("type") == "file":
             self.photo_inputs += 1
+        if tag == "img" and "brand-logo" in classes:
+            self.brand_logos += 1
         for key in ("href", "src"):
             value = values.get(key)
             if value:
@@ -110,11 +113,11 @@ def assert_required_files() -> None:
         "netlify.toml", "robots.txt", "sitemap.xml", "requirements.txt",
         "templates/index.template.html", "scripts/tracker_catalog.py", "scripts/fetch_vendor.py",
         "scripts/build_trackers.py", "scripts/build_site.py", "scripts/build_accessible_pages.py",
+        "scripts/verify_accessibility.py", "scripts/verify_personalization.py", "scripts/serve_ci.py",
     )
     missing = [path for path in required if not (ROOT / path).is_file()]
     if missing:
         raise AssertionError(f"Missing required production files: {', '.join(missing)}")
-
     care_pages = list((ROOT / "care").glob("*.html"))
     if len(care_pages) != len(TRACKERS):
         raise AssertionError(f"Expected {len(TRACKERS)} accessible care pages, found {len(care_pages)}")
@@ -127,6 +130,16 @@ def assert_vendor_integrity() -> None:
     if digest != EXPECTED_VENDOR_SHA512:
         raise AssertionError("Self-hosted pdf-lib bytes do not match the pinned SHA-512")
     LOGGER.info("Pinned self-hosted personalization helper: PASS")
+
+
+def assert_paw_asset() -> None:
+    svg = (ROOT / "assets/paw.svg").read_text(encoding="utf-8")
+    for marker in ('aria-label="Steady Paws paw logo"', 'fill="#55756c"', 'fill="#fffdf9"'):
+        if marker not in svg:
+            raise AssertionError(f"Paw logo marker missing: {marker}")
+    if svg.count("<ellipse") < 5:
+        raise AssertionError("Paw logo does not contain a full four-toe paw mark")
+    LOGGER.info("Steady Paws paw logo asset: PASS")
 
 
 def assert_homepage() -> None:
@@ -145,7 +158,9 @@ def assert_homepage() -> None:
         "What is the biggest health concern right now?", "Primary health concern",
         "other conditions they are living with", "Make their paperwork feel like theirs.",
         "Private by design", "Steady Paws does not upload them", "Accessible web worksheet",
-        'id="family-name"', 'id="family-photo"', 'accept="image/*"',
+        'class="brand-logo"', 'class="footer-logo"',
+        'id="family-name"', 'id="family-photo"', 'type="file"', 'accept="image/*"',
+        'id="photo-help"', "JPG, PNG, and WebP are the most reliable", "page 1 of their PDF",
         "Get their care paperwork", "Someone else", "View all concerns",
         f'/assets/paw.svg?v={EXPECTED_ASSET_REV}',
         f'/styles/base.css?v={EXPECTED_ASSET_REV}', f'/styles/components.css?v={EXPECTED_ASSET_REV}',
@@ -166,14 +181,12 @@ def assert_homepage() -> None:
         raise AssertionError(f"Expected {len(CONDITION_NAMES)} health-concern cards, found {parser.condition_cards}")
     if len(parser.condition_keys) != len(set(parser.condition_keys)):
         raise AssertionError("Duplicate primary health-concern cards rendered on homepage")
-    if parser.form_variants != len(TRACKERS):
-        raise AssertionError(f"Expected {len(TRACKERS)} tailored variants, found {parser.form_variants}")
-    if parser.care_downloads != len(TRACKERS):
-        raise AssertionError(f"Expected {len(TRACKERS)} PDF links, found {parser.care_downloads}")
+    if parser.form_variants != len(TRACKERS) or parser.care_downloads != len(TRACKERS):
+        raise AssertionError("Homepage tailored PDF variant count does not match catalog")
     if parser.accessible_links != len(TRACKERS):
         raise AssertionError(f"Expected {len(TRACKERS)} accessible worksheet links, found {parser.accessible_links}")
-    if parser.photo_inputs != 1 or parser.family_choices < 13:
-        raise AssertionError("Family picker or optional photo personalization is incomplete")
+    if parser.photo_inputs != 1 or parser.family_choices < 13 or parser.brand_logos != 1:
+        raise AssertionError("Family picker, paw branding, or optional photo personalization is incomplete")
 
     for item in TRACKERS:
         for expected in (f'/downloads/{item["filename"]}', f'/care/{Path(item["filename"]).stem}.html'):
@@ -187,7 +200,28 @@ def assert_homepage() -> None:
         clean = parsed.path.lstrip("/")
         if clean and not (ROOT / clean).exists():
             raise AssertionError(f"Broken local reference: {target}")
-    LOGGER.info("Homepage SEO, progressive enhancement, dedupe, and resource links: PASS")
+    LOGGER.info("Homepage SEO, paw branding, visible photo picker, dedupe, and resource links: PASS")
+
+
+def assert_personalization_source() -> None:
+    js = (ROOT / "assets/site.js").read_text(encoding="utf-8")
+    css = (ROOT / "styles/components.css").read_text(encoding="utf-8")
+    required_js = (
+        "photoPreviewBox", "Photo ready ✓", "Personalized PDF ready ✓",
+        "embedJpg", "page.drawImage(photo, PHOTO_IMAGE_BOX)", "Milo" if False else "safeDownloadName",
+    )
+    for marker in required_js:
+        if marker not in js:
+            raise AssertionError(f"Personalization JavaScript marker missing: {marker}")
+    for marker in (
+        '.photo-field input[type="file"]', '::file-selector-button', '.photo-preview.is-ready',
+        '.personalize-privacy[data-state="ready"]',
+    ):
+        if marker not in css:
+            raise AssertionError(f"Visible photo-control style missing: {marker}")
+    if "pointer-events:none" in css and ".photo-upload input" in css:
+        raise AssertionError("Legacy hidden photo-upload control is still present")
+    LOGGER.info("Visible photo picker + local PDF stamping source: PASS")
 
 
 def assert_accessible_care_pages() -> None:
@@ -201,6 +235,7 @@ def assert_accessible_care_pages() -> None:
             f'rel="canonical" href="{care_page_url(item)}"',
             f'rel="alternate" type="application/pdf" href="/downloads/{item["filename"]}"',
             '<main id="main"', '<fieldset', '<legend>', '<caption id="daily-caption">', '<th scope="col">',
+            'class="brand-logo"', f'/assets/paw.svg?v={EXPECTED_ASSET_REV}',
             "Other conditions they're living with", "Questions for their veterinary team",
             escape(concern), escape(item["species"]), '/accessibility.html', '/privacy.html',
         )
@@ -209,7 +244,24 @@ def assert_accessible_care_pages() -> None:
             raise AssertionError(f"Accessible page markers missing from {path.name}: {missing}")
         if "style=" in html or "<script" in html:
             raise AssertionError(f"Accessible page should not require inline styles or JavaScript: {path.name}")
-    LOGGER.info("72 semantic keyboard/screen-reader worksheet alternatives: PASS")
+    LOGGER.info("72 semantic keyboard/screen-reader worksheet alternatives with paw branding: PASS")
+
+
+def assert_static_pages() -> None:
+    for filename in ("404.html", "accessibility.html", "privacy.html"):
+        html = (ROOT / filename).read_text(encoding="utf-8")
+        for marker in (
+            f'/assets/paw.svg?v={EXPECTED_ASSET_REV}',
+            f'/styles/base.css?v={EXPECTED_ASSET_REV}',
+            f'/styles/components.css?v={EXPECTED_ASSET_REV}',
+        ):
+            if marker not in html:
+                raise AssertionError(f"{filename} still references a stale asset revision: {marker}")
+    for filename in ("accessibility.html", "privacy.html"):
+        html = (ROOT / filename).read_text(encoding="utf-8")
+        if 'class="brand-logo"' not in html:
+            raise AssertionError(f"Paw brand logo missing from {filename}")
+    LOGGER.info("Static support pages use fresh paw-branded assets: PASS")
 
 
 def assert_security_and_cache_policy() -> None:
@@ -246,25 +298,19 @@ def assert_sitemap_and_robots() -> None:
         f"{EXPECTED_SITE_URL}privacy.html",
         *(care_page_url(item) for item in TRACKERS),
     }
-    if len(urls) != 75 or len(set(urls)) != 75:
-        raise AssertionError(f"Expected 75 unique sitemap URLs, found {len(urls)} / {len(set(urls))} unique")
-    if set(urls) != expected:
-        missing = sorted(expected - set(urls))[:5]
-        extra = sorted(set(urls) - expected)[:5]
-        raise AssertionError(f"Sitemap mismatch; missing={missing}, extra={extra}")
+    if len(urls) != 75 or len(set(urls)) != 75 or set(urls) != expected:
+        raise AssertionError("Sitemap must contain exactly the 75 canonical Steady Paws URLs")
     LOGGER.info("75-URL canonical sitemap and robots.txt: PASS")
 
 
 def assert_pdfs() -> None:
     for item in TRACKERS:
         pdf = ROOT / "downloads" / item["filename"]
-        if not pdf.is_file() or pdf.stat().st_size < 1000:
-            raise AssertionError(f"Missing or unexpectedly small PDF: {item['filename']}")
-        if pdf.read_bytes()[:5] != b"%PDF-":
-            raise AssertionError(f"Invalid PDF signature: {item['filename']}")
+        if not pdf.is_file() or pdf.stat().st_size < 1000 or pdf.read_bytes()[:5] != b"%PDF-":
+            raise AssertionError(f"Missing or invalid PDF: {item['filename']}")
         reader = PdfReader(str(pdf))
         if len(reader.pages) != 2:
-            raise AssertionError(f"Expected 2 pages, found {len(reader.pages)}: {item['filename']}")
+            raise AssertionError(f"Expected 2 pages: {item['filename']}")
         first_page = reader.pages[0].extract_text() or ""
         second_page = reader.pages[1].extract_text() or ""
         for marker in (
@@ -277,11 +323,9 @@ def assert_pdfs() -> None:
             raise AssertionError(f"Weekly wording missing: {item['filename']}")
         if str(reader.root_object.get("/Lang")) != "en-US":
             raise AssertionError(f"PDF language metadata missing: {item['filename']}")
-        if not reader.metadata or not reader.metadata.title:
-            raise AssertionError(f"PDF title metadata missing: {item['filename']}")
-        if len(reader.outline) < 2:
-            raise AssertionError(f"PDF navigation bookmarks missing: {item['filename']}")
-    LOGGER.info("72 two-page print PDFs with language metadata + bookmarks (144 pages): PASS")
+        if not reader.metadata or not reader.metadata.title or len(reader.outline) < 2:
+            raise AssertionError(f"PDF metadata/bookmarks missing: {item['filename']}")
+    LOGGER.info("72 two-page print PDFs with photo space, language metadata, and bookmarks (144 pages): PASS")
 
 
 def main() -> int:
@@ -289,8 +333,11 @@ def main() -> int:
         assert_catalog()
         assert_required_files()
         assert_vendor_integrity()
+        assert_paw_asset()
         assert_homepage()
+        assert_personalization_source()
         assert_accessible_care_pages()
+        assert_static_pages()
         assert_security_and_cache_policy()
         assert_sitemap_and_robots()
         assert_pdfs()

@@ -16,6 +16,7 @@
   const familyName = document.querySelector('#family-name');
   const familyPhoto = document.querySelector('#family-photo');
   const photoPreview = document.querySelector('#photo-preview');
+  const photoPreviewBox = document.querySelector('.photo-preview');
   const photoPlaceholder = document.querySelector('#photo-placeholder');
   const photoRemove = document.querySelector('#photo-remove');
   const personalizeStatus = document.querySelector('#personalize-status');
@@ -172,7 +173,7 @@
     return new Promise((resolve, reject) => {
       const image = new Image();
       image.onload = () => resolve(image);
-      image.onerror = () => reject(new Error('That picture could not be opened.'));
+      image.onerror = () => reject(new Error('That picture format could not be opened by this browser. Try a JPG, PNG, or WebP image.'));
       image.src = src;
     });
   }
@@ -184,6 +185,7 @@
     const objectUrl = URL.createObjectURL(file);
     try {
       const image = await loadImage(objectUrl);
+      if (!image.naturalWidth || !image.naturalHeight) throw new Error('That picture did not contain readable image data.');
       const size = Math.min(image.naturalWidth, image.naturalHeight);
       const sourceX = (image.naturalWidth - size) / 2;
       const sourceY = (image.naturalHeight - size) / 2;
@@ -202,10 +204,10 @@
     }
   }
 
-  function setPersonalizeStatus(message, isError = false) {
+  function setPersonalizeStatus(message, state = 'ok') {
     if (!personalizeStatus) return;
     personalizeStatus.textContent = message;
-    personalizeStatus.dataset.state = isError ? 'error' : 'ok';
+    personalizeStatus.dataset.state = state;
   }
 
   function clearPhoto() {
@@ -216,6 +218,7 @@
       photoPreview.src = '';
       photoPreview.hidden = true;
     }
+    photoPreviewBox?.classList.remove('is-ready');
     if (photoPlaceholder) photoPlaceholder.hidden = false;
     if (photoRemove) photoRemove.hidden = true;
     setPersonalizeStatus('Private by design: their name and photo stay in this browser and are added to the PDF on this device. Steady Paws does not upload them.');
@@ -297,7 +300,7 @@
     document.body.appendChild(download);
     download.click();
     download.remove();
-    window.setTimeout(() => URL.revokeObjectURL(url), 1000);
+    window.setTimeout(() => URL.revokeObjectURL(url), 3000);
     return true;
   }
 
@@ -347,7 +350,7 @@
   familyPhoto?.addEventListener('change', async () => {
     const file = familyPhoto.files?.[0];
     if (!file) return;
-    setPersonalizeStatus('Preparing their photo on this device...');
+    setPersonalizeStatus(`Preparing ${file.name} on this device...`);
     try {
       const prepared = await makeSquareJpeg(file);
       photoJpegBytes = prepared.bytes;
@@ -356,13 +359,14 @@
         photoPreview.src = photoDataUrl;
         photoPreview.hidden = false;
       }
+      photoPreviewBox?.classList.add('is-ready');
       if (photoPlaceholder) photoPlaceholder.hidden = true;
       if (photoRemove) photoRemove.hidden = false;
-      setPersonalizeStatus('Their photo is ready. It has not been uploaded anywhere.');
+      setPersonalizeStatus('Photo ready ✓ It will appear on page 1 of the personalized PDF. Nothing was uploaded.', 'ready');
       updateDownloadLabels();
     } catch (error) {
       clearPhoto();
-      setPersonalizeStatus(error instanceof Error ? error.message : 'That picture could not be prepared.', true);
+      setPersonalizeStatus(error instanceof Error ? error.message : 'That picture could not be prepared.', 'error');
     }
   });
 
@@ -378,10 +382,10 @@
     setPersonalizeStatus('Adding their name and photo to this copy on your device...');
     try {
       await personalizePdf(link);
-      setPersonalizeStatus('Their personalized care paperwork is ready. Nothing was uploaded or stored by Steady Paws.');
+      setPersonalizeStatus('Personalized PDF ready ✓ Their photo and name were added on this device. Nothing was uploaded or stored by Steady Paws.', 'ready');
     } catch (error) {
       console.error('Steady Paws PDF personalization failed:', error);
-      setPersonalizeStatus('Personalization could not finish, so the plain care form is downloading instead.', true);
+      setPersonalizeStatus('Personalization could not finish, so the plain care form is downloading instead.', 'error');
       downloadPlainPdf(link);
     } finally {
       preparingDownload = false;

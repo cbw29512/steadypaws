@@ -29,7 +29,7 @@
   <a class="skip-link" href="#main">Skip to main content</a>
   <header class="site-header">
     <div class="shell nav-wrap">
-      <a class="brand" href="/" aria-label="Steady Paws home" itemprop="name"><span class="brand-mark" aria-hidden="true">SP</span><span>Steady Paws</span></a>
+      <a class="brand" href="/" aria-label="Steady Paws home" itemprop="name"><img class="brand-logo" src="/assets/paw.svg" width="38" height="38" alt=""><span>Steady Paws</span></a>
       <nav aria-label="Primary navigation"><a href="#finder">Find their paperwork</a><a href="#how">How it helps</a><a href="#safety">Important</a></nav>
       <a class="button button-small" href="https://buymeacoffee.com/divclass016" target="_blank" rel="noopener noreferrer">Buy me a coffee</a>
     </div>
@@ -95,10 +95,14 @@
             <div class="personalize-copy">
               <p class="eyebrow">Optional</p>
               <h3 id="personalize-title">Make their paperwork feel like theirs.</h3>
-              <p>Add their name and a favorite picture. When you choose a care form, Steady Paws can place both directly on their PDF before it downloads.</p>
+              <p>Add their name and a favorite picture. You will see the photo here first, then Steady Paws will place it directly on page 1 of their PDF when you download.</p>
               <div class="personalize-fields">
-                <label>Their name<input id="family-name" type="text" maxlength="48" autocomplete="off" placeholder="Their name" aria-describedby="personalize-status"></label>
-                <label class="photo-upload">Add their photo<input id="family-photo" type="file" accept="image/*" aria-describedby="personalize-status"></label>
+                <label class="name-field" for="family-name">Their name<input id="family-name" type="text" maxlength="48" autocomplete="off" placeholder="Their name" aria-describedby="personalize-status"></label>
+                <div class="photo-field">
+                  <label for="family-photo">Their photo <span>optional</span></label>
+                  <input id="family-photo" type="file" accept="image/*" aria-describedby="photo-help personalize-status">
+                  <p id="photo-help" class="photo-help">Choose a photo your browser can open. JPG, PNG, and WebP are the most reliable.</p>
+                </div>
                 <button id="photo-remove" class="photo-remove" type="button" hidden>Remove photo</button>
               </div>
               <p id="personalize-status" class="personalize-privacy" role="status">Private by design: their name and photo stay in this browser and are added to the PDF on this device. Steady Paws does not upload them.</p>
@@ -138,6 +142,6 @@
     </section>
   </main>
 
-  <footer class="site-footer"><div class="shell footer-wrap"><div><strong>Steady Paws</strong><p>Care paperwork for the little details that matter when someone you love is not feeling like themselves.</p></div><div><a href="/accessibility.html">Accessibility</a><a href="/privacy.html">Privacy</a><a href="https://buymeacoffee.com/divclass016" target="_blank" rel="noopener noreferrer">Support Steady Paws</a></div></div></footer>
+  <footer class="site-footer"><div class="shell footer-wrap"><div class="footer-brand"><img class="footer-logo" src="/assets/paw.svg" width="34" height="34" alt=""><div><strong>Steady Paws</strong><p>Care paperwork for the little details that matter when someone you love is not feeling like themselves.</p></div></div><div><a href="/accessibility.html">Accessibility</a><a href="/privacy.html">Privacy</a><a href="https://buymeacoffee.com/divclass016" target="_blank" rel="noopener noreferrer">Support Steady Paws</a></div></div></footer>
 </body>
 </html>

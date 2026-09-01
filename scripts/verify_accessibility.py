@@ -184,8 +184,10 @@ def assert_wcag_palette() -> None:
         (base, "--focus: #976a40;"),
         (base, ":where(a,button,input,textarea,summary):focus-visible"),
         (base, "@media (prefers-reduced-motion: reduce)"),
+        (base, ".brand-logo {"),
         (components, "border:1px solid #82978f"),
-        (components, ".photo-upload:focus-within"),
+        (components, '.photo-field input[type="file"]'),
+        (components, "::file-selector-button"),
         (family, "border:1px solid #9d897a"),
         (care, ".care-table th"),
         (care, "border:1px solid #82978f"),
@@ -193,7 +195,7 @@ def assert_wcag_palette() -> None:
     for text, marker in required_markers:
         if marker not in text:
             raise AssertionError(f"Required accessibility CSS marker missing: {marker}")
-    LOGGER.info("WCAG-oriented palette, focus, target boundary, reduced motion: PASS")
+    LOGGER.info("WCAG-oriented palette, visible photo control, focus, boundaries, reduced motion: PASS")
 
 
 def assert_all_html() -> None:

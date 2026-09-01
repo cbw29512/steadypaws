@@ -1,1 +1,8 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="Steady Paws paw mark"><rect width="64" height="64" rx="18" fill="#163a33"/><ellipse cx="32" cy="40" rx="14" ry="11" fill="#fff"/><circle cx="18" cy="27" r="6" fill="#fff"/><circle cx="31" cy="20" r="6" fill="#fff"/><circle cx="45" cy="27" r="6" fill="#fff"/></svg>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="Steady Paws paw logo">
+  <rect width="64" height="64" rx="19" fill="#55756c"/>
+  <ellipse cx="32" cy="42" rx="14.5" ry="11.5" fill="#fffdf9"/>
+  <ellipse cx="14.5" cy="27" rx="5.4" ry="6.6" transform="rotate(-18 14.5 27)" fill="#fffdf9"/>
+  <ellipse cx="26" cy="19" rx="5.3" ry="6.8" transform="rotate(-6 26 19)" fill="#fffdf9"/>
+  <ellipse cx="38" cy="19" rx="5.3" ry="6.8" transform="rotate(6 38 19)" fill="#fffdf9"/>
+  <ellipse cx="49.5" cy="27" rx="5.4" ry="6.6" transform="rotate(18 49.5 27)" fill="#fffdf9"/>
+</svg>
