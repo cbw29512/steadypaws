@@ -41,10 +41,16 @@ jobs:
         run: python scripts/build_accessible_pages.py
 
       - name: Check browser JavaScript syntax
-        run: node --check assets/site.js
+        run: |
+          node --check assets/site.js
+          node --check assets/personalization-bridge-print1.js
+          node --check assets/care-personalization-print1.js
 
       - name: Verify SEO, downloads, security, and production integrity
         run: python scripts/verify_site.py
+
+      - name: Add local personalization to printable web worksheets
+        run: python scripts/enhance_accessible_pages.py
 
       - name: Verify WCAG 2.2 AA static requirements
         run: python scripts/verify_accessibility.py
@@ -72,7 +78,7 @@ jobs:
               raise SystemExit("Production-like static server did not become ready")
           PY
 
-      - name: Verify paw logo and personalized photo PDF in Chrome
+      - name: Verify photo survives download and browser printing
         run: python scripts/verify_personalization.py
 
       - name: Lighthouse mobile 100 / 100 / 100 / 100
