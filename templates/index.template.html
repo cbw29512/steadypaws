@@ -6,7 +6,7 @@
   <title>Steady Paws | Your Family Member's Care Paperwork</title>
   <meta name="description" content="Free printable care paperwork for the animals you love. Choose your family member, choose their main health concern, and get the right form for their veterinary care.">
   <meta name="robots" content="index, follow">
-  <meta name="theme-color" content="#163a33">
+  <meta name="theme-color" content="#55756c">
   <link rel="canonical" href="https://steadypaws.netlify.app/">
   <meta property="og:type" content="website">
   <meta property="og:url" content="https://steadypaws.netlify.app/">
@@ -18,6 +18,7 @@
   <link rel="icon" href="/assets/paw.svg" type="image/svg+xml">
   <link rel="stylesheet" href="/styles/base.css">
   <link rel="stylesheet" href="/styles/components.css">
+  <script src="https://cdn.jsdelivr.net/npm/pdf-lib@1.17.1/dist/pdf-lib.min.js" integrity="sha512-z8IYLHO8bTgFqj+yrPyIJnzBDf7DDhWwiEsk4sY+Oe6J2M+WQequeGS7qioI5vT6rXgVRb4K1UVQC5ER7MKzKQ==" crossorigin="anonymous" defer></script>
   <script src="/assets/site.js" defer></script>
 </head>
 <body>
@@ -79,6 +80,26 @@
             <button class="family-choice" type="button" data-family-group="aquatic" data-family-label="fish or amphibian"><span class="family-icon" aria-hidden="true">🐠</span><strong>Fish or amphibian</strong><span>Your water-loving family member</span></button>
           </div>
         </div>
+
+        <div class="personalize-wrap">
+          <section id="personalize" class="personalize-card" aria-labelledby="personalize-title" hidden>
+            <div class="photo-preview" aria-hidden="true">
+              <img id="photo-preview" alt="" hidden>
+              <span id="photo-placeholder" class="photo-placeholder"><span>♡<small>Their photo</small></span></span>
+            </div>
+            <div class="personalize-copy">
+              <p class="eyebrow">Optional</p>
+              <h3 id="personalize-title">Make their paperwork feel like theirs.</h3>
+              <p>Add their name and a favorite picture. When you choose a care form, Steady Paws can place both directly on their PDF before it downloads.</p>
+              <div class="personalize-fields">
+                <label>Their name<input id="family-name" type="text" maxlength="48" autocomplete="off" placeholder="Their name"></label>
+                <label class="photo-upload">Add their photo<input id="family-photo" type="file" accept="image/*"></label>
+                <button id="photo-remove" class="photo-remove" type="button" hidden>Remove photo</button>
+              </div>
+              <p id="personalize-status" class="personalize-privacy" role="status">Private by design: their name and photo stay in this browser and are added to the PDF on this device. Steady Paws does not upload them.</p>
+            </div>
+          </section>
+        </div>
       </div>
     </section>
 
@@ -103,7 +124,7 @@
       <div class="shell"><p class="eyebrow">How Steady Paws helps</p><h2>Less trying to remember. More time being there for them.</h2><div class="steps"><article><span>1</span><h3>Choose who needs you</h3><p>Start with your family member so the paperwork fits the kind of care they need.</p></article><article><span>2</span><h3>Focus on the biggest concern</h3><p>Track the health issue that matters most right now, while keeping room on the sheet for their other conditions.</p></article><article><span>3</span><h3>Walk in prepared</h3><p>Bring their care paperwork to the next visit so you can spend less time trying to remember and more time talking about what they need.</p></article></div></div>
     </section>
 
-    <section class="section library-note"><div class="shell resource-grid"><div><p class="eyebrow">Built with care</p><h2>The paperwork should fit your family member — not the other way around.</h2><p class="lede compact">The health concern may have the same name across species, but what is useful to observe can be different. Steady Paws lists each concern once, then gives you the version built for your family member.</p></div><div class="principles"><p><strong>Focused:</strong> each sheet centers one primary health concern so the daily record stays useful.</p><p><strong>Whole-picture:</strong> every sheet has room to note other conditions they are living with.</p><p><strong>Specific:</strong> observation fields can change when the species and health concern call for it.</p><p><strong>Free:</strong> every care form can be downloaded without an account or email address.</p></div></div></section>
+    <section class="section library-note"><div class="shell resource-grid"><div><p class="eyebrow">Built with care</p><h2>The paperwork should fit your family member — not the other way around.</h2><p class="lede compact">The health concern may have the same name across species, but what is useful to observe can be different. Steady Paws lists each concern once, then gives you the version built for your family member.</p></div><div class="principles"><p><strong>Focused:</strong> each sheet centers one primary health concern so the daily record stays useful.</p><p><strong>Whole-picture:</strong> every sheet has room to note other conditions they are living with.</p><p><strong>Personal:</strong> you can optionally add their name and photo before downloading.</p><p><strong>Specific:</strong> observation fields can change when the species and health concern call for it.</p><p><strong>Free:</strong> every care form can be downloaded without an account or email address.</p></div></div></section>
 
     <section id="safety" class="section">
       <div class="shell safety"><div><p class="eyebrow">One important thing</p><h2>You know them. Their veterinary team knows the medicine.</h2></div><p>Steady Paws helps you organize what you notice between visits. Choosing one primary concern for a tracker does not mean their other conditions are less important. It does not diagnose disease, recommend medication doses, or set medical or husbandry targets. Use the plan given by a veterinarian experienced with their species, and seek prompt veterinary care for urgent or concerning changes.</p></div>
