@@ -57,6 +57,7 @@ jobs:
       - name: Check browser JavaScript syntax
         run: |
           node --check assets/site.js
+          node --check assets/launch-polish-1.js
           node --check assets/personalization-bridge-print1.js
           node --check assets/care-personalization-print1.js
 
