@@ -29,9 +29,21 @@ PHOTO_INK = HexColor("#7B695F")
 WARN = HexColor("#FBF3E9")
 WARN_INK = HexColor("#746457")
 HEADER_LIGHT = HexColor("#EDF6F3")
+IDENTITY_BG = HexColor("#FFFEFA")
 
-# These coordinates are also used by assets/site.js when an optional photo/name
-# is added in the browser. Keep them stable or update both places together.
+GROUP_ACCENTS = {
+    "cat": HexColor("#EBCFC6"),
+    "dog": HexColor("#CFE0D9"),
+    "small-mammal": HexColor("#E2D8EA"),
+    "bird": HexColor("#D7E8EB"),
+    "reptile": HexColor("#DDE7CF"),
+    "horse": HexColor("#E8D6C2"),
+    "aquatic": HexColor("#CFE7E5"),
+    "universal": HexColor("#E9DFC5"),
+}
+
+# These coordinates are also used by assets/site.js and care personalization JS.
+# Keep them stable or update every browser personalization path at the same time.
 PHOTO_BOX = (486, 603, 90, 90)
 PHOTO_IMAGE_BOX = (490, 607, 82, 82)
 NAME_TEXT_POSITION = (96, 666)
@@ -63,6 +75,22 @@ def form_title(spec: dict) -> str:
     return f"{concern} Care Tracker"
 
 
+def accent_for(spec: dict):
+    return GROUP_ACCENTS.get(spec.get("group"), GROUP_ACCENTS["universal"])
+
+
+def draw_paw_mark(c: canvas.Canvas, x: float, y: float, scale: float = 1.0, color=white) -> None:
+    """Draw a compact four-toe paw without relying on an external image asset."""
+    c.saveState()
+    c.setFillColor(color)
+    c.ellipse(x + 6 * scale, y + 0 * scale, x + 20 * scale, y + 12 * scale, stroke=0, fill=1)
+    c.ellipse(x + 0 * scale, y + 12 * scale, x + 7 * scale, y + 21 * scale, stroke=0, fill=1)
+    c.ellipse(x + 7 * scale, y + 18 * scale, x + 14 * scale, y + 27 * scale, stroke=0, fill=1)
+    c.ellipse(x + 16 * scale, y + 18 * scale, x + 23 * scale, y + 27 * scale, stroke=0, fill=1)
+    c.ellipse(x + 23 * scale, y + 11 * scale, x + 30 * scale, y + 20 * scale, stroke=0, fill=1)
+    c.restoreState()
+
+
 def draw_fitted_title(c: canvas.Canvas, text: str, x: float, y: float, max_width: float) -> None:
     size = 20.0
     while size > 13 and stringWidth(text, "Helvetica-Bold", size) > max_width:
@@ -73,21 +101,32 @@ def draw_fitted_title(c: canvas.Canvas, text: str, x: float, y: float, max_width
 
 def draw_header(c: canvas.Canvas, spec: dict, page: int, subtitle: str | None = None) -> None:
     width, height = letter
+    accent = accent_for(spec)
     c.setFillColor(CREAM)
     c.rect(0, 0, width, height, stroke=0, fill=1)
     c.setFillColor(BRAND)
     c.rect(0, height - 88, width, 88, stroke=0, fill=1)
+    c.setFillColor(accent)
+    c.rect(0, height - 92, width, 4, stroke=0, fill=1)
+
+    draw_paw_mark(c, 36, height - 44, scale=0.58, color=white)
     c.setFillColor(white)
     c.setFont("Helvetica-Bold", 10)
-    c.drawString(36, height - 30, "STEADY PAWS")
-    c.setFillColor(HEADER_LIGHT)
-    c.setFont("Helvetica-Bold", 8)
-    c.drawRightString(width - 36, height - 30, spec["species"].upper())
+    c.drawString(58, height - 30, "STEADY PAWS")
+
+    species = spec["species"].upper()
+    badge_width = max(70, min(145, stringWidth(species, "Helvetica-Bold", 7.5) + 20))
+    c.setFillColor(accent)
+    c.roundRect(width - 36 - badge_width, height - 41, badge_width, 20, 10, stroke=0, fill=1)
+    c.setFillColor(INK)
+    c.setFont("Helvetica-Bold", 7.5)
+    c.drawCentredString(width - 36 - badge_width / 2, height - 34, species)
+
     c.setFillColor(white)
-    draw_fitted_title(c, form_title(spec), 36, height - 56, width - 72)
+    draw_fitted_title(c, form_title(spec), 36, height - 58, width - 72)
     c.setFillColor(HEADER_LIGHT)
     c.setFont("Helvetica", 8.3)
-    c.drawString(36, height - 73, subtitle or spec["subtitle"])
+    c.drawString(36, height - 75, subtitle or spec["subtitle"])
     c.setFillColor(MUTED)
     c.setFont("Helvetica", 7.5)
     c.drawRightString(width - 36, 20, f"Page {page} | steadypaws.netlify.app")
@@ -97,7 +136,8 @@ def draw_disclaimer(c: canvas.Canvas) -> None:
     width, _ = letter
     y = 45
     c.setFillColor(WARN)
-    c.roundRect(36, y, width - 72, 35, 6, stroke=0, fill=1)
+    c.setStrokeColor(HexColor("#E7D6C7"))
+    c.roundRect(36, y, width - 72, 35, 6, stroke=1, fill=1)
     c.setFillColor(WARN_INK)
     c.setFont("Helvetica", 6.8)
     text = (
@@ -108,24 +148,38 @@ def draw_disclaimer(c: canvas.Canvas) -> None:
         c.drawString(47, y + 22 - index * 10, line)
 
 
-def draw_photo_placeholder(c: canvas.Canvas) -> None:
+def draw_photo_placeholder(c: canvas.Canvas, accent) -> None:
     x, y, box_w, box_h = PHOTO_BOX
     c.setFillColor(PHOTO_SOFT)
     c.setStrokeColor(HexColor("#9D897A"))
     c.setLineWidth(0.8)
     c.roundRect(x, y, box_w, box_h, 14, stroke=1, fill=1)
+    draw_paw_mark(c, x + 31, y + 50, scale=0.85, color=accent)
     c.setFillColor(PHOTO_INK)
     c.setFont("Helvetica-Bold", 7.2)
-    c.drawCentredString(x + box_w / 2, y + 44, "THEIR PHOTO")
+    c.drawCentredString(x + box_w / 2, y + 34, "THEIR PHOTO")
     c.setFont("Helvetica", 6.6)
-    c.drawCentredString(x + box_w / 2, y + 31, "optional")
+    c.drawCentredString(x + box_w / 2, y + 22, "optional")
 
 
 def draw_identity(c: canvas.Canvas, spec: dict) -> None:
     width, height = letter
+    accent = accent_for(spec)
+
+    # Warm identity card: visually groups the person, primary concern, and photo.
+    c.setFillColor(IDENTITY_BG)
+    c.setStrokeColor(accent)
+    c.setLineWidth(1.0)
+    c.roundRect(28, 558, width - 56, 150, 14, stroke=1, fill=1)
+    c.setFillColor(accent)
+    c.roundRect(36, 688, 106, 15, 7.5, stroke=0, fill=1)
+    c.setFillColor(INK)
+    c.setFont("Helvetica-Bold", 6.7)
+    c.drawString(47, 693, "ABOUT YOUR FAMILY MEMBER")
+
+    # Keep these original baselines aligned with the browser PDF-stamping coordinates.
     c.setFillColor(INK)
     c.setFont("Helvetica-Bold", 8)
-
     name_y = height - 116
     c.drawString(36, name_y, "Their name")
     c.setStrokeColor(LINE)
@@ -158,15 +212,26 @@ def draw_identity(c: canvas.Canvas, spec: dict) -> None:
     c.setStrokeColor(LINE)
     c.line(194, other_y - 13, 466, other_y - 13)
 
-    draw_photo_placeholder(c)
+    draw_photo_placeholder(c, accent)
 
 
-def draw_daily_table(c: canvas.Canvas, fields: list[str]) -> None:
+def draw_daily_table(c: canvas.Canvas, spec: dict) -> None:
     width, height = letter
-    x0, y_top, table_width, row_height = 36, height - 244, width - 72, 36
+    fields = spec["fields"]
+    accent = accent_for(spec)
+    x0, y_top, table_width, row_height = 36, height - 258, width - 72, 35
     weights = [0.95] + [1] * (len(fields) - 2) + [1.5]
     total = sum(weights)
     widths = [table_width * weight / total for weight in weights]
+
+    c.setFillColor(INK)
+    c.setFont("Helvetica-Bold", 9)
+    c.drawString(x0, y_top + 13, "Daily observations")
+    c.setFillColor(accent)
+    c.roundRect(x0 + 96, y_top + 6, 62, 13, 6.5, stroke=0, fill=1)
+    c.setFillColor(INK)
+    c.setFont("Helvetica-Bold", 6.5)
+    c.drawCentredString(x0 + 127, y_top + 10, "11 ENTRIES")
 
     c.setFillColor(BRAND)
     c.roundRect(x0, y_top - 24, table_width, 24, 5, stroke=0, fill=1)
@@ -197,20 +262,28 @@ def draw_daily_table(c: canvas.Canvas, fields: list[str]) -> None:
     c.rect(x0, y_top - 24 - row_height * 11, table_width, row_height * 11 + 24, stroke=1, fill=0)
 
 
-def draw_summary(c: canvas.Canvas, items: list[str]) -> None:
+def draw_summary(c: canvas.Canvas, spec: dict) -> None:
     width, height = letter
+    items = spec["summary"]
+    accent = accent_for(spec)
     x0, y = 36, height - 135
+
+    c.setFillColor(accent)
+    c.roundRect(x0, y - 9, 190, 30, 15, stroke=0, fill=1)
     c.setFillColor(INK)
     c.setFont("Helvetica-Bold", 16)
-    c.drawString(x0, y, "How they did this week")
+    c.drawString(x0 + 14, y, "How they did this week")
     c.setFillColor(MUTED)
     c.setFont("Helvetica", 8.5)
-    c.drawString(x0, y - 18, "Use the little patterns you noticed to make their next veterinary conversation easier.")
+    c.drawString(x0, y - 26, "Use the little patterns you noticed to make their next veterinary conversation easier.")
     y -= 52
 
     for index, item in enumerate(items):
         col, row = index % 2, index // 2
         x, yy = x0 + col * 270, y - row * 58
+        c.setFillColor(SOFT if row % 2 == 0 else IDENTITY_BG)
+        c.setStrokeColor(LINE)
+        c.roundRect(x - 6, yy - 37, 258, 45, 8, stroke=1, fill=1)
         c.setStrokeColor(BRAND2)
         c.setLineWidth(1)
         c.roundRect(x, yy - 11, 12, 12, 2, stroke=1, fill=0)
@@ -283,12 +356,12 @@ def make_pdf(spec: dict) -> Path:
 
     draw_header(c, spec, 1)
     draw_identity(c, spec)
-    draw_daily_table(c, spec["fields"])
+    draw_daily_table(c, spec)
     draw_disclaimer(c)
     c.showPage()
 
     draw_header(c, spec, 2, "How they did this week + veterinary visit notes")
-    draw_summary(c, spec["summary"])
+    draw_summary(c, spec)
     draw_disclaimer(c)
     c.save()
     enhance_pdf(path, spec)

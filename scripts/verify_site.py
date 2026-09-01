@@ -1,4 +1,4 @@
-"""Production certification for Steady Paws SEO, downloads, privacy, and build integrity."""
+"""Production certification for Steady Paws SEO, downloads, privacy, print design, and build integrity."""
 
 from __future__ import annotations
 
@@ -21,6 +21,7 @@ ROOT = Path(__file__).resolve().parents[1]
 EXPECTED_SITE_URL = "https://steadypaws.netlify.app/"
 EXPECTED_SUPPORT_URL = "https://buymeacoffee.com/divclass016"
 EXPECTED_ASSET_REV = "20260901-pawphoto1"
+CARE_ASSET_REV = "20260901-printphoto2"
 EXPECTED_VENDOR_SHA512 = "z8IYLHO8bTgFqj+yrPyIJnzBDf7DDhWwiEsk4sY+Oe6J2M+WQequeGS7qioI5vT6rXgVRb4K1UVQC5ER7MKzKQ=="
 VENDOR_PATH = ROOT / "assets/vendor/pdf-lib-1.17.1.min.js"
 
@@ -109,7 +110,8 @@ def assert_required_files() -> None:
     required = (
         "index.html", "404.html", "accessibility.html", "privacy.html",
         "styles/base.css", "styles/components.css", "styles/family.css", "styles/care.css",
-        "assets/paw.svg", "assets/site.js", "assets/vendor/pdf-lib-1.17.1.min.js",
+        "assets/paw.svg", "assets/site.js", "assets/personalization-bridge-print1.js",
+        "assets/care-personalization-print1.js", "assets/vendor/pdf-lib-1.17.1.min.js",
         "netlify.toml", "robots.txt", "sitemap.xml", "requirements.txt",
         "templates/index.template.html", "scripts/tracker_catalog.py", "scripts/fetch_vendor.py",
         "scripts/build_trackers.py", "scripts/build_site.py", "scripts/build_accessible_pages.py",
@@ -165,6 +167,7 @@ def assert_homepage() -> None:
         f'/assets/paw.svg?v={EXPECTED_ASSET_REV}',
         f'/styles/base.css?v={EXPECTED_ASSET_REV}', f'/styles/components.css?v={EXPECTED_ASSET_REV}',
         f'/styles/family.css?v={EXPECTED_ASSET_REV}', f'/assets/site.js?v={EXPECTED_ASSET_REV}',
+        '/assets/personalization-bridge-print1.js',
     )
     missing = [marker for marker in required_markers if marker not in html]
     if missing:
@@ -204,15 +207,33 @@ def assert_homepage() -> None:
 
 
 def assert_personalization_source() -> None:
-    js = (ROOT / "assets/site.js").read_text(encoding="utf-8")
+    site_js = (ROOT / "assets/site.js").read_text(encoding="utf-8")
+    bridge_js = (ROOT / "assets/personalization-bridge-print1.js").read_text(encoding="utf-8")
+    care_js = (ROOT / "assets/care-personalization-print1.js").read_text(encoding="utf-8")
     css = (ROOT / "styles/components.css").read_text(encoding="utf-8")
-    required_js = (
-        "photoPreviewBox", "Photo ready ✓", "Personalized PDF ready ✓",
-        "embedJpg", "page.drawImage(photo, PHOTO_IMAGE_BOX)", "Milo" if False else "safeDownloadName",
-    )
-    for marker in required_js:
-        if marker not in js:
-            raise AssertionError(f"Personalization JavaScript marker missing: {marker}")
+
+    for marker in (
+        "photoPreviewBox", "Photo ready ✓", "Personalized PDF ready ✓", "embedJpg",
+        "page.drawImage(photo, PHOTO_IMAGE_BOX)", "safeDownloadName",
+        "const PHOTO_IMAGE_BOX = { x: 490, y: 607, width: 82, height: 82 }",
+        "const NAME_POSITION = { x: 96, y: 666, maxWidth: 190 }",
+    ):
+        if marker not in site_js:
+            raise AssertionError(f"Homepage personalization JavaScript marker missing: {marker}")
+
+    for marker in ("sessionStorage", "steadypaws.personalization.v1", "accessibleLinks", "MutationObserver"):
+        if marker not in bridge_js:
+            raise AssertionError(f"Personalization bridge marker missing: {marker}")
+
+    for marker in (
+        "sessionStorage", "care-family-photo", "care-print-personalized", "care-personalization-status",
+        "embedJpg", "page.drawImage(photo, PHOTO_IMAGE_BOX)",
+        "const PHOTO_IMAGE_BOX = { x: 490, y: 607, width: 82, height: 82 }",
+        "const NAME_POSITION = { x: 96, y: 666, maxWidth: 190 }",
+    ):
+        if marker not in care_js:
+            raise AssertionError(f"Care-page personalization JavaScript marker missing: {marker}")
+
     for marker in (
         '.photo-field input[type="file"]', '::file-selector-button', '.photo-preview.is-ready',
         '.personalize-privacy[data-state="ready"]',
@@ -221,7 +242,23 @@ def assert_personalization_source() -> None:
             raise AssertionError(f"Visible photo-control style missing: {marker}")
     if "pointer-events:none" in css and ".photo-upload input" in css:
         raise AssertionError("Legacy hidden photo-upload control is still present")
-    LOGGER.info("Visible photo picker + local PDF stamping source: PASS")
+    LOGGER.info("Local photo/name personalization across download + web-print paths: PASS")
+
+
+def assert_print_design_source() -> None:
+    source = (ROOT / "scripts/build_trackers.py").read_text(encoding="utf-8")
+    required = (
+        "GROUP_ACCENTS", '"cat": HexColor("#EBCFC6")', '"dog": HexColor("#CFE0D9")',
+        '"small-mammal": HexColor("#E2D8EA")', '"bird": HexColor("#D7E8EB")',
+        '"reptile": HexColor("#DDE7CF")', '"horse": HexColor("#E8D6C2")',
+        '"aquatic": HexColor("#CFE7E5")', "draw_paw_mark", "ABOUT YOUR FAMILY MEMBER",
+        "Daily observations", "IDENTITY_BG", "PHOTO_SOFT", "11 ENTRIES",
+        "PHOTO_IMAGE_BOX = (490, 607, 82, 82)", "NAME_TEXT_POSITION = (96, 666)",
+    )
+    missing = [marker for marker in required if marker not in source]
+    if missing:
+        raise AssertionError(f"Print-design markers missing: {missing}")
+    LOGGER.info("Soft colorful species accents + paw-branded printable design source: PASS")
 
 
 def assert_accessible_care_pages() -> None:
@@ -236,15 +273,18 @@ def assert_accessible_care_pages() -> None:
             f'rel="alternate" type="application/pdf" href="/downloads/{item["filename"]}"',
             '<main id="main"', '<fieldset', '<legend>', '<caption id="daily-caption">', '<th scope="col">',
             'class="brand-logo"', f'/assets/paw.svg?v={EXPECTED_ASSET_REV}',
+            f'/styles/care.css?v={CARE_ASSET_REV}',
+            f'/assets/care-personalization-print1.js?v={CARE_ASSET_REV}',
+            'id="care-family-name"', 'id="care-print-personalized"', 'id="care-personalization-status"',
             "Other conditions they're living with", "Questions for their veterinary team",
             escape(concern), escape(item["species"]), '/accessibility.html', '/privacy.html',
         )
         missing = [marker for marker in required if marker not in html]
         if missing:
             raise AssertionError(f"Accessible page markers missing from {path.name}: {missing}")
-        if "style=" in html or "<script" in html:
-            raise AssertionError(f"Accessible page should not require inline styles or JavaScript: {path.name}")
-    LOGGER.info("72 semantic keyboard/screen-reader worksheet alternatives with paw branding: PASS")
+        if "style=" in html:
+            raise AssertionError(f"Accessible page should not require inline styles: {path.name}")
+    LOGGER.info("72 semantic worksheets with stable personalized print controls + paw branding: PASS")
 
 
 def assert_static_pages() -> None:
@@ -279,9 +319,11 @@ def assert_security_and_cache_policy() -> None:
         raise AssertionError(f"Security/build policy markers missing: {missing}")
     if "cdn.jsdelivr.net" in netlify:
         raise AssertionError("Runtime CSP still permits the former third-party PDF library")
+    if "enhance_accessible_pages.py" in netlify:
+        raise AssertionError("Netlify still relies on the former post-build worksheet enhancer")
     if netlify.count('Cache-Control = "public, max-age=31536000, immutable"') < 2:
         raise AssertionError("Versioned CSS/JS assets are not immutable-cached")
-    LOGGER.info("Hardened CSP, privacy boundary, and immutable versioned assets: PASS")
+    LOGGER.info("Hardened CSP, privacy boundary, direct build, and immutable versioned assets: PASS")
 
 
 def assert_sitemap_and_robots() -> None:
@@ -315,7 +357,7 @@ def assert_pdfs() -> None:
         second_page = reader.pages[1].extract_text() or ""
         for marker in (
             "Their name", "Primary health concern", "Other conditions they're living with",
-            "THEIR PHOTO", "optional", condition_name(item),
+            "THEIR PHOTO", "optional", "Daily observations", condition_name(item),
         ):
             if marker not in first_page:
                 raise AssertionError(f"Printable PDF marker missing from {item['filename']}: {marker}")
@@ -325,7 +367,7 @@ def assert_pdfs() -> None:
             raise AssertionError(f"PDF language metadata missing: {item['filename']}")
         if not reader.metadata or not reader.metadata.title or len(reader.outline) < 2:
             raise AssertionError(f"PDF metadata/bookmarks missing: {item['filename']}")
-    LOGGER.info("72 two-page print PDFs with photo space, language metadata, and bookmarks (144 pages): PASS")
+    LOGGER.info("72 two-page paw-branded print PDFs with photo space + metadata (144 pages): PASS")
 
 
 def main() -> int:
@@ -336,6 +378,7 @@ def main() -> int:
         assert_paw_asset()
         assert_homepage()
         assert_personalization_source()
+        assert_print_design_source()
         assert_accessible_care_pages()
         assert_static_pages()
         assert_security_and_cache_policy()

@@ -1,7 +1,8 @@
-"""Browser regression for Steady Paws local name/photo PDF personalization."""
+"""Browser regression for Steady Paws local name/photo PDF and print personalization."""
 
 from __future__ import annotations
 
+import base64
 import shutil
 import tempfile
 import time
@@ -44,6 +45,25 @@ def page_has_image(reader: PdfReader) -> bool:
     return False
 
 
+def page_has_large_image(reader: PdfReader, minimum: int = 300) -> bool:
+    for page in reader.pages:
+        resources = page.get("/Resources")
+        if not resources:
+            continue
+        xobjects = resources.get_object().get("/XObject")
+        if not xobjects:
+            continue
+        for value in xobjects.get_object().values():
+            candidate = value.get_object()
+            if candidate.get("/Subtype") != "/Image":
+                continue
+            width = int(candidate.get("/Width", 0))
+            height = int(candidate.get("/Height", 0))
+            if width >= minimum and height >= minimum:
+                return True
+    return False
+
+
 def wait_for_download(directory: Path, timeout: float = 20.0) -> Path:
     deadline = time.time() + timeout
     while time.time() < deadline:
@@ -65,8 +85,6 @@ def scroll_and_click(driver: webdriver.Chrome, wait: WebDriverWait, by: str, val
     try:
         element.click()
     except Exception:
-        # Headless Chrome can still report a transient sticky-header interception after scroll.
-        # Dispatching the click on the same visible/enabled control tests the exact site handler.
         driver.execute_script("arguments[0].click();", element)
     return element
 
@@ -77,6 +95,7 @@ def main() -> int:
         downloads = root / "downloads"
         downloads.mkdir()
         photo = root / "family-photo.jpg"
+        printed = root / "accessible-print.pdf"
         make_test_photo(photo)
 
         options = Options()
@@ -128,6 +147,9 @@ def main() -> int:
                 (element for element in d.find_elements(By.CSS_SELECTOR, ".care-download") if element.is_displayed()),
                 None,
             ))
+            variant = download_link.find_element(By.XPATH, "./ancestor::div[contains(@class,'tracker-variant')]")
+            accessible_link = variant.find_element(By.CSS_SELECTOR, ".accessible-link")
+
             driver.execute_script("arguments[0].scrollIntoView({block:'center', inline:'nearest'});", download_link)
             wait.until(lambda d: download_link.is_displayed() and download_link.is_enabled() and "Personalize" in download_link.text)
             try:
@@ -143,7 +165,44 @@ def main() -> int:
             text = reader.pages[0].extract_text() or ""
             assert "Milo" in text, "Personalized name was not embedded into the PDF"
             assert page_has_image(reader), "Personalized photo image was not embedded into the PDF"
-            print(f"Personalization browser test PASS: {downloaded.name}")
+            downloaded.unlink()
+
+            driver.execute_script("arguments[0].scrollIntoView({block:'center', inline:'nearest'});", accessible_link)
+            try:
+                accessible_link.click()
+            except Exception:
+                driver.execute_script("arguments[0].click();", accessible_link)
+
+            wait.until(EC.url_contains("/care/"))
+            care_name = wait.until(EC.presence_of_element_located((By.ID, "care-family-name")))
+            assert care_name.get_attribute("value") == "Milo", "Name did not carry into the accessible worksheet"
+            care_photo = wait.until(EC.visibility_of_element_located((By.ID, "care-family-photo")))
+            wait.until(lambda d: d.execute_script("return arguments[0].naturalWidth", care_photo) > 0)
+
+            result = driver.execute_cdp_cmd(
+                "Page.printToPDF",
+                {"printBackground": True, "preferCSSPageSize": True},
+            )
+            printed.write_bytes(base64.b64decode(result["data"]))
+            print_reader = PdfReader(str(printed))
+            assert page_has_large_image(print_reader), "Uploaded photo was not rendered into the browser-printed worksheet"
+
+            care_download = driver.find_element(By.CSS_SELECTOR, '.care-actions a.button[href$=".pdf"]')
+            assert "personalized" in care_download.text.lower(), "Care-page PDF action did not recognize personalization"
+            try:
+                care_download.click()
+            except Exception:
+                driver.execute_script("arguments[0].click();", care_download)
+            wait.until(lambda d: "Personalized PDF ready" in d.find_element(By.ID, "care-personalization-status").text)
+            second_download = wait_for_download(downloads)
+            second_reader = PdfReader(str(second_download))
+            second_text = second_reader.pages[0].extract_text() or ""
+            assert "Milo" in second_text, "Care-page PDF download lost the personalized name"
+            assert page_has_image(second_reader), "Care-page PDF download lost the personalized photo"
+
+            print(
+                "Personalization browser test PASS: homepage PDF + accessible worksheet print + care-page PDF all retain photo/name"
+            )
             return 0
         finally:
             driver.quit()
