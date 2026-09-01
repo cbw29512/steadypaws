@@ -5,7 +5,7 @@
   const familyChoices = [...document.querySelectorAll('.family-choice')];
   const moreButton = document.querySelector('.family-more');
   const moreFamily = document.querySelector('#more-family');
-  const cards = [...document.querySelectorAll('.tracker-card')];
+  const cards = [...document.querySelectorAll('.condition-card')];
   const search = document.querySelector('#tracker-search');
   const count = document.querySelector('#result-count');
   const empty = document.querySelector('#no-results');
@@ -21,12 +21,19 @@
   const normalize = value => value.trim().toLowerCase();
 
   function cardText(card) {
-    return `${card.dataset.species || ''} ${card.dataset.search || ''} ${card.textContent}`.toLowerCase();
+    return `${card.dataset.search || ''} ${card.textContent}`.toLowerCase();
   }
 
-  function familyMatches(card) {
+  function variantText(variant) {
+    return `${variant.dataset.species || ''} ${variant.dataset.search || ''} ${variant.textContent}`.toLowerCase();
+  }
+
+  function variantFitsFamily(variant) {
+    const group = variant.dataset.group || '';
+    const groupMatch = activeGroup === 'all' || group === activeGroup;
+    if (!groupMatch) return false;
     if (!familyTerms.length) return true;
-    const text = cardText(card);
+    const text = variantText(variant);
     return familyTerms.some(term => text.includes(term));
   }
 
@@ -37,26 +44,35 @@
       let visible = 0;
 
       cards.forEach(card => {
-        const cardGroup = card.dataset.group || '';
-        const groupMatch = activeGroup === 'all' || cardGroup === activeGroup;
-        const searchMatch = !query || cardText(card).includes(query);
-        const show = browsing && groupMatch && familyMatches(card) && searchMatch;
-        card.hidden = !show;
-        if (show) visible += 1;
+        const variants = [...card.querySelectorAll('.tracker-variant')];
+        const queryMatchesCard = !query || cardText(card).includes(query);
+        let visibleVariants = 0;
+
+        variants.forEach(variant => {
+          const searchMatch = !query || queryMatchesCard || variantText(variant).includes(query);
+          const showVariant = browsing && variantFitsFamily(variant) && searchMatch;
+          variant.hidden = !showVariant;
+          if (showVariant) visibleVariants += 1;
+        });
+
+        const showCard = browsing && visibleVariants > 0;
+        card.hidden = !showCard;
+        card.classList.toggle('has-multiple-variants', visibleVariants > 1);
+        if (showCard) visible += 1;
       });
 
       if (!browsing) {
-        count.textContent = 'Pick your family member above to see their care paperwork.';
+        count.textContent = 'Pick your family member above to see their primary health concerns.';
         empty.hidden = true;
         return;
       }
 
       count.textContent = visible === 1
-        ? '1 care form ready for you'
-        : `${visible} care forms ready for you`;
+        ? '1 primary health concern ready to choose'
+        : `${visible} primary health concerns ready to choose`;
       empty.hidden = visible !== 0;
     } catch (error) {
-      console.error('Steady Paws care-paperwork filtering failed:', error);
+      console.error('Steady Paws health-concern filtering failed:', error);
     }
   }
 
@@ -90,11 +106,11 @@
       choice.setAttribute('aria-pressed', 'true');
       setActiveChip(activeGroup);
 
-      if (journeyHeading) journeyHeading.textContent = 'What tough time are they going through?';
+      if (journeyHeading) journeyHeading.textContent = 'What is the biggest health concern right now?';
       if (journeyCopy) {
         journeyCopy.textContent = activeGroup === 'all'
-          ? 'Here is every Steady Paws care form. Choose the one that best matches what your family member and veterinary team are working through.'
-          : `Here is the care paperwork that fits your ${familyLabel}. Choose what their veterinary team is helping them manage.`;
+          ? 'Each health concern appears once. Open the concern you need and choose the version made for your family member.'
+          : `Choose the main health concern you want to track for your ${familyLabel}. Their form has room to note other conditions they are living with too.`;
       }
 
       applyFilters();
@@ -129,7 +145,8 @@
     journeyStarted = true;
     clearFamilySelection();
     setActiveChip(activeGroup);
-    if (journeyCopy) journeyCopy.textContent = 'Browse the complete care-paperwork collection or search for what your family member is going through.';
+    if (journeyHeading) journeyHeading.textContent = 'Browse primary health concerns';
+    if (journeyCopy) journeyCopy.textContent = 'Each concern is listed once. When several tailored forms exist, choose the one made for your family member.';
     applyFilters();
   }));
 
