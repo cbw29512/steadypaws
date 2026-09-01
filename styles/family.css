@@ -1,7 +1,7 @@
 .family-grid-primary { grid-template-columns:repeat(4,minmax(0,1fr)); }
 .family-more { min-height:166px; padding:22px; border:1px solid #dedbd5; border-radius:20px; background:linear-gradient(145deg,#fbf2eb,#fffefa); color:var(--ink); text-align:left; font:inherit; cursor:pointer; box-shadow:0 8px 24px rgba(53,72,66,.035); transition:transform .16s ease,border-color .16s ease,box-shadow .16s ease,background .16s ease; }
 .family-more:hover,.family-more.is-open { transform:translateY(-3px); border-color:#c9b8a9; box-shadow:0 14px 30px rgba(53,72,66,.065); }
-.family-more:focus-visible { outline:3px solid rgba(196,154,108,.40); outline-offset:3px; }
+.family-more:focus-visible { outline-color:var(--focus); outline-offset:3px; }
 .family-more > strong,.family-more > span { display:block; }
 .family-more > strong { margin:12px 0 5px; font-size:1.08rem; }
 .family-more > span:last-child { color:var(--muted); font-size:.82rem; line-height:1.4; }
@@ -17,7 +17,8 @@
 .tracker-variant[hidden] { display:none; }
 .tracker-variant .species-badge { margin-bottom:8px; }
 .tracker-variant p { margin:0 0 12px; font-size:.84rem; line-height:1.45; }
-.tracker-variant .download-link { display:inline-flex; margin-top:0; padding-top:0; border-top:0; }
+.tracker-variant .download-link { display:inline-flex; margin-top:0; padding-top:0; border-top:0; min-height:28px; align-items:center; }
+.tracker-variant .accessible-link { display:inline-flex; min-height:28px; align-items:center; margin-top:6px; color:var(--muted); font-size:.8rem; font-weight:750; text-decoration:underline; text-underline-offset:3px; }
 .condition-card.has-multiple-variants .tracker-variants { gap:12px; }
 .condition-card.has-multiple-variants .tracker-variant { padding:14px; border:1px solid #e0e8e4; border-radius:14px; background:#fbfdfc; }
 .browse-tools { margin-top:30px; border:1px solid var(--line); border-radius:18px; background:rgba(255,254,250,.76); }
