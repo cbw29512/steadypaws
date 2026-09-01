@@ -4,8 +4,9 @@
 .care-header .eyebrow { margin-bottom:8px; }
 .care-header h1 { max-width:900px; font-size:clamp(2.25rem,5vw,4.6rem); }
 .care-actions { display:flex; gap:12px; flex-wrap:wrap; margin:24px 0 12px; }
+.care-print-button { font:inherit; cursor:pointer; }
 .care-note { padding:18px 20px; border:1px solid #b7a18f; border-radius:16px; background:#fbf3e9; color:#65584e; }
-.care-personalization-status { margin:0 0 24px; color:var(--muted); font-size:.9rem; font-weight:700; }
+.care-personalization-status { min-height:2.8em; margin:0 0 24px; color:var(--muted); font-size:.9rem; font-weight:700; }
 .care-form { display:grid; gap:28px; }
 .care-fieldset { min-width:0; margin:0; padding:22px; border:1px solid #b9c9c3; border-radius:18px; background:var(--white); }
 .care-fieldset legend { padding:0 8px; color:var(--ink); font-weight:850; }
