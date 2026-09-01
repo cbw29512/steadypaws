@@ -108,7 +108,11 @@ def main() -> int:
         .replace('href="/assets/paw.svg"', f'href="/assets/paw.svg?v={ASSET_REV}"')
         .replace('src="/assets/paw.svg"', f'src="/assets/paw.svg?v={ASSET_REV}"')
         .replace('src="/assets/site.js"', f'src="/assets/site.js?v={ASSET_REV}"')
-        .replace("</head>", f'  <link rel="stylesheet" href="/styles/family.css?v={ASSET_REV}">\n</head>')
+        .replace(
+            "</head>",
+            '<script src="/assets/personalization-bridge-print1.js" defer></script>\n'
+            f'  <link rel="stylesheet" href="/styles/family.css?v={ASSET_REV}">\n</head>',
+        )
     )
     if "{{" in html or "}}" in html:
         raise RuntimeError("Unresolved homepage template placeholder")
