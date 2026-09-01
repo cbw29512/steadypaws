@@ -19,7 +19,9 @@ def group_counts() -> Counter:
 
 def render_filters() -> str:
     counts = group_counts()
-    parts = [f'<button class="filter-chip is-active" type="button" data-filter="all" aria-pressed="true">All <span>{len(TRACKERS)}</span></button>']
+    parts = [
+        f'<button class="filter-chip is-active" type="button" data-filter="all" aria-pressed="true">All <span>{len(TRACKERS)}</span></button>'
+    ]
     for key in ("cat", "dog", "small-mammal", "bird", "reptile", "horse", "aquatic", "universal"):
         parts.append(
             f'<button class="filter-chip" type="button" data-filter="{key}" aria-pressed="false">'
@@ -32,6 +34,32 @@ def badge_class(group: str) -> str:
     return group.replace("-", "_")
 
 
+def friendly_title(item: dict) -> str:
+    """Remove clinical species prefixes from the user-facing card title."""
+    title = item["title"].strip()
+    prefixes = (
+        f'{item["species"]} ',
+        "Feline ",
+        "Canine ",
+        "Equine ",
+        "Avian ",
+    )
+    for prefix in prefixes:
+        if title.lower().startswith(prefix.lower()):
+            title = title[len(prefix):]
+            break
+    if title.endswith(" Tracker"):
+        title = title[:-8]
+    return title.strip()
+
+
+def badge_label(item: dict) -> str:
+    species = item["species"].strip()
+    if item["group"] == "universal" or species.lower() in {"all pets", "all"}:
+        return "For any pet"
+    return f"For {species.lower()}"
+
+
 def render_cards() -> str:
     cards = []
     for item in TRACKERS:
@@ -39,10 +67,10 @@ def render_cards() -> str:
         cards.append(
             f'<article class="tracker-card" data-group="{escape(item["group"], quote=True)}" '
             f'data-species="{escape(item["species"], quote=True)}" data-search="{search}">'
-            f'<span class="species-badge {badge_class(item["group"])}">{escape(item["species"])}</span>'
-            f'<h3>{escape(item["title"])}</h3><p>{escape(item["description"])}</p>'
+            f'<span class="species-badge {badge_class(item["group"])}">{escape(badge_label(item))}</span>'
+            f'<h3>{escape(friendly_title(item))}</h3><p>{escape(item["description"])}</p>'
             f'<a class="download-link" href="/downloads/{escape(item["filename"], quote=True)}" download>'
-            f'Download PDF <span aria-hidden="true">↓</span></a></article>'
+            f'Get their tracker <span aria-hidden="true">↓</span></a></article>'
         )
     return "\n          ".join(cards)
 
