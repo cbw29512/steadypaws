@@ -64,6 +64,9 @@ jobs:
       - name: Verify SEO, downloads, security, and production integrity
         run: python scripts/verify_site.py
 
+      - name: Verify cat/dog search hubs and discovery sitemap
+        run: python scripts/verify_species_hubs.py
+
       - name: Verify WCAG 2.2 AA static requirements
         run: python scripts/verify_accessibility.py
 
@@ -98,6 +101,8 @@ jobs:
         with:
           urls: |
             http://127.0.0.1:4173/
+            http://127.0.0.1:4173/pets/cat-health-trackers.html
+            http://127.0.0.1:4173/pets/dog-health-trackers.html
             http://127.0.0.1:4173/care/diabetic-cat-tracker.html
             http://127.0.0.1:4173/accessibility.html
           configPath: ./.lighthouserc.mobile.json
@@ -109,6 +114,8 @@ jobs:
         with:
           urls: |
             http://127.0.0.1:4173/
+            http://127.0.0.1:4173/pets/cat-health-trackers.html
+            http://127.0.0.1:4173/pets/dog-health-trackers.html
             http://127.0.0.1:4173/care/diabetic-cat-tracker.html
             http://127.0.0.1:4173/accessibility.html
           configPath: ./.lighthouserc.desktop.json
