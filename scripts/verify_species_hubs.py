@@ -65,6 +65,21 @@ def verify_hub(animal: str, path: Path) -> None:
         raise
 
 
+def verify_home_links() -> None:
+    try:
+        html = (ROOT / "index.html").read_text(encoding="utf-8")
+        parser = LinkParser()
+        parser.feed(html)
+        expected = {f"/pets/{animal}-health-trackers.html" for animal in HUBS}
+        missing = expected.difference(parser.hrefs)
+        if missing:
+            raise AssertionError(f"Homepage does not link to species hubs: {sorted(missing)}")
+        LOGGER.info("Homepage internal links to species hubs: PASS")
+    except Exception:
+        LOGGER.exception("Homepage species-hub linking: FAIL")
+        raise
+
+
 def verify_sitemap() -> None:
     try:
         robots = (ROOT / "robots.txt").read_text(encoding="utf-8")
@@ -88,6 +103,7 @@ def main() -> int:
     try:
         for animal, path in HUBS.items():
             verify_hub(animal, path)
+        verify_home_links()
         verify_sitemap()
         LOGGER.info("STEADY PAWS SPECIES SEO HUB GATE: PASS")
         return 0
