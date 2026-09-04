@@ -54,6 +54,9 @@ jobs:
       - name: Build accessible care worksheets and sitemap
         run: python scripts/build_accessible_pages.py
 
+      - name: Apply commercial trust layer
+        run: python scripts/apply_commercial_trust.py
+
       - name: Check browser JavaScript syntax
         run: |
           node --check assets/site.js
@@ -63,6 +66,9 @@ jobs:
 
       - name: Verify SEO, downloads, security, and production integrity
         run: python scripts/verify_site.py
+
+      - name: Verify commercial trust, terms, and support coverage
+        run: python scripts/verify_commercial_trust.py
 
       - name: Verify cat/dog search hubs and discovery sitemap
         run: python scripts/verify_species_hubs.py
