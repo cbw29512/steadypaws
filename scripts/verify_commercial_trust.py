@@ -3,7 +3,6 @@
 from __future__ import annotations
 
 import logging
-import xml.etree.ElementTree as ET
 from html.parser import HTMLParser
 from pathlib import Path
 
@@ -14,7 +13,6 @@ LOGGER = logging.getLogger(__name__)
 ROOT = Path(__file__).resolve().parents[1]
 SUPPORT_URL = "https://buymeacoffee.com/divclass016"
 TERMS_PATH = "/terms.html"
-TERMS_URL = "https://steadypaws.netlify.app/terms.html"
 
 
 class BasicParser(HTMLParser):
@@ -88,15 +86,6 @@ def assert_public_coverage() -> None:
     LOGGER.info("Homepage + 72 care pages + species/info pages carry trust/support links: PASS")
 
 
-def assert_sitemap() -> None:
-    tree = ET.parse(ROOT / "sitemap.xml")
-    ns = {"s": "http://www.sitemaps.org/schemas/sitemap/0.9"}
-    urls = {node.text for node in tree.findall("s:url/s:loc", ns) if node.text}
-    if TERMS_URL not in urls:
-        raise AssertionError("Main sitemap does not include terms.html")
-    LOGGER.info("Terms sitemap discovery: PASS")
-
-
 def assert_support_remains_optional() -> None:
     homepage = (ROOT / "index.html").read_text(encoding="utf-8")
     terms = (ROOT / "terms.html").read_text(encoding="utf-8")
@@ -112,7 +101,6 @@ def main() -> int:
     try:
         assert_terms_page()
         assert_public_coverage()
-        assert_sitemap()
         assert_support_remains_optional()
         LOGGER.info("STEADY PAWS COMMERCIAL TRUST GATE: PASS")
         return 0

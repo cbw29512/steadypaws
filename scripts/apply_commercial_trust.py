@@ -3,14 +3,12 @@
 from __future__ import annotations
 
 import logging
-import xml.etree.ElementTree as ET
 from pathlib import Path
 
 logging.basicConfig(level=logging.INFO, format="%(levelname)s | %(message)s")
 LOGGER = logging.getLogger(__name__)
 ROOT = Path(__file__).resolve().parents[1]
 SUPPORT_URL = "https://buymeacoffee.com/divclass016"
-SITE_TERMS_URL = "https://steadypaws.netlify.app/terms.html"
 
 CARE_FOOTER = (
     '<footer class="care-footer"><p>Steady Paws · Free pet health trackers for animals you love · '
@@ -54,20 +52,6 @@ def polish_care_pages() -> int:
     return count
 
 
-def polish_sitemap() -> None:
-    path = ROOT / "sitemap.xml"
-    tree = ET.parse(path)
-    root = tree.getroot()
-    ns = "{http://www.sitemaps.org/schemas/sitemap/0.9}"
-    urls = {node.text for node in root.findall(f"{ns}url/{ns}loc") if node.text}
-    if SITE_TERMS_URL not in urls:
-        url = ET.SubElement(root, f"{ns}url")
-        loc = ET.SubElement(url, f"{ns}loc")
-        loc.text = SITE_TERMS_URL
-    ET.register_namespace("", "http://www.sitemaps.org/schemas/sitemap/0.9")
-    tree.write(path, encoding="utf-8", xml_declaration=True)
-
-
 def main() -> int:
     try:
         for path in (
@@ -79,7 +63,6 @@ def main() -> int:
         ):
             append_footer_links(path)
         care_count = polish_care_pages()
-        polish_sitemap()
         LOGGER.info("Commercial trust polish applied to homepage, %d care pages, hubs, and information pages", care_count)
         return 0
     except Exception:
