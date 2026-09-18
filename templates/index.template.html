@@ -99,8 +99,12 @@
               <h3 id="personalize-title">Make their tracker feel like theirs.</h3>
               <p>Add their name and a favorite picture. You will see the photo here first, then Steady Paws will place it directly on page 1 of their PDF when you download.</p>
               <div class="personalize-fields">
-                <label class="name-field" for="family-name">Their name<input id="family-name" type="text" maxlength="48" autocomplete="off" placeholder="Their name" aria-describedby="personalize-status"></label>
-                <div class="photo-field">
+                <div class="personalize-field name-field">
+                  <label for="family-name">Their name</label>
+                  <input id="family-name" type="text" maxlength="48" autocomplete="off" placeholder="Their name" aria-describedby="personalize-status">
+                  <span class="field-help" aria-hidden="true">&nbsp;</span>
+                </div>
+                <div class="personalize-field photo-field">
                   <label for="family-photo">Their photo <span>optional</span></label>
                   <input id="family-photo" type="file" accept="image/*" aria-describedby="photo-help personalize-status">
                   <p id="photo-help" class="photo-help">Choose a photo your browser can open. JPG, PNG, and WebP are the most reliable.</p>
