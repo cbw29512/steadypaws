@@ -71,6 +71,8 @@ jobs:
           node --check assets/launch-polish-1.js
           node --check assets/personalization-bridge-print1.js
           node --check assets/care-personalization-print1.js
+          node --check assets/mobile-app.js
+          node --check app/sw.js
 
       - name: Verify SEO, downloads, security, and production integrity
         run: python scripts/verify_site.py
@@ -119,6 +121,7 @@ jobs:
             http://127.0.0.1:4173/pets/dog-health-trackers.html
             http://127.0.0.1:4173/care/diabetic-cat-tracker.html
             http://127.0.0.1:4173/accessibility.html
+            http://127.0.0.1:4173/app/
           configPath: ./.lighthouserc.mobile.json
           uploadArtifacts: true
           temporaryPublicStorage: false
@@ -132,6 +135,7 @@ jobs:
             http://127.0.0.1:4173/pets/dog-health-trackers.html
             http://127.0.0.1:4173/care/diabetic-cat-tracker.html
             http://127.0.0.1:4173/accessibility.html
+            http://127.0.0.1:4173/app/
           configPath: ./.lighthouserc.desktop.json
           uploadArtifacts: false
           temporaryPublicStorage: false
