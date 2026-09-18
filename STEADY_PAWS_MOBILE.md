@@ -190,3 +190,62 @@ Before adding a feature, ask:
 5. Is it worth the cognitive cost?
 
 If not, leave it out.
+
+
+## Authority vision: the sick-pet memory system
+
+Steady Paws should become the tool an owner remembers after a difficult illness because it reduced the mental load of caring for their pet.
+
+Target story:
+> "When Fluffy was sick there was so much to remember, but Steady Paws kept the medicine, meals, bathroom changes, treatment notes, and vet updates straight."
+
+This is not a diagnosis product. It is the reliable memory and communication layer between the owner, other caregivers, and the veterinary team.
+
+### Core care record domains
+
+The product architecture should support structured, timestamped records for:
+- medications: owner/vet-entered name, prescribed directions, scheduled times, given/skipped status, optional note;
+- treatments and home-care tasks: owner/vet-entered instructions and completion;
+- food and diet: food name/type, amount offered, amount eaten, meal time, optional diet-plan note;
+- water/intake observations;
+- stool/bowel movements: occurrence plus simple owner observations and optional photo/note;
+- urination observations;
+- vomiting/regurgitation events;
+- appetite;
+- energy/activity/mobility;
+- weight;
+- symptoms/changes the owner noticed;
+- photos and documents;
+- veterinary appointments and owner questions.
+
+The app records what the owner or veterinary team specified. It must not invent a dose, treatment, diet, target, or medical schedule.
+
+### Today screen priority
+
+For a pet under active care, the default experience should answer:
+1. What did I already record today?
+2. What owner/vet-entered care items are still due?
+3. Did someone else already do it? (future caregiver sharing)
+4. What changed today?
+5. Can I show the vet an accurate timeline without reconstructing it from memory?
+
+Medication and treatment actions should be one-tap completion wherever safe. Food, water, stool, urine, vomiting, and common observations should be quick-log actions.
+
+### Trust requirements for authority status
+
+Authority is earned through reliability, not medical claims:
+- exact timestamps;
+- edit history/auditability for important medication/treatment records;
+- clear distinction between scheduled, completed, skipped, and not recorded;
+- never convert "not recorded" into "missed";
+- explicit units for amounts/doses/weights;
+- timezone-safe dates;
+- backup/export before users depend on local-only history;
+- accessible and usable while stressed;
+- owner-entered facts remain verbatim in vet summaries;
+- report completeness should be transparent;
+- no generated diagnosis or verdict.
+
+### Product success metric
+
+The primary success metric is not time spent in the app. It is whether an owner can reliably care for a sick pet with less memory burden and give the veterinary team a clearer, trustworthy history.
