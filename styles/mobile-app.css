@@ -9,3 +9,5 @@
 @media(forced-colors:active){.app-choice[aria-pressed=true],.app-action:active,.text-link:active,.app-remove-pet:active{outline:3px solid Highlight;outline-offset:2px}.app-choice,.app-action,.text-link,.app-remove-pet{forced-color-adjust:auto}}
 
 .app-report-pet{display:flex;align-items:center;gap:1rem;margin:.75rem 0 1rem;padding-bottom:1rem;border-bottom:1px solid #d9e1de}.app-report-pet h2{margin:.15rem 0}.app-report-pet .eyebrow{margin:0}.app-report-species{margin:.15rem 0 0}.app-report-avatar{width:72px;height:72px;flex:0 0 72px;font-size:2.25rem}@media print{.app-report-pet{display:flex!important}.app-report-avatar{width:58px;height:58px;flex-basis:58px;font-size:1.8rem}}
+
+.app-checkin-time{display:inline-flex;align-items:center;min-height:36px;margin:.1rem 0 .55rem;padding:.4rem .7rem;border-radius:999px;background:#e8f0ed;color:#294f45;font-weight:800;font-size:.9rem;font-variant-numeric:tabular-nums}@media(max-width:420px){.app-checkin-time{font-size:.85rem}}
