@@ -249,3 +249,38 @@ Authority is earned through reliability, not medical claims:
 ### Product success metric
 
 The primary success metric is not time spent in the app. It is whether an owner can reliably care for a sick pet with less memory burden and give the veterinary team a clearer, trustworthy history.
+
+
+## Photo-first evidence capture
+
+Photo capture is a first-class care-record feature, not decoration.
+
+### Interaction
+- A prominent "Take a photo" action should use the phone camera directly when supported.
+- "Choose existing photo" remains available.
+- Photo automatically inherits pet, date/time, and the care event/check-in it was captured from.
+- Owner may add a short optional caption.
+- No filename management is exposed to the owner.
+- Thumbnail appears immediately in the timeline.
+- Owner can remove/replace a photo with an undo opportunity before final report sharing.
+
+### Report behavior
+- Vet Summary can include selected photos inline next to the associated timestamp/event.
+- Default report should use useful thumbnails rather than enormous images.
+- Tapping/opening the digital report should preserve access to a clearer image where feasible.
+- Photo captions remain owner-recorded observations and are not medically interpreted.
+- Report generation must distinguish attached photos from missing/not-recorded photos.
+
+### Storage and privacy
+- Persistent care-record photos use IndexedDB Blob storage, not base64 localStorage.
+- Keep originals locally where practical while generating appropriately sized report/display derivatives.
+- Strip unnecessary metadata from exported/shared derivatives where practical, especially location metadata.
+- Never upload a care photo merely to make local tracking work.
+- Backup/export must eventually include photo attachments so a device loss does not destroy the care history.
+
+### Quality
+- Camera/photo capture must be tested on narrow mobile layouts.
+- Large photos must not freeze or overflow the UI.
+- Orientation must display correctly.
+- Reports must paginate cleanly with photos.
+- Existing Steady Paws photo/download/print regression remains mandatory.
