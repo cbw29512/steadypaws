@@ -12,7 +12,7 @@ from tracker_catalog import TRACKERS, condition_name
 
 ROOT = Path(__file__).resolve().parents[1]
 CARE_DIR = ROOT / "care"
-SITE_URL = "https://steadypaws.netlify.app"
+SITE_URL = "https://yourpetshealthlog.netlify.app"
 CARE_ASSET_REV = "20260901-printphoto2"
 
 
