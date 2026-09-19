@@ -44,7 +44,7 @@ def assert_terms_page() -> None:
         "Organization, not diagnosis or treatment", "Not an emergency service",
         "does not diagnose disease", "contact a veterinarian or veterinary emergency service promptly",
         "Support is optional", SUPPORT_URL, '/privacy.html', '/accessibility.html',
-        'rel="canonical" href="https://steadypaws.netlify.app/terms.html"',
+        'rel="canonical" href="https://yourpetshealthlog.netlify.app/terms.html"',
     )
     missing = [marker for marker in required if marker not in html]
     if missing:
