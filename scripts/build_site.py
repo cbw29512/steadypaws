@@ -11,7 +11,7 @@ from tracker_catalog import CONDITION_NAMES, GROUP_LABELS, TRACKERS, condition_k
 ROOT = Path(__file__).resolve().parents[1]
 TEMPLATE = ROOT / "templates" / "index.template.html"
 OUTPUT = ROOT / "index.html"
-ASSET_REV = "20260919-above-fold1"
+ASSET_REV = "20260919-launch-qr1"
 
 
 def grouped_conditions() -> list[tuple[str, list[dict]]]:
