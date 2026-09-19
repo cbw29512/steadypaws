@@ -318,6 +318,16 @@ def assert_accessible_care_pages() -> None:
 
 
 def assert_security_sitemap_and_static_pages() -> None:
+    privacy = (ROOT / "privacy.html").read_text(encoding="utf-8")
+    for disclosure in (
+        "Quick Phone Log records stay on your device",
+        "browser's local storage",
+        "browser's local database",
+        "Clear saved form data",
+    ):
+        if disclosure not in privacy:
+            raise AssertionError(f"Privacy local-storage disclosure missing: {disclosure}")
+
     for filename in (
         "404.html", "accessibility.html", "privacy.html", "terms.html",
         "pets/cat-health-trackers.html", "pets/dog-health-trackers.html",
