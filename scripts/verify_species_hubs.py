@@ -11,7 +11,7 @@ from urllib.parse import urlparse
 logging.basicConfig(level=logging.INFO, format="%(levelname)s | %(message)s")
 LOGGER = logging.getLogger(__name__)
 ROOT = Path(__file__).resolve().parents[1]
-SITE_URL = "https://steadypaws.netlify.app"
+SITE_URL = "https://yourpetshealthlog.netlify.app"
 HUBS = {
     "cat": ROOT / "pets/cat-health-trackers.html",
     "dog": ROOT / "pets/dog-health-trackers.html",
