@@ -46,7 +46,7 @@ python scripts/verify_site.py
 
 ## Netlify
 
-Netlify reads `netlify.toml` and runs the tracker generator and homepage builder before publishing the repository root. The production URL is `https://steadypaws.netlify.app/`.
+Netlify reads `netlify.toml` and runs the tracker generator and homepage builder before publishing the repository root. The production URL is `https://yourpetshealthlog.netlify.app/`.
 
 ## Product principles
 
