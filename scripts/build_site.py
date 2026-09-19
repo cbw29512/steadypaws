@@ -7,11 +7,40 @@ from html import escape
 from pathlib import Path
 
 from tracker_catalog import CONDITION_NAMES, GROUP_LABELS, TRACKERS, condition_key, condition_name
+from structured_data import homepage_json_ld
 
 ROOT = Path(__file__).resolve().parents[1]
 TEMPLATE = ROOT / "templates" / "index.template.html"
 OUTPUT = ROOT / "index.html"
-ASSET_REV = "20260919-verified-paw-qr2"
+ASSET_REV = "20260919-a11y-seo-offline1"
+
+HOME_TITLE = "Free Pet Health Tracker Printables | Your Pet’s Health Log"
+HOME_DESCRIPTION = (
+    "Free printable pet health trackers for dogs, cats, rabbits, birds, reptiles, horses and more. "
+    "Track symptoms, medications, daily changes and vet notes by health condition."
+)
+HOME_FAQ = [
+    (
+        "What can I track with Your Pet’s Health Log?",
+        "Each printable focuses on one main health concern and gives you room to record symptoms, day-to-day changes, medicines or measurements your veterinary team asked you to track, other health conditions, and questions for the next visit.",
+    ),
+    (
+        "Can I bring a Your Pet’s Health Log tracker to my veterinarian?",
+        "Yes. The trackers are designed to keep observations together so you can bring a clearer record to a veterinary appointment. Your veterinary team decides what the observations mean and what care is appropriate.",
+    ),
+    (
+        "Do I need an account or email address?",
+        "No. Every tracker is free to use without creating an account or giving Your Pet’s Health Log your email address.",
+    ),
+    (
+        "Does Your Pet’s Health Log upload my pet's name or photo?",
+        "No. Optional names and photos stay in your browser and are added to the PDF on your device. Your Pet’s Health Log does not upload them.",
+    ),
+    (
+        "Does Your Pet’s Health Log replace veterinary care?",
+        "No. Your Pet’s Health Log organizes what you observe. It does not diagnose disease, recommend medication doses, set treatment targets, or replace care from a veterinarian experienced with your pet's species.",
+    ),
+]
 
 
 def grouped_conditions() -> list[tuple[str, list[dict]]]:
@@ -101,6 +130,7 @@ def main() -> int:
     html = (
         template.replace("{{TOTAL}}", str(len(TRACKERS)))
         .replace("{{CONDITION_TOTAL}}", str(len(CONDITION_NAMES)))
+        .replace("{{JSON_LD}}", homepage_json_ld(title=HOME_TITLE, description=HOME_DESCRIPTION, faq_items=HOME_FAQ))
         .replace("{{FILTERS}}", render_filters())
         .replace("{{TRACKER_CARDS}}", render_cards())
         .replace('href="/styles/base.css"', f'href="/styles/base.css?v={ASSET_REV}"')
@@ -109,6 +139,7 @@ def main() -> int:
         .replace('href="/assets/paw.svg"', f'href="/assets/paw.svg?v={ASSET_REV}"')
         .replace('src="/assets/paw.svg"', f'src="/assets/paw.svg?v={ASSET_REV}"')
         .replace('src="/assets/site.js"', f'src="/assets/site.js?v={ASSET_REV}"')
+        .replace('src="/assets/sw-register.js"', f'src="/assets/sw-register.js?v={ASSET_REV}"')
         .replace(
             "</head>",
             '<script src="/assets/personalization-bridge-print1.js" defer></script>\n'
