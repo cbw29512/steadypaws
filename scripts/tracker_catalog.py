@@ -1,4 +1,4 @@
-"""Load and normalize the version-controlled Steady Paws care-form catalog."""
+"""Load and normalize the version-controlled Your Pet’s Health Log care-form catalog."""
 
 from __future__ import annotations
 
