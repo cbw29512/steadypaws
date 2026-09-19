@@ -126,7 +126,7 @@ jobs:
             http://127.0.0.1:4173/accessibility.html
             http://127.0.0.1:4173/app/
           configPath: ./.lighthouserc.mobile.json
-          uploadArtifacts: false
+          uploadArtifacts: true
           temporaryPublicStorage: false
 
       - name: Lighthouse desktop 100 / 100 / 100 / 100
@@ -140,5 +140,5 @@ jobs:
             http://127.0.0.1:4173/accessibility.html
             http://127.0.0.1:4173/app/
           configPath: ./.lighthouserc.desktop.json
-          uploadArtifacts: true
+          uploadArtifacts: false
           temporaryPublicStorage: false
