@@ -1,4 +1,4 @@
-"""Static WCAG-oriented accessibility checks for every Steady Paws HTML page."""
+"""Static WCAG-oriented accessibility checks for every Your Pet’s Health Log HTML page."""
 
 from __future__ import annotations
 
