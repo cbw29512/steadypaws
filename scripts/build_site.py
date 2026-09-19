@@ -105,6 +105,7 @@ def main() -> int:
         .replace("{{TRACKER_CARDS}}", render_cards())
         .replace('href="/styles/base.css"', f'href="/styles/base.css?v={ASSET_REV}"')
         .replace('href="/styles/components.css"', f'href="/styles/components.css?v={ASSET_REV}"')
+        .replace('href="/styles/launch-polish-1.css?v=1"', f'href="/styles/launch-polish-1.css?v={ASSET_REV}"')
         .replace('href="/assets/paw.svg"', f'href="/assets/paw.svg?v={ASSET_REV}"')
         .replace('src="/assets/paw.svg"', f'src="/assets/paw.svg?v={ASSET_REV}"')
         .replace('src="/assets/site.js"', f'src="/assets/site.js?v={ASSET_REV}"')
