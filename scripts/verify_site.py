@@ -20,8 +20,8 @@ LOGGER = logging.getLogger(__name__)
 ROOT = Path(__file__).resolve().parents[1]
 EXPECTED_SITE_URL = "https://yourpetshealthlog.netlify.app/"
 EXPECTED_SUPPORT_URL = "https://buymeacoffee.com/divclass016"
-EXPECTED_ASSET_REV = "20260919-jsonld-offline1"
-CARE_ASSET_REV = "20260901-printphoto2"
+EXPECTED_ASSET_REV = "20260919-trust-content2"
+CARE_ASSET_REV = "20260919-trust-content2"
 EXPECTED_VENDOR_SHA512 = "z8IYLHO8bTgFqj+yrPyIJnzBDf7DDhWwiEsk4sY+Oe6J2M+WQequeGS7qioI5vT6rXgVRb4K1UVQC5ER7MKzKQ=="
 VENDOR_PATH = ROOT / "assets/vendor/pdf-lib-1.17.1.min.js"
 
@@ -107,7 +107,7 @@ def assert_catalog() -> None:
 
 def assert_required_files() -> None:
     required = (
-        "index.html", "404.html", "accessibility.html", "privacy.html",
+        "index.html", "404.html", "accessibility.html", "privacy.html", "about.html",
         "styles/base.css", "styles/components.css", "styles/family.css", "styles/care.css", "styles/launch-polish-1.css",
         "assets/paw.svg", "assets/site.js", "assets/launch-polish-1.js", "assets/personalization-bridge-print1.js",
         "assets/care-personalization-print1.js", "assets/care-autosave.js", "assets/offline.js", "assets/vendor/pdf-lib-1.17.1.min.js", "sw.js",
@@ -151,6 +151,7 @@ def assert_homepage() -> None:
         f'/assets/paw.svg?v={EXPECTED_ASSET_REV}', f'/assets/site.js?v={EXPECTED_ASSET_REV}',
         f'/styles/launch-polish-1.css?v={EXPECTED_ASSET_REV}', '/assets/launch-polish-1.js?v=1',
         '/assets/personalization-bridge-print1.js', '/assets/offline.js', 'application/ld+json', '"@type":"WebSite"', '"@type":"CollectionPage"',
+        '"@type":"Person"', '"name":"Chris"', "/about.html", "Built by Chris",
     )
     missing = [marker for marker in required if marker not in html]
     if missing:
@@ -257,6 +258,7 @@ def assert_accessible_care_pages() -> None:
             f'/assets/care-personalization-print1.js?v={CARE_ASSET_REV}',
             'id="care-family-name"', 'id="care-print-personalized"', 'id="clear-care-form-data"', 'id="care-personalization-status"',
             '/assets/care-autosave.js', '/assets/offline.js', 'application/ld+json', '"@type":"WebSite"',
+            "observation prompts, not medical targets or instructions", "Daily record:", "Review before the next visit:",
             escape(condition_name(item)), escape(item["species"]), '/accessibility.html', '/privacy.html',
             *required_copy,
         )
@@ -269,7 +271,7 @@ def assert_accessible_care_pages() -> None:
 
 
 def assert_security_sitemap_and_static_pages() -> None:
-    for filename in ("404.html", "accessibility.html", "privacy.html"):
+    for filename in ("404.html", "accessibility.html", "privacy.html", "about.html"):
         html = (ROOT / filename).read_text(encoding="utf-8")
         if f'/assets/paw.svg?v={EXPECTED_ASSET_REV}' not in html:
             raise AssertionError(f"Stale branding asset in {filename}")
@@ -291,10 +293,28 @@ def assert_security_sitemap_and_static_pages() -> None:
     root = ET.parse(ROOT / "sitemap.xml").getroot()
     namespace = {"s": "http://www.sitemaps.org/schemas/sitemap/0.9"}
     urls = [node.text for node in root.findall("s:url/s:loc", namespace) if node.text]
-    expected = {EXPECTED_SITE_URL, f"{EXPECTED_SITE_URL}accessibility.html", f"{EXPECTED_SITE_URL}privacy.html", *(care_page_url(item) for item in TRACKERS)}
-    if len(urls) != 75 or set(urls) != expected:
-        raise AssertionError("Sitemap must contain exactly 75 canonical URLs")
+    expected = {EXPECTED_SITE_URL, f"{EXPECTED_SITE_URL}about.html", f"{EXPECTED_SITE_URL}accessibility.html", f"{EXPECTED_SITE_URL}privacy.html", *(care_page_url(item) for item in TRACKERS)}
+    if len(urls) != 76 or set(urls) != expected:
+        raise AssertionError("Sitemap must contain exactly 76 canonical URLs")
     LOGGER.info("Security, cache policy, static pages, robots, and sitemap: PASS")
+
+
+def assert_no_visible_legacy_brand() -> None:
+    public_text_paths = [
+        ROOT / "index.html", ROOT / "about.html", ROOT / "privacy.html", ROOT / "accessibility.html",
+        ROOT / "terms.html", ROOT / "app" / "index.html", ROOT / "assets" / "mobile-app.js",
+    ]
+    public_text_paths.extend(sorted((ROOT / "care").glob("*.html")))
+    for path in public_text_paths:
+        text = path.read_text(encoding="utf-8")
+        if "Steady Paws" in text or "STEADY PAWS" in text:
+            raise AssertionError(f"Legacy public branding remains in {path}")
+    for item in TRACKERS:
+        reader = PdfReader(str(ROOT / "downloads" / item["filename"]))
+        pdf_text = "\n".join((page.extract_text() or "") for page in reader.pages)
+        if "STEADY PAWS" in pdf_text or "Steady Paws" in pdf_text:
+            raise AssertionError(f"Legacy public branding remains in {item['filename']}")
+    LOGGER.info("No user-visible legacy Steady Paws branding: PASS")
 
 
 def assert_pdfs() -> None:
@@ -308,7 +328,7 @@ def assert_pdfs() -> None:
         first_page = reader.pages[0].extract_text() or ""
         second_page = reader.pages[1].extract_text() or ""
         for marker in (
-            "Their name", "Main health concern", "Other health conditions", "THEIR PHOTO", "optional",
+            "YOUR PET'S HEALTH LOG", "Their name", "Main health concern", "Other health conditions", "THEIR PHOTO", "optional",
             "Daily care log", "Date / time", condition_name(item),
         ):
             if marker not in first_page:
@@ -335,6 +355,7 @@ def main() -> int:
         assert_print_design_source()
         assert_accessible_care_pages()
         assert_security_sitemap_and_static_pages()
+        assert_no_visible_legacy_brand()
         assert_pdfs()
         LOGGER.info("YOUR PET’S HEALTH LOG PRODUCTION QUALITY GATE: PASS")
         return 0
