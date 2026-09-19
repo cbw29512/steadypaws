@@ -209,6 +209,7 @@ def assert_personalization_source() -> None:
     launch_js = (ROOT / "assets/launch-polish-1.js").read_text(encoding="utf-8")
     bridge_js = (ROOT / "assets/personalization-bridge-print1.js").read_text(encoding="utf-8")
     care_js = (ROOT / "assets/care-personalization-print1.js").read_text(encoding="utf-8")
+    mobile_js = (ROOT / "assets/mobile-app.js").read_text(encoding="utf-8")
     for marker in (
         "Photo ready ✓", "Personalized PDF ready ✓", "embedJpg", "page.drawImage(photo, PHOTO_IMAGE_BOX)",
         "const PHOTO_IMAGE_BOX = { x: 490, y: 607, width: 82, height: 82 }",
@@ -228,7 +229,11 @@ def assert_personalization_source() -> None:
     ):
         if marker not in care_js:
             raise AssertionError(f"Care-page personalization marker missing: {marker}")
-    LOGGER.info("Local photo/name personalization + pet-first interactive copy: PASS")
+    if "Steady Paws" in mobile_js or "STEADY PAWS" in mobile_js:
+        raise AssertionError("Legacy public product name remains in Quick Phone Log")
+    if "Your Pet’s Health Log progress summary" not in mobile_js:
+        raise AssertionError("Quick Phone Log summary branding is incomplete")
+    LOGGER.info("Local photo/name personalization + pet-first interactive copy + current branding: PASS")
 
 
 def assert_client_state_and_offline_source() -> None:
@@ -259,7 +264,7 @@ def assert_print_design_source() -> None:
         "Daily care log", "Use one row each time you check or give care.", "Date / time",
         "This week at a glance", "Since the last vet visit", "Questions for the vet",
         "Plan / next steps from the vet", "For organizing care, not medical advice.",
-        "PHOTO_IMAGE_BOX = (490, 607, 82, 82)", "NAME_TEXT_POSITION = (96, 666)",
+        "PHOTO_IMAGE_BOX = (490, 607, 82, 82)", "NAME_TEXT_POSITION = (96, 666)", "YOUR PET'S HEALTH LOG",
     )
     missing = [marker for marker in required if marker not in source]
     if missing:
