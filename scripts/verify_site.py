@@ -323,10 +323,10 @@ def main() -> int:
         assert_accessible_care_pages()
         assert_security_sitemap_and_static_pages()
         assert_pdfs()
-        LOGGER.info("STEADY PAWS PRODUCTION QUALITY GATE: PASS")
+        LOGGER.info("YOUR PET’S HEALTH LOG PRODUCTION QUALITY GATE: PASS")
         return 0
     except Exception as exc:
-        LOGGER.exception("STEADY PAWS PRODUCTION QUALITY GATE: FAIL: %s", exc)
+        LOGGER.exception("YOUR PET’S HEALTH LOG PRODUCTION QUALITY GATE: FAIL: %s", exc)
         return 1
 
 
