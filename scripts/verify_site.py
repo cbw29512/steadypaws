@@ -324,7 +324,7 @@ def assert_security_sitemap_and_static_pages() -> None:
     required = (
         "python scripts/fetch_vendor.py", "python scripts/build_accessible_pages.py", "Strict-Transport-Security",
         'X-Frame-Options = "DENY"', "script-src 'self'", "connect-src 'self'", "img-src 'self' data: blob:",
-        "object-src 'none'", "frame-ancestors 'none'", 'for = "/styles/*"', 'for = "/assets/*"',
+        "object-src 'none'", "worker-src 'self'", "frame-ancestors 'none'", 'for = "/styles/*"', 'for = "/assets/*"',
     )
     missing = [marker for marker in required if marker not in netlify]
     if missing:
