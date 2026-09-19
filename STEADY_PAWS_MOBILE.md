@@ -1,13 +1,13 @@
-# Steady Paws Mobile App Product Contract
+# Your Pet’s Health Log Mobile App Product Contract
 
 Status: MVP implementation contract  
 Last updated: 2026-09-18
 
 ## Product promise
 
-Steady Paws should reduce work for a pet owner who may already be worried, tired, busy, or sitting in a veterinary waiting room. The pet is visually central, routine recording is fast, and the software stays out of the way.
+Your Pet’s Health Log should reduce work for a pet owner who may already be worried, tired, busy, or sitting in a veterinary waiting room. The pet is visually central, routine recording is fast, and the software stays out of the way.
 
-Steady Paws organizes owner-recorded observations. Veterinary professionals make medical decisions.
+Your Pet’s Health Log organizes owner-recorded observations. Veterinary professionals make medical decisions.
 
 ## Non-negotiable UX rules
 
@@ -26,7 +26,7 @@ Steady Paws organizes owner-recorded observations. Veterinary professionals make
 
 Mobile v1 is complete when a user can:
 
-- open Steady Paws comfortably on a phone;
+- open Your Pet’s Health Log comfortably on a phone;
 - add a pet with only name and species required;
 - optionally add veterinarian contact details;
 - choose a simple check-in;
@@ -41,7 +41,7 @@ Mobile v1 is complete when a user can:
 - install the site as a PWA;
 - open the core app shell offline after it has been loaded once.
 
-Release still requires the existing Steady Paws production quality gate, WCAG checks, photo/print regression, and Lighthouse 100/100/100/100 on mobile and desktop.
+Release still requires the existing Your Pet’s Health Log production quality gate, WCAG checks, photo/print regression, and Lighthouse 100/100/100/100 on mobile and desktop.
 
 ## MVP user flow
 
@@ -124,13 +124,13 @@ The summary screen prioritizes:
 2. Device Share
 3. Print
 
-For MVP, Steady Paws opens the user's normal email/share capability. It does not operate an email server or silently send records. The owner reviews and sends the information.
+For MVP, Your Pet’s Health Log opens the user's normal email/share capability. It does not operate an email server or silently send records. The owner reviews and sends the information.
 
 A pet profile may store Primary Vet, Clinic, and Vet Email locally to reduce repeated typing.
 
 ## Reminders
 
-Reminders are owner-controlled and may represent schedules the owner or veterinary team has already established. Steady Paws must not independently decide medical follow-up timing.
+Reminders are owner-controlled and may represent schedules the owner or veterinary team has already established. Your Pet’s Health Log must not independently decide medical follow-up timing.
 
 Good reminder examples:
 - owner-entered medication log time;
@@ -194,10 +194,10 @@ If not, leave it out.
 
 ## Authority vision: the sick-pet memory system
 
-Steady Paws should become the tool an owner remembers after a difficult illness because it reduced the mental load of caring for their pet.
+Your Pet’s Health Log should become the tool an owner remembers after a difficult illness because it reduced the mental load of caring for their pet.
 
 Target story:
-> "When Fluffy was sick there was so much to remember, but Steady Paws kept the medicine, meals, bathroom changes, treatment notes, and vet updates straight."
+> "When Fluffy was sick there was so much to remember, but Your Pet’s Health Log kept the medicine, meals, bathroom changes, treatment notes, and vet updates straight."
 
 This is not a diagnosis product. It is the reliable memory and communication layer between the owner, other caregivers, and the veterinary team.
 
@@ -283,4 +283,4 @@ Photo capture is a first-class care-record feature, not decoration.
 - Large photos must not freeze or overflow the UI.
 - Orientation must display correctly.
 - Reports must paginate cleanly with photos.
-- Existing Steady Paws photo/download/print regression remains mandatory.
+- Existing Your Pet’s Health Log photo/download/print regression remains mandatory.
