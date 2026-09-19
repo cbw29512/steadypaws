@@ -310,7 +310,7 @@
     const url = URL.createObjectURL(blob);
     const download = document.createElement('a');
     download.href = url;
-    download.download = safeDownloadName(link.dataset.downloadName || 'steady-paws-care-paperwork.pdf', name);
+    download.download = safeDownloadName(link.dataset.downloadName || 'pet-health-log-care-paperwork.pdf', name);
     document.body.appendChild(download);
     download.click();
     download.remove();
@@ -321,7 +321,7 @@
   function downloadPlainPdf(link) {
     const download = document.createElement('a');
     download.href = link.dataset.pdfUrl || link.getAttribute('href');
-    download.download = link.dataset.downloadName || 'steady-paws-care-paperwork.pdf';
+    download.download = link.dataset.downloadName || 'pet-health-log-care-paperwork.pdf';
     document.body.appendChild(download);
     download.click();
     download.remove();
