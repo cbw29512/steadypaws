@@ -1,4 +1,4 @@
-"""Commercial trust certification for Steady Paws public pages."""
+"""Commercial trust certification for Your Pet’s Health Log public pages."""
 
 from __future__ import annotations
 
