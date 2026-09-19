@@ -1,4 +1,4 @@
-name: Steady Paws Quality Gate
+name: Your Pet’s Health Log Quality Gate
 
 on:
   push:
