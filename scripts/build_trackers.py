@@ -1,4 +1,4 @@
-"""Generate every Steady Paws printable care form from the shared catalog."""
+"""Generate every Your Pet’s Health Log printable care form from the shared catalog."""
 
 from __future__ import annotations
 
@@ -338,7 +338,7 @@ def enhance_pdf(path: Path, spec: dict) -> None:
     writer.add_metadata(
         {
             "/Title": form_title(spec),
-            "/Author": "Steady Paws",
+            "/Author": "Your Pet’s Health Log",
             "/Subject": f"Printable {condition_name(spec)} care paperwork for {spec['species'].lower()} veterinary conversations",
         }
     )
@@ -363,7 +363,7 @@ def make_pdf(spec: dict) -> Path:
     path = OUT / spec["filename"]
     c = canvas.Canvas(str(path), pagesize=letter, pageCompression=1)
     c.setTitle(form_title(spec))
-    c.setAuthor("Steady Paws")
+    c.setAuthor("Your Pet’s Health Log")
     c.setSubject(f"Printable {condition_name(spec)} care paperwork for {spec['species'].lower()} veterinary conversations")
 
     draw_header(c, spec, 1)
