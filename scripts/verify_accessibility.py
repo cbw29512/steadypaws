@@ -201,19 +201,23 @@ def assert_wcag_palette() -> None:
 def assert_all_html() -> None:
     pages = [
         ROOT / "index.html", ROOT / "404.html", ROOT / "accessibility.html", ROOT / "privacy.html",
-        ROOT / "terms.html", ROOT / "app" / "index.html",
+        ROOT / "about.html", ROOT / "terms.html", ROOT / "app" / "index.html",
         ROOT / "pets" / "cat-health-trackers.html", ROOT / "pets" / "dog-health-trackers.html",
     ]
     pages.extend(sorted((ROOT / "care").glob("*.html")))
-    if len(pages) != 80:
-        raise AssertionError(f"Expected 80 audited HTML pages, found {len(pages)}")
+    if len(pages) != 81:
+        raise AssertionError(f"Expected 81 audited HTML pages, found {len(pages)}")
     for page in pages:
         assert_html_page(page)
-    LOGGER.info("Semantic HTML audit across all 80 pages: PASS")
+    LOGGER.info("Semantic HTML audit across all 81 pages: PASS")
 
 
 def assert_no_external_runtime_dependencies() -> None:
-    html_pages = [ROOT / "index.html", ROOT / "404.html", ROOT / "accessibility.html", ROOT / "privacy.html"]
+    html_pages = [
+        ROOT / "index.html", ROOT / "404.html", ROOT / "accessibility.html", ROOT / "privacy.html",
+        ROOT / "about.html", ROOT / "terms.html", ROOT / "app" / "index.html",
+        ROOT / "pets" / "cat-health-trackers.html", ROOT / "pets" / "dog-health-trackers.html",
+    ]
     html_pages.extend((ROOT / "care").glob("*.html"))
     allowed_external_hosts = {"yourpetshealthlog.netlify.app", "buymeacoffee.com", "schema.org"}
     for path in html_pages:
