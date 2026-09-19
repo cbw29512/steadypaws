@@ -4,6 +4,7 @@ from __future__ import annotations
 
 from datetime import date
 from html import escape
+import json
 from pathlib import Path
 
 from build_site import ASSET_REV
@@ -55,6 +56,46 @@ def seo_description(item: dict) -> str:
     return short[:180].rstrip(" ,.;") + "."
 
 
+def medical_condition_node(item: dict, canonical: str) -> dict | None:
+    concern = condition_name(item)
+    non_conditions = (
+        "health log", "weight & nutrition", "senior", "quality-of-life",
+        "medication & appointment", "husbandry",
+    )
+    if item["group"] == "universal" or any(term in concern.lower() for term in non_conditions):
+        return None
+    return {
+        "@type": "MedicalCondition",
+        "@id": f"{canonical}#condition",
+        "name": concern,
+    }
+
+
+def page_json_ld(item: dict, heading: str, description: str, canonical: str) -> str:
+    graph: list[dict] = [
+        {
+            "@type": "WebSite",
+            "@id": f"{SITE_URL}/#website",
+            "url": f"{SITE_URL}/",
+            "name": "Your Pet’s Health Log",
+        },
+        {
+            "@type": "WebPage",
+            "@id": f"{canonical}#webpage",
+            "url": canonical,
+            "name": heading,
+            "description": description,
+            "isPartOf": {"@id": f"{SITE_URL}/#website"},
+        },
+    ]
+    condition = medical_condition_node(item, canonical)
+    if condition:
+        graph.append(condition)
+        graph[1]["about"] = {"@id": condition["@id"]}
+    payload = {"@context": "https://schema.org", "@graph": graph}
+    return '<script type="application/ld+json">' + json.dumps(payload, ensure_ascii=False, separators=(",", ":")) + "</script>"
+
+
 def render_daily_table(item: dict) -> str:
     headers = "".join(f'<th scope="col">{escape(display_field(field))}</th>' for field in item["fields"])
     rows: list[str] = []
@@ -94,6 +135,7 @@ def render_page(item: dict) -> str:
     canonical = care_url(item)
     pdf_url = f"/downloads/{escape(item['filename'], quote=True)}"
     intro = item["description"].strip().rstrip(".")
+    json_ld = page_json_ld(item, heading, description, canonical)
     return f'''<!doctype html>
 <html lang="en">
 <head>
@@ -116,21 +158,26 @@ def render_page(item: dict) -> str:
   <link rel="stylesheet" href="/styles/components.css?v={ASSET_REV}">
   <link rel="stylesheet" href="/styles/care.css?v={CARE_ASSET_REV}">
   <script src="/assets/care-personalization-print1.js?v={CARE_ASSET_REV}" defer></script>
+  <script src="/assets/care-autosave.js?v={ASSET_REV}" defer></script>
+  <script src="/assets/offline.js?v={ASSET_REV}" defer></script>
+  {json_ld}
 </head>
 <body class="care-page">
   <a class="skip-link" href="#main">Skip to pet health tracker</a>
   <header class="site-header"><div class="shell nav-wrap"><a class="brand" href="/" aria-label="Your Pet’s Health Log home"><img class="brand-logo" src="/assets/paw.svg?v={ASSET_REV}" width="38" height="38" alt=""><span>Your Pet’s Health Log</span></a><nav aria-label="Tracker navigation"><a href="/#finder">Find another pet health tracker</a><a href="/accessibility.html">Accessibility</a></nav></div></header>
-  <main id="main" class="care-shell" itemscope itemtype="https://schema.org/WebPage">
+  <main id="main" class="care-shell">
     <header class="care-header">
       <p class="eyebrow">Free pet health tracker · {escape(species)}</p>
-      <h1 itemprop="name">{escape(heading)}</h1>
-      <p class="lede" itemprop="description">Use this simple tracker to record {escape(intro.lower())}. Keep the important details together for the days between veterinary visits.</p>
+      <h1>{escape(heading)}</h1>
+      <p class="lede">Use this simple tracker to record {escape(intro.lower())}. Keep the important details together for the days between veterinary visits.</p>
       <div class="care-actions">
         <a class="button" href="{pdf_url}" download>Download printable PDF</a>
         <button id="care-print-personalized" class="button care-print-button" type="button">Print this worksheet</button>
+        <button id="clear-care-form-data" class="button button-secondary" type="button">Clear Form Data</button>
         <a class="text-link" href="/#finder">Choose a different pet health tracker <span aria-hidden="true">→</span></a>
       </div>
       <p id="care-personalization-status" class="care-personalization-status" role="status">Tip: add a name or photo on the Your Pet’s Health Log finder page before opening this tracker if you want it included when printing.</p>
+      <p id="care-autosave-status" class="care-personalization-status" role="status">Worksheet entries auto-save only in this browser on this device.</p>
       <p class="care-note" id="care-safety"><strong>For organizing care, not medical advice.</strong> Follow their veterinarian's plan and contact a veterinarian for urgent or concerning changes.</p>
     </header>
 
