@@ -20,7 +20,7 @@
           : '',
       };
     } catch (error) {
-      console.warn('Steady Paws could not read personalization from this tab:', error);
+      console.warn('Your Pet’s Health Log could not read personalization from this tab:', error);
       return { name: '', photoDataUrl: '' };
     }
   }
@@ -155,7 +155,7 @@
         await downloadPersonalizedPdf(pdfLink, personalization);
         status.textContent = 'Personalized PDF ready ✓ Their name and photo were added on this device.';
       } catch (error) {
-        console.error('Steady Paws care-page personalization failed:', error);
+        console.error('Your Pet’s Health Log care-page personalization failed:', error);
         status.textContent = 'The personalized PDF could not be prepared. The web worksheet can still be printed with the photo shown here.';
       } finally {
         preparingDownload = false;
