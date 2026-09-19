@@ -65,7 +65,6 @@
     window.clearTimeout(saveTimer);
     try {
       localStorage.setItem(storageKey, JSON.stringify(serialize()));
-      setStatus("Saved on this device.");
     } catch (error) {
       console.error("Your Pet’s Health Log form auto-save failed:", error);
       setStatus("This browser could not save the form locally.");
