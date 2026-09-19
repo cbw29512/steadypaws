@@ -1,4 +1,4 @@
-"""Verify Steady Paws species SEO hubs without touching medical content."""
+"""Verify Your Pet’s Health Log species SEO hubs without touching medical content."""
 
 from __future__ import annotations
 
