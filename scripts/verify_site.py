@@ -20,7 +20,7 @@ LOGGER = logging.getLogger(__name__)
 ROOT = Path(__file__).resolve().parents[1]
 EXPECTED_SITE_URL = "https://yourpetshealthlog.netlify.app/"
 EXPECTED_SUPPORT_URL = "https://buymeacoffee.com/divclass016"
-EXPECTED_ASSET_REV = "20260919-verified-paw-qr2"
+EXPECTED_ASSET_REV = "20260919-jsonld-offline1"
 CARE_ASSET_REV = "20260901-printphoto2"
 EXPECTED_VENDOR_SHA512 = "z8IYLHO8bTgFqj+yrPyIJnzBDf7DDhWwiEsk4sY+Oe6J2M+WQequeGS7qioI5vT6rXgVRb4K1UVQC5ER7MKzKQ=="
 VENDOR_PATH = ROOT / "assets/vendor/pdf-lib-1.17.1.min.js"
@@ -110,7 +110,7 @@ def assert_required_files() -> None:
         "index.html", "404.html", "accessibility.html", "privacy.html",
         "styles/base.css", "styles/components.css", "styles/family.css", "styles/care.css", "styles/launch-polish-1.css",
         "assets/paw.svg", "assets/site.js", "assets/launch-polish-1.js", "assets/personalization-bridge-print1.js",
-        "assets/care-personalization-print1.js", "assets/vendor/pdf-lib-1.17.1.min.js",
+        "assets/care-personalization-print1.js", "assets/care-autosave.js", "assets/offline.js", "assets/vendor/pdf-lib-1.17.1.min.js", "sw.js",
         "netlify.toml", "robots.txt", "sitemap.xml", "requirements.txt",
         "templates/index.template.html", "scripts/tracker_catalog.py", "scripts/fetch_vendor.py",
         "scripts/build_trackers.py", "scripts/build_site.py", "scripts/build_accessible_pages.py",
@@ -150,7 +150,7 @@ def assert_homepage() -> None:
         'id="family-name"', 'id="family-photo"', 'type="file"', 'accept="image/*"',
         f'/assets/paw.svg?v={EXPECTED_ASSET_REV}', f'/assets/site.js?v={EXPECTED_ASSET_REV}',
         f'/styles/launch-polish-1.css?v={EXPECTED_ASSET_REV}', '/assets/launch-polish-1.js?v=1',
-        '/assets/personalization-bridge-print1.js',
+        '/assets/personalization-bridge-print1.js', '/assets/offline.js', 'application/ld+json', '"@type":"WebSite"', '"@type":"CollectionPage"',
     )
     missing = [marker for marker in required if marker not in html]
     if missing:
@@ -206,7 +206,19 @@ def assert_personalization_source() -> None:
     ):
         if marker not in care_js:
             raise AssertionError(f"Care-page personalization marker missing: {marker}")
-    LOGGER.info("Local photo/name personalization + pet-first interactive copy: PASS")
+    autosave_js = (ROOT / "assets/care-autosave.js").read_text(encoding="utf-8")
+    offline_js = (ROOT / "assets/offline.js").read_text(encoding="utf-8")
+    service_worker = (ROOT / "sw.js").read_text(encoding="utf-8")
+    for marker in ("localStorage.setItem", "localStorage.getItem", "clearPetHealthFormData", "window.confirm"):
+        if marker not in autosave_js:
+            raise AssertionError(f"Care autosave marker missing: {marker}")
+    for marker in ("navigator.serviceWorker.register('/sw.js'", "getRegistrations", "unregister"):
+        if marker not in offline_js:
+            raise AssertionError(f"Offline registration marker missing: {marker}")
+    for marker in ("cacheWorksheets", "/care/", "caches.open", "ignoreSearch"):
+        if marker not in service_worker:
+            raise AssertionError(f"Service worker marker missing: {marker}")
+    LOGGER.info("Local photo/name personalization + autosave + offline support: PASS")
 
 
 def assert_print_design_source() -> None:
@@ -243,7 +255,8 @@ def assert_accessible_care_pages() -> None:
             '<main id="main"', '<fieldset', '<legend>', '<caption id="daily-caption">', '<th scope="col">',
             'class="brand-logo"', f'/styles/care.css?v={CARE_ASSET_REV}',
             f'/assets/care-personalization-print1.js?v={CARE_ASSET_REV}',
-            'id="care-family-name"', 'id="care-print-personalized"', 'id="care-personalization-status"',
+            'id="care-family-name"', 'id="care-print-personalized"', 'id="clear-care-form-data"', 'id="care-personalization-status"',
+            '/assets/care-autosave.js', '/assets/offline.js', 'application/ld+json', '"@type":"WebSite"',
             escape(condition_name(item)), escape(item["species"]), '/accessibility.html', '/privacy.html',
             *required_copy,
         )
