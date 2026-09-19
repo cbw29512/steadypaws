@@ -43,7 +43,7 @@ def json_ld_script(graph: list[dict]) -> str:
         "@graph": graph,
     }
     # Escape closing tags defensively while keeping readable JSON-LD.
-    serialized = json.dumps(payload, ensure_ascii=False, separators=(",", ":")).replace("</", "<\/")
+    serialized = json.dumps(payload, ensure_ascii=False, separators=(",", ":")).replace("</", "<\\/")
     return f'<script type="application/ld+json">{serialized}</script>'
 
 
