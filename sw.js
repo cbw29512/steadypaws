@@ -1,6 +1,6 @@
 "use strict";
 
-const VERSION = "v1";
+const VERSION = "20260919-a11y-seo-offline1";
 const STATIC_CACHE = `yourpetshealthlog-static-${VERSION}`;
 const PAGE_CACHE = `yourpetshealthlog-pages-${VERSION}`;
 
