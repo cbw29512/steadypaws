@@ -12,7 +12,7 @@ from tracker_catalog import CONDITION_NAMES, GROUP_LABELS, TRACKERS, condition_k
 ROOT = Path(__file__).resolve().parents[1]
 TEMPLATE = ROOT / "templates" / "index.template.html"
 OUTPUT = ROOT / "index.html"
-ASSET_REV = "20260919-jsonld-offline1"
+ASSET_REV = "20260919-trust-content2"
 
 
 def render_json_ld() -> str:
@@ -25,6 +25,7 @@ def render_json_ld() -> str:
                 "url": "https://yourpetshealthlog.netlify.app/",
                 "name": "Your Pet’s Health Log",
                 "description": "Free pet health tracking tools, printable worksheets, and a private quick phone log.",
+                "creator": {"@id": "https://yourpetshealthlog.netlify.app/about.html#creator"},
             },
             {
                 "@type": "CollectionPage",
@@ -33,6 +34,12 @@ def render_json_ld() -> str:
                 "name": "Free Pet Health Trackers",
                 "isPartOf": {"@id": "https://yourpetshealthlog.netlify.app/#website"},
                 "description": f"A collection of {len(TRACKERS)} tailored pet health trackers across {len(CONDITION_NAMES)} health concerns.",
+            },
+            {
+                "@type": "Person",
+                "@id": "https://yourpetshealthlog.netlify.app/about.html#creator",
+                "name": "Chris",
+                "url": "https://yourpetshealthlog.netlify.app/about.html",
             },
             {
                 "@type": "FAQPage",
