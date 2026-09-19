@@ -12,8 +12,8 @@ SUPPORT_URL = "https://buymeacoffee.com/divclass016"
 
 CARE_FOOTER = (
     '<footer class="care-footer"><p>Your Pet’s Health Log · Free pet health trackers for animals you love · '
-    '<a href="/accessibility.html">Accessibility options</a> · <a href="/privacy.html">Privacy</a> · '
-    '<a href="/terms.html">Terms</a> · '
+    '<a href="/about.html">About</a> · <a href="/accessibility.html">Accessibility options</a> · '
+    '<a href="/privacy.html">Privacy</a> · <a href="/terms.html">Terms</a> · '
     f'<a href="{SUPPORT_URL}" target="_blank" rel="noopener noreferrer">Support Your Pet’s Health Log</a></p></footer>'
 )
 
@@ -23,9 +23,12 @@ def append_footer_links(path: Path) -> None:
     closing = "</div></div></footer>"
     if closing not in html:
         raise ValueError(f"Footer marker missing: {path}")
+    about_link = '<a href="/about.html">About</a>'
     terms_link = '<a href="/terms.html">Terms</a>'
     support_link = f'<a href="{SUPPORT_URL}" target="_blank" rel="noopener noreferrer">Support Your Pet’s Health Log</a>'
     additions = ""
+    if about_link not in html:
+        additions += about_link
     if terms_link not in html:
         additions += terms_link
     if SUPPORT_URL not in html:
@@ -60,10 +63,11 @@ def main() -> int:
             ROOT / "pets" / "dog-health-trackers.html",
             ROOT / "privacy.html",
             ROOT / "accessibility.html",
+            ROOT / "about.html",
         ):
             append_footer_links(path)
         care_count = polish_care_pages()
-        LOGGER.info("Commercial trust polish applied to homepage, %d care pages, hubs, and information pages", care_count)
+        LOGGER.info("Commercial trust polish applied to homepage, %d care pages, hubs, About, and information pages", care_count)
         return 0
     except Exception:
         LOGGER.exception("Commercial trust polish failed")
