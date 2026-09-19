@@ -241,6 +241,7 @@ def assert_print_design_source() -> None:
 
 
 def assert_accessible_care_pages() -> None:
+    context_sections: set[str] = set()
     required_copy = (
         "Care details", "Main health concern", "Other health conditions", "Daily care log",
         "This week at a glance", "Since the last vet visit", "Questions for the vet", "Plan / next steps from the vet",
@@ -267,7 +268,17 @@ def assert_accessible_care_pages() -> None:
             raise AssertionError(f"Accessible page markers missing from {path.name}: {missing}")
         if "style=" in html:
             raise AssertionError(f"Accessible page contains inline style: {path.name}")
-    LOGGER.info("72 accessible worksheets use the same calm KISS language: PASS")
+        context_start = html.find('<section class="care-context"')
+        context_end = html.find("</section>", context_start)
+        if context_start < 0 or context_end < 0:
+            raise AssertionError(f"SEO context section missing from {path.name}")
+        context = html[context_start:context_end]
+        if len(context) < 500:
+            raise AssertionError(f"SEO context section is too thin in {path.name}: {len(context)} characters")
+        context_sections.add(context)
+    if len(context_sections) != len(TRACKERS):
+        raise AssertionError(f"Expected {len(TRACKERS)} distinct care-context sections, found {len(context_sections)}")
+    LOGGER.info("72 accessible worksheets carry distinct substantive species/condition context: PASS")
 
 
 def assert_security_sitemap_and_static_pages() -> None:
