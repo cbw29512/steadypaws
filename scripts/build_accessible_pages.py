@@ -14,7 +14,7 @@ from tracker_catalog import TRACKERS, condition_name
 ROOT = Path(__file__).resolve().parents[1]
 CARE_DIR = ROOT / "care"
 SITE_URL = "https://yourpetshealthlog.netlify.app"
-CARE_ASSET_REV = "20260901-printphoto2"
+CARE_ASSET_REV = "20260919-trust-content2"
 
 SPECIES_CONTEXT = {
     "Cat": "For cats, consistent notes can make quiet day-to-day changes easier to describe later. This version keeps the selected concern tied to repeatable home observations without asking you to interpret the cause.",
@@ -272,7 +272,7 @@ def render_page(item: dict) -> str:
 
 
 def write_sitemap() -> None:
-    urls = [f"{SITE_URL}/", f"{SITE_URL}/accessibility.html", f"{SITE_URL}/privacy.html"]
+    urls = [f"{SITE_URL}/", f"{SITE_URL}/about.html", f"{SITE_URL}/accessibility.html", f"{SITE_URL}/privacy.html"]
     urls.extend(care_url(item) for item in TRACKERS)
     lastmod = date.today().isoformat()
     body = "\n".join(
