@@ -149,7 +149,7 @@ def assert_homepage() -> None:
         'id="support-after-download"', "Help keep every pet health tracker free.",
         'id="family-name"', 'id="family-photo"', 'type="file"', 'accept="image/*"',
         f'/assets/paw.svg?v={EXPECTED_ASSET_REV}', f'/assets/site.js?v={EXPECTED_ASSET_REV}',
-        '/styles/launch-polish-1.css?v=1', '/assets/launch-polish-1.js?v=1',
+        f'/styles/launch-polish-1.css?v={EXPECTED_ASSET_REV}', '/assets/launch-polish-1.js?v=1',
         '/assets/personalization-bridge-print1.js',
     )
     missing = [marker for marker in required if marker not in html]
