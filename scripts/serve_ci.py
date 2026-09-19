@@ -88,7 +88,7 @@ class ProductionLikeHandler(SimpleHTTPRequestHandler):
 
 def main() -> None:
     server = ThreadingHTTPServer((HOST, PORT), ProductionLikeHandler)
-    print(f"Steady Paws Lighthouse server listening on http://{HOST}:{PORT}", flush=True)
+    print(f"Your Pet’s Health Log Lighthouse server listening on http://{HOST}:{PORT}", flush=True)
     server.serve_forever()
 
 
