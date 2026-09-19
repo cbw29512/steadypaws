@@ -243,7 +243,7 @@ def assert_client_state_and_offline_source() -> None:
     for marker in ('register("/sw.js", { scope: "/" })', "getRegistrations", 'endsWith("/app/sw.js")'):
         if marker not in sw_register:
             raise AssertionError(f"Root service-worker registration marker missing: {marker}")
-    for marker in ('"/app/"', '"/care/"', '"/sitemap.xml"', "caches.open", "skipWaiting", "clients.claim"):
+    for marker in ('"/app/"', '"/care/"', "networkFirst", "caches.open", "skipWaiting", "clients.claim"):
         if marker not in service_worker:
             raise AssertionError(f"Offline service-worker marker missing: {marker}")
     for marker in ("setFilterBusy", "aria-busy", "focusLibrary", "library.focus"):
