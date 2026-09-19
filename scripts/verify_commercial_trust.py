@@ -59,7 +59,7 @@ def assert_terms_page() -> None:
 def assert_support_and_terms(path: Path, label: str, *, require_privacy: bool = True) -> None:
     html = path.read_text(encoding="utf-8")
     missing = []
-    for marker in (SUPPORT_URL, TERMS_PATH):
+    for marker in (SUPPORT_URL, TERMS_PATH, "/about.html"):
         if marker not in html:
             missing.append(marker)
     if require_privacy and "/privacy.html" not in html:
@@ -72,6 +72,7 @@ def assert_public_coverage() -> None:
     assert_support_and_terms(ROOT / "index.html", "homepage")
     assert_support_and_terms(ROOT / "privacy.html", "privacy", require_privacy=False)
     assert_support_and_terms(ROOT / "accessibility.html", "accessibility")
+    assert_support_and_terms(ROOT / "about.html", "about")
     for animal in ("cat", "dog"):
         assert_support_and_terms(ROOT / "pets" / f"{animal}-health-trackers.html", f"{animal} hub")
 
@@ -80,10 +81,25 @@ def assert_public_coverage() -> None:
         raise AssertionError(f"Expected {len(TRACKERS)} care pages, found {len(care_pages)}")
     for path in care_pages:
         html = path.read_text(encoding="utf-8")
-        for marker in (SUPPORT_URL, TERMS_PATH, "/privacy.html", "/accessibility.html", "For organizing care, not medical advice."):
+        for marker in (SUPPORT_URL, TERMS_PATH, "/about.html", "/privacy.html", "/accessibility.html", "For organizing care, not medical advice."):
             if marker not in html:
                 raise AssertionError(f"{path.name} missing marker: {marker}")
     LOGGER.info("Homepage + 72 care pages + species/info pages carry trust/support links: PASS")
+
+
+def assert_creator_trust() -> None:
+    about = (ROOT / "about.html").read_text(encoding="utf-8")
+    homepage = (ROOT / "index.html").read_text(encoding="utf-8")
+    for marker in (
+        "I’m Chris", "I am not presenting myself as a veterinarian",
+        "Why I built it", "privacy-friendly pet health tracking project",
+    ):
+        if marker not in about:
+            raise AssertionError(f"About page missing creator-trust marker: {marker}")
+    for marker in ("Built by Chris", "Read why I built it", "/about.html"):
+        if marker not in homepage:
+            raise AssertionError(f"Homepage missing creator-trust marker: {marker}")
+    LOGGER.info("Named creator + non-veterinary trust boundary: PASS")
 
 
 def assert_support_remains_optional() -> None:
@@ -101,6 +117,7 @@ def main() -> int:
     try:
         assert_terms_page()
         assert_public_coverage()
+        assert_creator_trust()
         assert_support_remains_optional()
         LOGGER.info("STEADY PAWS COMMERCIAL TRUST GATE: PASS")
         return 0
