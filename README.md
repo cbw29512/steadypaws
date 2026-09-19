@@ -1,6 +1,6 @@
-# Steady Paws
+# Your Pet’s Health Log
 
-Steady Paws is a privacy-conscious library of free printable **care paperwork for someone you love**. The experience starts with the family member being cared for, then guides the person to the health problem or care challenge they are going through and the right printable tracker.
+Your Pet’s Health Log is a privacy-conscious library of free printable **care paperwork for someone you love**. The experience starts with the family member being cared for, then guides the person to the health problem or care challenge they are going through and the right printable tracker.
 
 ## Current production library
 
@@ -46,7 +46,7 @@ python scripts/verify_site.py
 
 ## Netlify
 
-Netlify reads `netlify.toml` and runs the tracker generator and homepage builder before publishing the repository root. The production URL is `https://steadypaws.netlify.app/`.
+Netlify reads `netlify.toml` and runs the tracker generator and homepage builder before publishing the repository root. The production URL is `https://yourpetshealthlog.netlify.app/`.
 
 ## Product principles
 

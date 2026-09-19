@@ -103,7 +103,7 @@
         : `${visible} primary health concerns ready to choose`;
       empty.hidden = visible !== 0;
     } catch (error) {
-      console.error('Steady Paws health-concern filtering failed:', error);
+      console.error('Your Pet’s Health Log health-concern filtering failed:', error);
     }
   }
 
@@ -157,7 +157,7 @@
         target.scrollIntoView({ behavior, block: 'center' });
       }
     } catch (error) {
-      console.error('Steady Paws family picker failed:', error);
+      console.error('Your Pet’s Health Log family picker failed:', error);
     }
   }
 
@@ -221,7 +221,7 @@
     photoPreviewBox?.classList.remove('is-ready');
     if (photoPlaceholder) photoPlaceholder.hidden = false;
     if (photoRemove) photoRemove.hidden = true;
-    setPersonalizeStatus('Private by design: their name and photo stay in this browser and are added to the PDF on this device. Steady Paws does not upload them.');
+    setPersonalizeStatus('Private by design: their name and photo stay in this browser and are added to the PDF on this device. Your Pet’s Health Log does not upload them.');
     updateDownloadLabels();
   }
 
@@ -382,9 +382,9 @@
     setPersonalizeStatus('Adding their name and photo to this copy on your device...');
     try {
       await personalizePdf(link);
-      setPersonalizeStatus('Personalized PDF ready ✓ Their photo and name were added on this device. Nothing was uploaded or stored by Steady Paws.', 'ready');
+      setPersonalizeStatus('Personalized PDF ready ✓ Their photo and name were added on this device. Nothing was uploaded or stored by Your Pet’s Health Log.', 'ready');
     } catch (error) {
-      console.error('Steady Paws PDF personalization failed:', error);
+      console.error('Your Pet’s Health Log PDF personalization failed:', error);
       setPersonalizeStatus('Personalization could not finish, so the plain care form is downloading instead.', 'error');
       downloadPlainPdf(link);
     } finally {

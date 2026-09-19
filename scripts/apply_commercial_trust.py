@@ -1,4 +1,4 @@
-"""Apply deterministic commercial trust links after Steady Paws static generation."""
+"""Apply deterministic commercial trust links after Your Pet’s Health Log static generation."""
 
 from __future__ import annotations
 
@@ -11,10 +11,10 @@ ROOT = Path(__file__).resolve().parents[1]
 SUPPORT_URL = "https://buymeacoffee.com/divclass016"
 
 CARE_FOOTER = (
-    '<footer class="care-footer"><p>Steady Paws · Free pet health trackers for animals you love · '
+    '<footer class="care-footer"><p>Your Pet’s Health Log · Free pet health trackers for animals you love · '
     '<a href="/accessibility.html">Accessibility options</a> · <a href="/privacy.html">Privacy</a> · '
     '<a href="/terms.html">Terms</a> · '
-    f'<a href="{SUPPORT_URL}" target="_blank" rel="noopener noreferrer">Support Steady Paws</a></p></footer>'
+    f'<a href="{SUPPORT_URL}" target="_blank" rel="noopener noreferrer">Support Your Pet’s Health Log</a></p></footer>'
 )
 
 
@@ -24,7 +24,7 @@ def append_footer_links(path: Path) -> None:
     if closing not in html:
         raise ValueError(f"Footer marker missing: {path}")
     terms_link = '<a href="/terms.html">Terms</a>'
-    support_link = f'<a href="{SUPPORT_URL}" target="_blank" rel="noopener noreferrer">Support Steady Paws</a>'
+    support_link = f'<a href="{SUPPORT_URL}" target="_blank" rel="noopener noreferrer">Support Your Pet’s Health Log</a>'
     additions = ""
     if terms_link not in html:
         additions += terms_link

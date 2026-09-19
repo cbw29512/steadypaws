@@ -1,4 +1,4 @@
-"""Static WCAG-oriented accessibility checks for every Steady Paws HTML page."""
+"""Static WCAG-oriented accessibility checks for every Your Pet’s Health Log HTML page."""
 
 from __future__ import annotations
 
@@ -211,7 +211,7 @@ def assert_all_html() -> None:
 def assert_no_external_runtime_dependencies() -> None:
     html_pages = [ROOT / "index.html", ROOT / "404.html", ROOT / "accessibility.html", ROOT / "privacy.html"]
     html_pages.extend((ROOT / "care").glob("*.html"))
-    allowed_external_hosts = {"steadypaws.netlify.app", "buymeacoffee.com", "schema.org"}
+    allowed_external_hosts = {"yourpetshealthlog.netlify.app", "buymeacoffee.com", "schema.org"}
     for path in html_pages:
         text = path.read_text(encoding="utf-8")
         for url in re.findall(r'https://[^"\'<>\s]+', text):

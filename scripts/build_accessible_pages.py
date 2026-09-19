@@ -1,4 +1,4 @@
-"""Generate accessible HTML worksheets for every tailored Steady Paws care form."""
+"""Generate accessible HTML worksheets for every tailored Your Pet’s Health Log care form."""
 
 from __future__ import annotations
 
@@ -12,7 +12,7 @@ from tracker_catalog import TRACKERS, condition_name
 
 ROOT = Path(__file__).resolve().parents[1]
 CARE_DIR = ROOT / "care"
-SITE_URL = "https://steadypaws.netlify.app"
+SITE_URL = "https://yourpetshealthlog.netlify.app"
 CARE_ASSET_REV = "20260901-printphoto2"
 
 
@@ -38,10 +38,10 @@ def tracker_heading(item: dict) -> str:
 
 
 def seo_title(item: dict) -> str:
-    title = f"Free {tracker_heading(item)} | Steady Paws"
+    title = f"Free {tracker_heading(item)} | Your Pet’s Health Log"
     if len(title) <= 70:
         return title
-    compact = f"{tracker_heading(item)} | Steady Paws"
+    compact = f"{tracker_heading(item)} | Your Pet’s Health Log"
     return compact[:70].rstrip()
 
 
@@ -107,7 +107,7 @@ def render_page(item: dict) -> str:
   <link rel="canonical" href="{canonical}">
   <link rel="alternate" type="application/pdf" href="{pdf_url}">
   <meta property="og:type" content="website">
-  <meta property="og:site_name" content="Steady Paws">
+  <meta property="og:site_name" content="Your Pet’s Health Log">
   <meta property="og:title" content="{escape(title, quote=True)}">
   <meta property="og:description" content="{escape(description, quote=True)}">
   <meta property="og:url" content="{canonical}">
@@ -119,7 +119,7 @@ def render_page(item: dict) -> str:
 </head>
 <body class="care-page">
   <a class="skip-link" href="#main">Skip to pet health tracker</a>
-  <header class="site-header"><div class="shell nav-wrap"><a class="brand" href="/" aria-label="Steady Paws home"><img class="brand-logo" src="/assets/paw.svg?v={ASSET_REV}" width="38" height="38" alt=""><span>Steady Paws</span></a><nav aria-label="Tracker navigation"><a href="/#finder">Find another pet health tracker</a><a href="/accessibility.html">Accessibility</a></nav></div></header>
+  <header class="site-header"><div class="shell nav-wrap"><a class="brand" href="/" aria-label="Your Pet’s Health Log home"><img class="brand-logo" src="/assets/paw.svg?v={ASSET_REV}" width="38" height="38" alt=""><span>Your Pet’s Health Log</span></a><nav aria-label="Tracker navigation"><a href="/#finder">Find another pet health tracker</a><a href="/accessibility.html">Accessibility</a></nav></div></header>
   <main id="main" class="care-shell" itemscope itemtype="https://schema.org/WebPage">
     <header class="care-header">
       <p class="eyebrow">Free pet health tracker · {escape(species)}</p>
@@ -130,7 +130,7 @@ def render_page(item: dict) -> str:
         <button id="care-print-personalized" class="button care-print-button" type="button">Print this worksheet</button>
         <a class="text-link" href="/#finder">Choose a different pet health tracker <span aria-hidden="true">→</span></a>
       </div>
-      <p id="care-personalization-status" class="care-personalization-status" role="status">Tip: add a name or photo on the Steady Paws finder page before opening this tracker if you want it included when printing.</p>
+      <p id="care-personalization-status" class="care-personalization-status" role="status">Tip: add a name or photo on the Your Pet’s Health Log finder page before opening this tracker if you want it included when printing.</p>
       <p class="care-note" id="care-safety"><strong>For organizing care, not medical advice.</strong> Follow their veterinarian's plan and contact a veterinarian for urgent or concerning changes.</p>
     </header>
 
@@ -165,7 +165,7 @@ def render_page(item: dict) -> str:
       </fieldset>
     </div>
 
-    <footer class="care-footer"><p>Steady Paws · Free pet health trackers for animals you love · <a href="/accessibility.html">Accessibility options</a> · <a href="/privacy.html">Privacy</a></p></footer>
+    <footer class="care-footer"><p>Your Pet’s Health Log · Free pet health trackers for animals you love · <a href="/accessibility.html">Accessibility options</a> · <a href="/privacy.html">Privacy</a></p></footer>
   </main>
 </body>
 </html>'''

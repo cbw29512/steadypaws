@@ -1,4 +1,4 @@
-"""Production certification for Steady Paws SEO, caregiver UX, downloads, privacy, and build integrity."""
+"""Production certification for Your Pet’s Health Log SEO, caregiver UX, downloads, privacy, and build integrity."""
 
 from __future__ import annotations
 
@@ -18,7 +18,7 @@ from tracker_catalog import CONDITION_NAMES, GROUP_LABELS, TRACKERS, condition_n
 logging.basicConfig(level=logging.INFO, format="%(levelname)s | %(message)s")
 LOGGER = logging.getLogger(__name__)
 ROOT = Path(__file__).resolve().parents[1]
-EXPECTED_SITE_URL = "https://steadypaws.netlify.app/"
+EXPECTED_SITE_URL = "https://yourpetshealthlog.netlify.app/"
 EXPECTED_SUPPORT_URL = "https://buymeacoffee.com/divclass016"
 EXPECTED_ASSET_REV = "20260918-personalize-grid1"
 CARE_ASSET_REV = "20260901-printphoto2"
@@ -129,7 +129,7 @@ def assert_vendor_and_paw() -> None:
     if digest != EXPECTED_VENDOR_SHA512:
         raise AssertionError("Self-hosted pdf-lib bytes do not match pinned SHA-512")
     svg = (ROOT / "assets/paw.svg").read_text(encoding="utf-8")
-    for marker in ('aria-label="Steady Paws paw logo"', 'fill="#55756c"', 'fill="#fffdf9"'):
+    for marker in ('aria-label="Your Pet’s Health Log paw logo"', 'fill="#55756c"', 'fill="#fffdf9"'):
         if marker not in svg:
             raise AssertionError(f"Paw logo marker missing: {marker}")
     if svg.count("<ellipse") < 5:
@@ -140,7 +140,7 @@ def assert_vendor_and_paw() -> None:
 def assert_homepage() -> None:
     html = (ROOT / "index.html").read_text(encoding="utf-8")
     required = (
-        '<title>Free Pet Health Tracker Printables | Steady Paws</title>',
+        '<title>Free Pet Health Tracker Printables | Your Pet’s Health Log</title>',
         'name="robots" content="index, follow, max-image-preview:large"',
         f'rel="canonical" href="{EXPECTED_SITE_URL}"', f'property="og:url" content="{EXPECTED_SITE_URL}"',
         EXPECTED_SUPPORT_URL, "Free printable pet health trackers", "Keep track of your pet's health when they need you most.",
@@ -323,10 +323,10 @@ def main() -> int:
         assert_accessible_care_pages()
         assert_security_sitemap_and_static_pages()
         assert_pdfs()
-        LOGGER.info("STEADY PAWS PRODUCTION QUALITY GATE: PASS")
+        LOGGER.info("YOUR PET’S HEALTH LOG PRODUCTION QUALITY GATE: PASS")
         return 0
     except Exception as exc:
-        LOGGER.exception("STEADY PAWS PRODUCTION QUALITY GATE: FAIL: %s", exc)
+        LOGGER.exception("YOUR PET’S HEALTH LOG PRODUCTION QUALITY GATE: FAIL: %s", exc)
         return 1
 
 

@@ -27,7 +27,7 @@
       }
       sessionStorage.setItem(STORAGE_KEY, JSON.stringify(payload));
     } catch (error) {
-      console.warn('Steady Paws could not keep personalization in this tab:', error);
+      console.warn('Your Pet’s Health Log could not keep personalization in this tab:', error);
     }
   }
 

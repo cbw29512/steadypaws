@@ -1,4 +1,4 @@
-"""Browser regression for Steady Paws local name/photo PDF and print personalization."""
+"""Browser regression for Your Pet’s Health Log local name/photo PDF and print personalization."""
 
 from __future__ import annotations
 
