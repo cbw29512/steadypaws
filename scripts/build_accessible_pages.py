@@ -61,8 +61,9 @@ def render_daily_table(item: dict) -> str:
     rows: list[str] = []
     for row_number in range(1, 12):
         cells = "".join(
-            f'<td><input type="text" aria-label="{escape(display_field(field), quote=True)}, entry {row_number}" autocomplete="off"></td>'
-            for field in item["fields"]
+            f'<td><input type="text" data-autosave-key="daily-{row_number}-{field_index}" '
+            f'aria-label="{escape(display_field(field), quote=True)}, entry {row_number}" autocomplete="off"></td>'
+            for field_index, field in enumerate(item["fields"], start=1)
         )
         rows.append(f"<tr>{cells}</tr>")
     return (
@@ -153,10 +154,10 @@ def render_page(item: dict) -> str:
         <legend>Care details</legend>
         <div class="identity-grid">
           <label class="field">Their name<input id="care-family-name" type="text" autocomplete="off"></label>
-          <label class="field">Week of<input type="date"></label>
-          <label class="field field-wide">Veterinarian<input type="text" autocomplete="off"></label>
-          <label class="field field-wide">Main health concern<input type="text" value="{escape(concern, quote=True)}" readonly></label>
-          <label class="field field-wide">Other health conditions<textarea rows="3"></textarea></label>
+          <label class="field">Week of<input id="care-week-of" type="date"></label>
+          <label class="field field-wide">Veterinarian<input id="care-veterinarian" type="text" autocomplete="off"></label>
+          <label class="field field-wide">Main health concern<input id="care-main-concern" type="text" value="{escape(concern, quote=True)}" readonly></label>
+          <label class="field field-wide">Other health conditions<textarea id="care-other-conditions" rows="3"></textarea></label>
         </div>
       </fieldset>
 
@@ -173,9 +174,9 @@ def render_page(item: dict) -> str:
 
       <fieldset class="care-fieldset">
         <legend>Vet visit notes</legend>
-        <label class="field">Since the last vet visit<textarea rows="5"></textarea></label>
-        <label class="field">Questions for the vet<textarea rows="5"></textarea></label>
-        <label class="field">Plan / next steps from the vet<textarea rows="5"></textarea></label>
+        <label class="field">Since the last vet visit<textarea id="care-since-last-visit" rows="5"></textarea></label>
+        <label class="field">Questions for the vet<textarea id="care-vet-questions" rows="5"></textarea></label>
+        <label class="field">Plan / next steps from the vet<textarea id="care-vet-plan" rows="5"></textarea></label>
       </fieldset>
     </div>
 
