@@ -18,7 +18,7 @@ from tracker_catalog import CONDITION_NAMES, GROUP_LABELS, TRACKERS, condition_n
 logging.basicConfig(level=logging.INFO, format="%(levelname)s | %(message)s")
 LOGGER = logging.getLogger(__name__)
 ROOT = Path(__file__).resolve().parents[1]
-EXPECTED_SITE_URL = "https://steadypaws.netlify.app/"
+EXPECTED_SITE_URL = "https://yourpetshealthlog.netlify.app/"
 EXPECTED_SUPPORT_URL = "https://buymeacoffee.com/divclass016"
 EXPECTED_ASSET_REV = "20260918-personalize-grid1"
 CARE_ASSET_REV = "20260901-printphoto2"
