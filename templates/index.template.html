@@ -10,6 +10,7 @@
   <meta name="theme-color" content="#55756c">
   <meta name="color-scheme" content="light">
   <link rel="canonical" href="https://yourpetshealthlog.netlify.app/">
+  {{JSON_LD}}
   <meta property="og:type" content="website">
   <meta property="og:site_name" content="Your Pet’s Health Log">
   <meta property="og:locale" content="en_US">
@@ -24,27 +25,26 @@
   <link rel="stylesheet" href="/styles/components.css">
   <link rel="stylesheet" href="/styles/launch-polish-1.css">
   <script src="/assets/site.js" defer></script>
+  <script src="/assets/sw-register.js" defer></script>
   <script src="/assets/launch-polish-1.js?v=1" defer></script>
 </head>
-<body itemscope itemtype="https://schema.org/WebSite">
-  <link itemprop="url" href="https://yourpetshealthlog.netlify.app/">
+<body>
   <a class="skip-link" href="#main">Skip to main content</a>
   <header class="site-header">
     <div class="shell nav-wrap">
-      <a class="brand" href="/" aria-label="Your Pet’s Health Log home" itemprop="name"><img class="brand-logo" src="/assets/paw.svg" width="38" height="38" alt=""><span>Your Pet’s Health Log</span></a>
+      <a class="brand" href="/" aria-label="Your Pet’s Health Log home"><img class="brand-logo" src="/assets/paw.svg" width="38" height="38" alt=""><span>Your Pet’s Health Log</span></a>
       <nav aria-label="Primary navigation"><a href="#finder">Find a pet health tracker</a><a href="#how">How it helps</a><a href="#safety">Care &amp; safety</a></nav>
       <a class="button button-small" href="https://buymeacoffee.com/divclass016" target="_blank" rel="noopener noreferrer">Buy me a coffee</a>
     </div>
   </header>
 
-  <main id="main" itemprop="mainEntity" itemscope itemtype="https://schema.org/CollectionPage">
-    <link itemprop="url" href="https://yourpetshealthlog.netlify.app/">
+  <main id="main">
     <section class="hero">
       <div class="shell hero-grid">
         <div>
           <p class="eyebrow">Track your pet your way</p>
-          <h1 itemprop="name">Keep track of your pet's health when they need you most.</h1>
-          <p class="lede" itemprop="description">Choose the way that fits you: tap quick buttons on your phone, fill out a health form online, or print a blank tracker and write by hand.</p>
+          <h1>Keep track of your pet's health when they need you most.</h1>
+          <p class="lede">Choose the way that fits you: tap quick buttons on your phone, fill out a health form online, or print a blank tracker and write by hand.</p>
           <div class="tracking-paths" aria-label="Choose how you want to track your pet">
             <article class="tracking-path">
               <span class="tracking-path-icon" aria-hidden="true">📱</span>
@@ -75,7 +75,7 @@
           <p class="card-kicker">Pet health tracking, kept simple</p>
           <h2>One main health concern. Room for the whole picture.</h2>
           <ul class="check-list"><li>Track symptoms and day-to-day changes</li><li>Record medicines or measurements their veterinarian asked you to track</li><li>Keep other health conditions on the same sheet</li><li>See what changed since yesterday or the last visit</li><li>Keep questions together for their veterinary team</li></ul>
-          <div class="phone-handoff"><div class="phone-handoff-copy"><strong>Want to use your phone?</strong><span>Scan to open the Quick Phone Log.</span></div><a href="/app/" aria-label="Open Quick Phone Log"><img class="phone-handoff-qr" src="/assets/quick-phone-log-qr.png?v=20260919-verified-paw-qr2" width="92" height="92" alt="QR code to open the Quick Phone Log on your phone"></a></div>
+          <div class="phone-handoff"><div class="phone-handoff-copy"><strong>Want to use your phone?</strong><span>Scan to open the Quick Phone Log.</span></div><a href="/app/" aria-label="Open Quick Phone Log"><img class="phone-handoff-qr" src="/assets/quick-phone-log-qr.png?v=20260919-a11y-seo-offline1" width="92" height="92" alt="QR code to open the Quick Phone Log on your phone"></a></div>
           <p class="microcopy">Your Pet’s Health Log organizes the notes. Their veterinary team makes the medical decisions.</p>
         </aside>
       </div>
@@ -144,7 +144,7 @@
       </div>
     </section>
 
-    <section id="library" class="section section-soft">
+    <section id="library" class="section section-soft" tabindex="-1">
       <div class="shell">
         <div class="section-heading"><div><p class="eyebrow">Next, choose the form</p><h2 id="journey-heading">What pet health concern are you tracking?</h2></div><p id="journey-copy">Pick the main issue you need to keep up with. Fill the tailored form out online, or print it blank and write by hand.</p></div>
         <p id="result-count" class="result-count" aria-live="polite">Choose your pet above to narrow the health trackers, or browse all health concerns.</p>
@@ -172,16 +172,16 @@
 
     <section class="section library-note"><div class="shell resource-grid"><div><p class="eyebrow">Built with care</p><h2>A pet health tracker should fit the animal — not the other way around.</h2><p class="lede compact">A health concern can have the same name across species, but what is useful to observe may be different. Your Pet’s Health Log lists each concern once, then gives you the version built for your pet.</p></div><div class="principles"><p><strong>Focused:</strong> each sheet centers one primary health concern so the daily record stays useful.</p><p><strong>Whole-picture:</strong> every sheet has room to note other health conditions.</p><p><strong>Personal:</strong> you can optionally add their name and photo before downloading.</p><p><strong>Accessible:</strong> every tailored form also has a keyboard- and screen-reader-friendly web worksheet.</p><p><strong>Free:</strong> every pet health tracker can be used without an account or email address.</p></div></div></section>
 
-    <section class="section section-soft" itemscope itemtype="https://schema.org/FAQPage" aria-labelledby="tracker-faq-title">
+    <section class="section section-soft" aria-labelledby="tracker-faq-title">
       <div class="shell">
         <p class="eyebrow">Pet health tracker questions</p>
         <h2 id="tracker-faq-title">Before you print a tracker</h2>
         <div class="principles">
-          <div itemscope itemprop="mainEntity" itemtype="https://schema.org/Question"><h3 itemprop="name">What can I track with Your Pet’s Health Log?</h3><div itemscope itemprop="acceptedAnswer" itemtype="https://schema.org/Answer"><p itemprop="text">Each printable focuses on one main health concern and gives you room to record symptoms, day-to-day changes, medicines or measurements your veterinary team asked you to track, other health conditions, and questions for the next visit.</p></div></div>
-          <div itemscope itemprop="mainEntity" itemtype="https://schema.org/Question"><h3 itemprop="name">Can I bring a Your Pet’s Health Log tracker to my veterinarian?</h3><div itemscope itemprop="acceptedAnswer" itemtype="https://schema.org/Answer"><p itemprop="text">Yes. The trackers are designed to keep observations together so you can bring a clearer record to a veterinary appointment. Your veterinary team decides what the observations mean and what care is appropriate.</p></div></div>
-          <div itemscope itemprop="mainEntity" itemtype="https://schema.org/Question"><h3 itemprop="name">Do I need an account or email address?</h3><div itemscope itemprop="acceptedAnswer" itemtype="https://schema.org/Answer"><p itemprop="text">No. Every tracker is free to use without creating an account or giving Your Pet’s Health Log your email address.</p></div></div>
-          <div itemscope itemprop="mainEntity" itemtype="https://schema.org/Question"><h3 itemprop="name">Does Your Pet’s Health Log upload my pet's name or photo?</h3><div itemscope itemprop="acceptedAnswer" itemtype="https://schema.org/Answer"><p itemprop="text">No. Optional names and photos stay in your browser and are added to the PDF on your device. Your Pet’s Health Log does not upload them.</p></div></div>
-          <div itemscope itemprop="mainEntity" itemtype="https://schema.org/Question"><h3 itemprop="name">Does Your Pet’s Health Log replace veterinary care?</h3><div itemscope itemprop="acceptedAnswer" itemtype="https://schema.org/Answer"><p itemprop="text">No. Your Pet’s Health Log organizes what you observe. It does not diagnose disease, recommend medication doses, set treatment targets, or replace care from a veterinarian experienced with your pet's species.</p></div></div>
+          <div><h3>What can I track with Your Pet’s Health Log?</h3><div><p>Each printable focuses on one main health concern and gives you room to record symptoms, day-to-day changes, medicines or measurements your veterinary team asked you to track, other health conditions, and questions for the next visit.</p></div></div>
+          <div><h3>Can I bring a Your Pet’s Health Log tracker to my veterinarian?</h3><div><p>Yes. The trackers are designed to keep observations together so you can bring a clearer record to a veterinary appointment. Your veterinary team decides what the observations mean and what care is appropriate.</p></div></div>
+          <div><h3>Do I need an account or email address?</h3><div><p>No. Every tracker is free to use without creating an account or giving Your Pet’s Health Log your email address.</p></div></div>
+          <div><h3>Does Your Pet’s Health Log upload my pet's name or photo?</h3><div><p>No. Optional names and photos stay in your browser and are added to the PDF on your device. Your Pet’s Health Log does not upload them.</p></div></div>
+          <div><h3>Does Your Pet’s Health Log replace veterinary care?</h3><div><p>No. Your Pet’s Health Log organizes what you observe. It does not diagnose disease, recommend medication doses, set treatment targets, or replace care from a veterinarian experienced with your pet's species.</p></div></div>
         </div>
       </div>
     </section>

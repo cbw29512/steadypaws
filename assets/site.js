@@ -12,6 +12,8 @@
   const journeyHeading = document.querySelector('#journey-heading');
   const journeyCopy = document.querySelector('#journey-copy');
   const library = document.querySelector('#library');
+  const trackerGrid = document.querySelector('#tracker-grid');
+  const filterGroup = document.querySelector('.filter-group');
   const personalize = document.querySelector('#personalize');
   const familyName = document.querySelector('#family-name');
   const familyPhoto = document.querySelector('#family-photo');
@@ -32,6 +34,21 @@
   let preparingDownload = false;
   let pdfLibPromise = null;
   const normalize = value => value.trim().toLowerCase();
+
+  function setFilterBusy(isBusy) {
+    const value = String(isBusy);
+    trackerGrid?.setAttribute('aria-busy', value);
+    filterGroup?.setAttribute('aria-busy', value);
+  }
+
+  function focusLibrary() {
+    if (!library) return;
+    library.focus({ preventScroll: true });
+    const behavior = window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth';
+    library.scrollIntoView({ behavior, block: 'start' });
+  }
+
+  setFilterBusy(true);
 
   // Must match scripts/build_trackers.py.
   const PHOTO_IMAGE_BOX = { x: 490, y: 607, width: 82, height: 82 };
@@ -69,6 +86,7 @@
   }
 
   function applyFilters() {
+    setFilterBusy(true);
     try {
       const query = normalize(search.value);
       const browsing = journeyStarted || Boolean(query) || activeGroup !== 'all';
@@ -104,6 +122,8 @@
       empty.hidden = visible !== 0;
     } catch (error) {
       console.error('Your Pet’s Health Log health-concern filtering failed:', error);
+    } finally {
+      setFilterBusy(false);
     }
   }
 
@@ -151,11 +171,7 @@
       }
 
       applyFilters();
-      const target = personalize && !personalize.hidden ? personalize : library;
-      if (target) {
-        const behavior = window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth';
-        target.scrollIntoView({ behavior, block: 'center' });
-      }
+      focusLibrary();
     } catch (error) {
       console.error('Your Pet’s Health Log family picker failed:', error);
     }
@@ -338,6 +354,7 @@
     if (journeyHeading) journeyHeading.textContent = 'Browse primary health concerns';
     if (journeyCopy) journeyCopy.textContent = 'Each concern is listed once. When several tailored forms exist, choose the one made for your family member.';
     applyFilters();
+    focusLibrary();
   }));
 
   search.addEventListener('input', () => {

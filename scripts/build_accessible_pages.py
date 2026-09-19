@@ -9,6 +9,7 @@ from pathlib import Path
 from build_site import ASSET_REV
 from build_trackers import display_field
 from tracker_catalog import TRACKERS, condition_name
+from structured_data import care_page_json_ld, is_medical_topic
 
 ROOT = Path(__file__).resolve().parents[1]
 CARE_DIR = ROOT / "care"
@@ -60,8 +61,9 @@ def render_daily_table(item: dict) -> str:
     rows: list[str] = []
     for row_number in range(1, 12):
         cells = "".join(
-            f'<td><input type="text" aria-label="{escape(display_field(field), quote=True)}, entry {row_number}" autocomplete="off"></td>'
-            for field in item["fields"]
+            f'<td><input type="text" data-autosave-key="daily-{row_number}-{field_index}" '
+            f'aria-label="{escape(display_field(field), quote=True)}, entry {row_number}" autocomplete="off"></td>'
+            for field_index, field in enumerate(item["fields"], start=1)
         )
         rows.append(f"<tr>{cells}</tr>")
     return (
@@ -94,6 +96,14 @@ def render_page(item: dict) -> str:
     canonical = care_url(item)
     pdf_url = f"/downloads/{escape(item['filename'], quote=True)}"
     intro = item["description"].strip().rstrip(".")
+    structured_data = care_page_json_ld(
+        canonical=canonical,
+        title=title,
+        description=description,
+        concern=concern,
+        species=species,
+        is_medical_condition=is_medical_topic(concern, item["group"]),
+    )
     return f'''<!doctype html>
 <html lang="en">
 <head>
@@ -105,6 +115,7 @@ def render_page(item: dict) -> str:
   <meta name="theme-color" content="#55756c">
   <meta name="color-scheme" content="light">
   <link rel="canonical" href="{canonical}">
+  {structured_data}
   <link rel="alternate" type="application/pdf" href="{pdf_url}">
   <meta property="og:type" content="website">
   <meta property="og:site_name" content="Your Pet’s Health Log">
@@ -116,21 +127,25 @@ def render_page(item: dict) -> str:
   <link rel="stylesheet" href="/styles/components.css?v={ASSET_REV}">
   <link rel="stylesheet" href="/styles/care.css?v={CARE_ASSET_REV}">
   <script src="/assets/care-personalization-print1.js?v={CARE_ASSET_REV}" defer></script>
+  <script src="/assets/care-form-state.js?v={ASSET_REV}" defer></script>
+  <script src="/assets/sw-register.js?v={ASSET_REV}" defer></script>
 </head>
 <body class="care-page">
   <a class="skip-link" href="#main">Skip to pet health tracker</a>
   <header class="site-header"><div class="shell nav-wrap"><a class="brand" href="/" aria-label="Your Pet’s Health Log home"><img class="brand-logo" src="/assets/paw.svg?v={ASSET_REV}" width="38" height="38" alt=""><span>Your Pet’s Health Log</span></a><nav aria-label="Tracker navigation"><a href="/#finder">Find another pet health tracker</a><a href="/accessibility.html">Accessibility</a></nav></div></header>
-  <main id="main" class="care-shell" itemscope itemtype="https://schema.org/WebPage">
+  <main id="main" class="care-shell">
     <header class="care-header">
       <p class="eyebrow">Free pet health tracker · {escape(species)}</p>
-      <h1 itemprop="name">{escape(heading)}</h1>
-      <p class="lede" itemprop="description">Use this simple tracker to record {escape(intro.lower())}. Keep the important details together for the days between veterinary visits.</p>
+      <h1>{escape(heading)}</h1>
+      <p class="lede">Use this simple tracker to record {escape(intro.lower())}. Keep the important details together for the days between veterinary visits.</p>
       <div class="care-actions">
         <a class="button" href="{pdf_url}" download>Download printable PDF</a>
         <button id="care-print-personalized" class="button care-print-button" type="button">Print this worksheet</button>
         <a class="text-link" href="/#finder">Choose a different pet health tracker <span aria-hidden="true">→</span></a>
       </div>
       <p id="care-personalization-status" class="care-personalization-status" role="status">Tip: add a name or photo on the Your Pet’s Health Log finder page before opening this tracker if you want it included when printing.</p>
+      <p id="care-form-state-status" class="care-personalization-status" role="status">Entries are saved on this device as you type.</p>
+      <p><button id="care-clear-form-data" class="button button-secondary" type="button" aria-describedby="care-form-state-status">Clear saved form data</button></p>
       <p class="care-note" id="care-safety"><strong>For organizing care, not medical advice.</strong> Follow their veterinarian's plan and contact a veterinarian for urgent or concerning changes.</p>
     </header>
 
@@ -139,10 +154,10 @@ def render_page(item: dict) -> str:
         <legend>Care details</legend>
         <div class="identity-grid">
           <label class="field">Their name<input id="care-family-name" type="text" autocomplete="off"></label>
-          <label class="field">Week of<input type="date"></label>
-          <label class="field field-wide">Veterinarian<input type="text" autocomplete="off"></label>
-          <label class="field field-wide">Main health concern<input type="text" value="{escape(concern, quote=True)}" readonly></label>
-          <label class="field field-wide">Other health conditions<textarea rows="3"></textarea></label>
+          <label class="field">Week of<input id="care-week-of" type="date"></label>
+          <label class="field field-wide">Veterinarian<input id="care-veterinarian" type="text" autocomplete="off"></label>
+          <label class="field field-wide">Main health concern<input id="care-main-concern" type="text" value="{escape(concern, quote=True)}" readonly></label>
+          <label class="field field-wide">Other health conditions<textarea id="care-other-conditions" rows="3"></textarea></label>
         </div>
       </fieldset>
 
@@ -159,9 +174,9 @@ def render_page(item: dict) -> str:
 
       <fieldset class="care-fieldset">
         <legend>Vet visit notes</legend>
-        <label class="field">Since the last vet visit<textarea rows="5"></textarea></label>
-        <label class="field">Questions for the vet<textarea rows="5"></textarea></label>
-        <label class="field">Plan / next steps from the vet<textarea rows="5"></textarea></label>
+        <label class="field">Since the last vet visit<textarea id="care-since-last-visit" rows="5"></textarea></label>
+        <label class="field">Questions for the vet<textarea id="care-vet-questions" rows="5"></textarea></label>
+        <label class="field">Plan / next steps from the vet<textarea id="care-vet-plan" rows="5"></textarea></label>
       </fieldset>
     </div>
 
