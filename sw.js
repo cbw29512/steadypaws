@@ -25,34 +25,11 @@ const CORE = [
   "/assets/sw-register.js",
 ];
 
-async function precacheCarePages() {
-  const cache = await caches.open(PAGE_CACHE);
-  try {
-    const response = await fetch("/sitemap.xml", { cache: "no-store" });
-    if (!response.ok) return;
-    const xml = await response.text();
-    const urls = [...xml.matchAll(/<loc>(https?:\/\/[^<]+)<\/loc>/g)]
-      .map((match) => new URL(match[1]))
-      .filter((url) => url.origin === self.location.origin && url.pathname.startsWith("/care/"))
-      .map((url) => url.pathname + url.search);
-
-    await Promise.allSettled(
-      urls.map(async (url) => {
-        const page = await fetch(url, { cache: "no-store" });
-        if (page.ok) await cache.put(url, page);
-      })
-    );
-  } catch (error) {
-    console.warn("Care-page precache skipped:", error);
-  }
-}
-
 self.addEventListener("install", (event) => {
   event.waitUntil(
-    Promise.all([
-      caches.open(STATIC_CACHE).then((cache) => cache.addAll(CORE)),
-      precacheCarePages(),
-    ]).then(() => self.skipWaiting())
+    caches.open(STATIC_CACHE)
+      .then((cache) => cache.addAll(CORE))
+      .then(() => self.skipWaiting())
   );
 });
 
