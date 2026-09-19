@@ -136,5 +136,5 @@
 .phone-handoff-copy span { color:var(--muted); font-size:.88rem; }
 .phone-handoff-qr { flex:0 0 auto; border-radius:8px; background:#fff; }
 .footer-trust { display:flex; justify-content:center; gap:10px; padding-top:22px; text-align:center; font-size:.88rem; }
-.footer-trust span { color:var(--muted); }
+.footer-trust span { color:inherit; }
 @media (max-width:620px) { .phone-handoff { display:none; } .footer-trust { align-items:center; flex-direction:column; gap:3px; } }
