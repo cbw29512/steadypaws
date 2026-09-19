@@ -167,7 +167,10 @@ def main() -> int:
         .replace('src="/assets/offline.js"', f'src="/assets/offline.js?v={ASSET_REV}"')
         .replace(
             "</head>",
-            f'  {render_json_ld()}\n'\n            f'  <script src="/assets/offline.js?v={ASSET_REV}" defer></script>\n'\n            f'  <script src="/assets/personalization-bridge-print1.js?v={ASSET_REV}" defer></script>\n'\n            f'  <link rel="stylesheet" href="/styles/family.css?v={ASSET_REV}">\n</head>',
+            f'  {render_json_ld()}\n'
+            f'  <script src="/assets/offline.js?v={ASSET_REV}" defer></script>\n'
+            f'  <script src="/assets/personalization-bridge-print1.js?v={ASSET_REV}" defer></script>\n'
+            f'  <link rel="stylesheet" href="/styles/family.css?v={ASSET_REV}">\n</head>',
         )
     )
     if "{{" in html or "}}" in html:
