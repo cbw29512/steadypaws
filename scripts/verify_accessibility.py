@@ -199,7 +199,14 @@ def assert_wcag_palette() -> None:
 
 
 def assert_all_html() -> None:
-    pages = [\n        ROOT / "index.html", ROOT / "404.html", ROOT / "accessibility.html", ROOT / "privacy.html",\n        ROOT / "terms.html", ROOT / "app" / "index.html",\n        ROOT / "pets" / "cat-health-trackers.html", ROOT / "pets" / "dog-health-trackers.html",\n    ]\n    pages.extend(sorted((ROOT / "care").glob("*.html")))\n    if len(pages) != 80:\n        raise AssertionError(f"Expected 80 audited HTML pages, found {len(pages)}")
+    pages = [
+        ROOT / "index.html", ROOT / "404.html", ROOT / "accessibility.html", ROOT / "privacy.html",
+        ROOT / "terms.html", ROOT / "app" / "index.html",
+        ROOT / "pets" / "cat-health-trackers.html", ROOT / "pets" / "dog-health-trackers.html",
+    ]
+    pages.extend(sorted((ROOT / "care").glob("*.html")))
+    if len(pages) != 80:
+        raise AssertionError(f"Expected 80 audited HTML pages, found {len(pages)}")
     for page in pages:
         assert_html_page(page)
     LOGGER.info("Semantic HTML audit across all 80 pages: PASS")
