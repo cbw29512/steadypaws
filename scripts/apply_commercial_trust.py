@@ -20,6 +20,7 @@ CARE_FOOTER = (
 
 def append_footer_links(path: Path) -> None:
     html = path.read_text(encoding="utf-8")
+    html = html.replace("<div><a", '<div class="footer-links"><a', 1)
     closing = "</div></div></footer>"
     if closing not in html:
         raise ValueError(f"Footer marker missing: {path}")
