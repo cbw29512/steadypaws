@@ -21,5 +21,3 @@
   .support-after-download { padding:20px; }
   .support-after-download .button { width:100%; }
 }
-
-.tracking-paths{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:.8rem;margin:1.25rem 0 .65rem}.tracking-path{display:grid;grid-template-columns:auto 1fr auto;align-items:center;gap:.75rem;min-height:92px;padding:1rem;border:2px solid #55756c;border-radius:1rem;background:#fff;color:#29483f;text-decoration:none}.tracking-path-app{background:#55756c;color:#fff}.tracking-path strong,.tracking-path small{display:block}.tracking-path strong{font-size:1rem}.tracking-path small{margin-top:.25rem;line-height:1.35}.tracking-path-icon{font-size:1.55rem}.tracking-path:hover{border-color:#18362e;background:#e4efeb;color:#18362e}.tracking-path-app:hover{background:#294f45;color:#fff}.tracking-path:focus-visible{outline:4px solid #b05d00;outline-offset:3px}@media(max-width:720px){.tracking-paths{grid-template-columns:1fr}.tracking-path{min-height:88px}}
