@@ -142,7 +142,7 @@ def draw_header(c: canvas.Canvas, spec: dict, page: int, subtitle: str | None = 
     c.drawString(36, height - 75, subtitle or spec["subtitle"])
     c.setFillColor(MUTED)
     c.setFont("Helvetica", 7.5)
-    c.drawRightString(width - 36, 20, f"Page {page} | steadypaws.netlify.app")
+    c.drawRightString(width - 36, 20, f"Page {page} | yourpetshealthlog.netlify.app")
 
 
 def draw_disclaimer(c: canvas.Canvas) -> None:
