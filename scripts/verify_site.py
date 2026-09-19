@@ -1,4 +1,4 @@
-"""Production certification for Steady Paws SEO, caregiver UX, downloads, privacy, and build integrity."""
+"""Production certification for Your Pet’s Health Log SEO, caregiver UX, downloads, privacy, and build integrity."""
 
 from __future__ import annotations
 
@@ -129,7 +129,7 @@ def assert_vendor_and_paw() -> None:
     if digest != EXPECTED_VENDOR_SHA512:
         raise AssertionError("Self-hosted pdf-lib bytes do not match pinned SHA-512")
     svg = (ROOT / "assets/paw.svg").read_text(encoding="utf-8")
-    for marker in ('aria-label="Steady Paws paw logo"', 'fill="#55756c"', 'fill="#fffdf9"'):
+    for marker in ('aria-label="Your Pet’s Health Log paw logo"', 'fill="#55756c"', 'fill="#fffdf9"'):
         if marker not in svg:
             raise AssertionError(f"Paw logo marker missing: {marker}")
     if svg.count("<ellipse") < 5:
@@ -140,7 +140,7 @@ def assert_vendor_and_paw() -> None:
 def assert_homepage() -> None:
     html = (ROOT / "index.html").read_text(encoding="utf-8")
     required = (
-        '<title>Free Pet Health Tracker Printables | Steady Paws</title>',
+        '<title>Free Pet Health Tracker Printables | Your Pet’s Health Log</title>',
         'name="robots" content="index, follow, max-image-preview:large"',
         f'rel="canonical" href="{EXPECTED_SITE_URL}"', f'property="og:url" content="{EXPECTED_SITE_URL}"',
         EXPECTED_SUPPORT_URL, "Free printable pet health trackers", "Keep track of your pet's health when they need you most.",
