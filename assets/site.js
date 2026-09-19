@@ -13,6 +13,8 @@
   const journeyCopy = document.querySelector('#journey-copy');
   const library = document.querySelector('#library');
   const personalize = document.querySelector('#personalize');
+  const trackerGrid = document.querySelector('#tracker-grid');
+  const filterGroup = document.querySelector('.filter-group');
   const familyName = document.querySelector('#family-name');
   const familyPhoto = document.querySelector('#family-photo');
   const photoPreview = document.querySelector('#photo-preview');
@@ -66,6 +68,20 @@
     careDownloads.forEach(link => {
       if (!link.dataset.busy) link.innerHTML = label;
     });
+  }
+
+  function setFilterBusy(isBusy) {
+    const value = String(isBusy);
+    library?.setAttribute('aria-busy', value);
+    trackerGrid?.setAttribute('aria-busy', value);
+    filterGroup?.setAttribute('aria-busy', value);
+  }
+
+  function focusLibrary() {
+    if (!library) return;
+    library.focus({ preventScroll: true });
+    const behavior = window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth';
+    library.scrollIntoView({ behavior, block: 'start' });
   }
 
   function applyFilters() {
@@ -129,6 +145,7 @@
 
   function selectFamily(choice) {
     try {
+      setFilterBusy(true);
       activeGroup = choice.dataset.familyGroup || 'all';
       familyLabel = choice.dataset.familyLabel || 'family member';
       familyTerms = normalize(choice.dataset.familyTerm || '')
@@ -151,11 +168,8 @@
       }
 
       applyFilters();
-      const target = personalize && !personalize.hidden ? personalize : library;
-      if (target) {
-        const behavior = window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth';
-        target.scrollIntoView({ behavior, block: 'center' });
-      }
+      setFilterBusy(false);
+      focusLibrary();
     } catch (error) {
       console.error('Your Pet’s Health Log family picker failed:', error);
     }
@@ -329,6 +343,7 @@
   }
 
   chips.forEach(chip => chip.addEventListener('click', () => {
+    setFilterBusy(true);
     activeGroup = chip.dataset.filter || 'all';
     familyLabel = '';
     familyTerms = [];
@@ -338,6 +353,8 @@
     if (journeyHeading) journeyHeading.textContent = 'Browse primary health concerns';
     if (journeyCopy) journeyCopy.textContent = 'Each concern is listed once. When several tailored forms exist, choose the one made for your family member.';
     applyFilters();
+    setFilterBusy(false);
+    focusLibrary();
   }));
 
   search.addEventListener('input', () => {
@@ -396,5 +413,6 @@
   }));
 
   applyFilters();
+  setFilterBusy(false);
   updateDownloadLabels();
 })();
