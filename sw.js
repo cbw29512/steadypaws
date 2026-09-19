@@ -1,6 +1,6 @@
 'use strict';
 
-const CACHE = 'yourpetshealthlog-v1';
+const CACHE = 'yourpetshealthlog-v2';
 const CORE = [
   '/',
   '/app/',
@@ -16,8 +16,26 @@ const CORE = [
   '/styles/mobile-app.css'
 ];
 
+async function cacheWorksheets(cache) {
+  try {
+    const response = await fetch('/sitemap.xml', { cache: 'no-store' });
+    if (!response.ok) return;
+    const xml = await response.text();
+    const urls = [...xml.matchAll(/<loc>([^<]+\/care\/[^<]+)<\/loc>/g)]
+      .map(match => new URL(match[1]).pathname);
+    await Promise.allSettled(urls.map(url => cache.add(url)));
+  } catch (error) {
+    console.warn('Worksheet precache skipped:', error);
+  }
+}
+
 self.addEventListener('install', event => {
-  event.waitUntil(caches.open(CACHE).then(cache => cache.addAll(CORE)).then(() => self.skipWaiting()));
+  event.waitUntil((async () => {
+    const cache = await caches.open(CACHE);
+    await cache.addAll(CORE);
+    await cacheWorksheets(cache);
+    await self.skipWaiting();
+  })());
 });
 
 self.addEventListener('activate', event => {
@@ -42,7 +60,7 @@ self.addEventListener('fetch', event => {
 
   if (isStatic) {
     event.respondWith(
-      caches.match(request).then(cached => cached || fetch(request).then(response => {
+      caches.match(request, { ignoreSearch: true }).then(cached => cached || fetch(request).then(response => {
         if (response.ok) caches.open(CACHE).then(cache => cache.put(request, response.clone()));
         return response;
       }))
