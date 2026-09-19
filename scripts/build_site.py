@@ -4,6 +4,7 @@ from __future__ import annotations
 
 from collections import Counter
 from html import escape
+import json
 from pathlib import Path
 
 from tracker_catalog import CONDITION_NAMES, GROUP_LABELS, TRACKERS, condition_key, condition_name
@@ -11,7 +12,68 @@ from tracker_catalog import CONDITION_NAMES, GROUP_LABELS, TRACKERS, condition_k
 ROOT = Path(__file__).resolve().parents[1]
 TEMPLATE = ROOT / "templates" / "index.template.html"
 OUTPUT = ROOT / "index.html"
-ASSET_REV = "20260919-verified-paw-qr2"
+ASSET_REV = "20260919-trust-content2"
+
+
+def render_json_ld() -> str:
+    payload = {
+        "@context": "https://schema.org",
+        "@graph": [
+            {
+                "@type": "WebSite",
+                "@id": "https://yourpetshealthlog.netlify.app/#website",
+                "url": "https://yourpetshealthlog.netlify.app/",
+                "name": "Your Pet’s Health Log",
+                "description": "Free pet health tracking tools, printable worksheets, and a private quick phone log.",
+                "creator": {"@id": "https://yourpetshealthlog.netlify.app/about.html#creator"},
+            },
+            {
+                "@type": "CollectionPage",
+                "@id": "https://yourpetshealthlog.netlify.app/#collection",
+                "url": "https://yourpetshealthlog.netlify.app/",
+                "name": "Free Pet Health Trackers",
+                "isPartOf": {"@id": "https://yourpetshealthlog.netlify.app/#website"},
+                "description": f"A collection of {len(TRACKERS)} tailored pet health trackers across {len(CONDITION_NAMES)} health concerns.",
+            },
+            {
+                "@type": "Person",
+                "@id": "https://yourpetshealthlog.netlify.app/about.html#creator",
+                "name": "Chris",
+                "url": "https://yourpetshealthlog.netlify.app/about.html",
+            },
+            {
+                "@type": "FAQPage",
+                "@id": "https://yourpetshealthlog.netlify.app/#faq",
+                "mainEntity": [
+                    {
+                        "@type": "Question",
+                        "name": "What can I track with Your Pet’s Health Log?",
+                        "acceptedAnswer": {
+                            "@type": "Answer",
+                            "text": "Each printable focuses on one main health concern and provides space for symptoms, day-to-day changes, veterinarian-directed medicines or measurements, other health conditions, and questions for the next visit.",
+                        },
+                    },
+                    {
+                        "@type": "Question",
+                        "name": "Can I bring a Your Pet’s Health Log tracker to my veterinarian?",
+                        "acceptedAnswer": {
+                            "@type": "Answer",
+                            "text": "Yes. The trackers organize observations for veterinary appointments. The veterinary team decides what the observations mean and what care is appropriate.",
+                        },
+                    },
+                    {
+                        "@type": "Question",
+                        "name": "Do I need an account or email address?",
+                        "acceptedAnswer": {
+                            "@type": "Answer",
+                            "text": "No. Every tracker is free to use without creating an account or providing an email address.",
+                        },
+                    },
+                ],
+            },
+        ],
+    }
+    return '<script type="application/ld+json">' + json.dumps(payload, ensure_ascii=False, separators=(",", ":")) + "</script>"
 
 
 def grouped_conditions() -> list[tuple[str, list[dict]]]:
@@ -109,14 +171,18 @@ def main() -> int:
         .replace('href="/assets/paw.svg"', f'href="/assets/paw.svg?v={ASSET_REV}"')
         .replace('src="/assets/paw.svg"', f'src="/assets/paw.svg?v={ASSET_REV}"')
         .replace('src="/assets/site.js"', f'src="/assets/site.js?v={ASSET_REV}"')
+        .replace('src="/assets/offline.js"', f'src="/assets/offline.js?v={ASSET_REV}"')
         .replace(
             "</head>",
-            '<script src="/assets/personalization-bridge-print1.js" defer></script>\n'
+            f'  {render_json_ld()}\n'
+            f'  <script src="/assets/offline.js?v={ASSET_REV}" defer></script>\n'
+            f'  <script src="/assets/personalization-bridge-print1.js?v={ASSET_REV}" defer></script>\n'
             f'  <link rel="stylesheet" href="/styles/family.css?v={ASSET_REV}">\n</head>',
         )
     )
-    if "{{" in html or "}}" in html:
-        raise RuntimeError("Unresolved homepage template placeholder")
+    unresolved = [token for token in ("{{TOTAL}}", "{{CONDITION_TOTAL}}", "{{FILTERS}}", "{{TRACKER_CARDS}}") if token in html]
+    if unresolved:
+        raise RuntimeError(f"Unresolved homepage template placeholders: {unresolved}")
     OUTPUT.write_text(html, encoding="utf-8")
     print(
         f"Built {OUTPUT} with {len(CONDITION_NAMES)} unique health concerns, "

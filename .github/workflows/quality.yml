@@ -71,7 +71,10 @@ jobs:
           node --check assets/launch-polish-1.js
           node --check assets/personalization-bridge-print1.js
           node --check assets/care-personalization-print1.js
+          node --check assets/care-autosave.js
+          node --check assets/offline.js
           node --check assets/mobile-app.js
+          node --check sw.js
           node --check app/sw.js
 
       - name: Verify SEO, downloads, security, and production integrity

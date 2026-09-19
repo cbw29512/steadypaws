@@ -117,7 +117,7 @@
     const blob = new Blob([bytes], { type: 'application/pdf' });
     const url = URL.createObjectURL(blob);
     const temp = document.createElement('a');
-    const filename = (link.getAttribute('href') || '').split('/').pop() || 'steady-paws-care-paperwork.pdf';
+    const filename = (link.getAttribute('href') || '').split('/').pop() || 'pet-health-log-care-paperwork.pdf';
     temp.href = url;
     temp.download = safeDownloadName(filename, personalization.name);
     document.body.appendChild(temp);

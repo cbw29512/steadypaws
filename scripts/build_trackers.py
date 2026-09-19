@@ -124,8 +124,8 @@ def draw_header(c: canvas.Canvas, spec: dict, page: int, subtitle: str | None = 
 
     draw_paw_mark(c, 36, height - 44, scale=0.58, color=white)
     c.setFillColor(white)
-    c.setFont("Helvetica-Bold", 10)
-    c.drawString(58, height - 30, "STEADY PAWS")
+    c.setFont("Helvetica-Bold", 8.6)
+    c.drawString(58, height - 30, "YOUR PET'S HEALTH LOG")
 
     species = spec["species"].upper()
     badge_width = max(70, min(145, stringWidth(species, "Helvetica-Bold", 7.5) + 20))
@@ -142,7 +142,7 @@ def draw_header(c: canvas.Canvas, spec: dict, page: int, subtitle: str | None = 
     c.drawString(36, height - 75, subtitle or spec["subtitle"])
     c.setFillColor(MUTED)
     c.setFont("Helvetica", 7.5)
-    c.drawRightString(width - 36, 20, f"Page {page} | yourpetshealthlog.netlify.app")
+    c.drawRightString(width - 36, 20, f"Page {page} | Your Pet's Health Log")
 
 
 def draw_disclaimer(c: canvas.Canvas) -> None:
