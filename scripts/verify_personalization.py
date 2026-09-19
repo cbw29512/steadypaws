@@ -221,8 +221,7 @@ def main() -> int:
             assert "Milo" in second_text, "Care-page PDF download lost the personalized name"
             assert page_has_image(second_reader), "Care-page PDF download lost the personalized photo"
 
-            clear_button = driver.find_element(By.ID, "care-clear-form-data")
-            clear_button.click()
+            scroll_and_click(driver, wait, By.ID, "care-clear-form-data")
             wait.until(EC.alert_is_present()).accept()
             wait.until(lambda d: d.find_element(By.ID, "care-other-conditions").get_attribute("value") == "")
             assert driver.execute_script(
