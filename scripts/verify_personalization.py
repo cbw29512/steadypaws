@@ -127,8 +127,15 @@ def main() -> int:
             wait.until(lambda d: d.execute_script(
                 "const logo=document.querySelector('.brand-logo'); return !!logo && logo.complete && logo.naturalWidth > 0;"
             ))
+            wait.until(lambda d: d.execute_script(
+                "return navigator.serviceWorker?.controller?.scriptURL?.endsWith('/sw.js') || false;"
+            ))
+            assert driver.find_element(By.ID, "tracker-grid").get_attribute("aria-busy") == "false", (
+                "Tracker library remained aria-busy after hydration"
+            )
 
             scroll_and_click(driver, wait, By.CSS_SELECTOR, '[data-family-group="cat"]')
+            wait.until(lambda d: d.execute_script("return document.activeElement?.id === 'library';"))
             personalize = wait.until(EC.visibility_of_element_located((By.ID, "personalize")))
             assert personalize.is_displayed(), "Personalization panel did not open"
 
@@ -179,6 +186,20 @@ def main() -> int:
             care_photo = wait.until(EC.visibility_of_element_located((By.ID, "care-family-photo")))
             wait.until(lambda d: d.execute_script("return arguments[0].naturalWidth", care_photo) > 0)
 
+            other_conditions = driver.find_element(By.ID, "care-other-conditions")
+            other_conditions.send_keys("Auto-save regression note")
+            wait.until(lambda d: d.execute_script(
+                "const key='yourpetshealthlog.care-form.v1:'+location.pathname;"
+                "return (localStorage.getItem(key)||'').includes('Auto-save regression note');"
+            ))
+            driver.refresh()
+            care_name = wait.until(EC.presence_of_element_located((By.ID, "care-family-name")))
+            assert care_name.get_attribute("value") == "Milo", "Auto-save reload lost the pet name"
+            other_conditions = wait.until(EC.presence_of_element_located((By.ID, "care-other-conditions")))
+            assert other_conditions.get_attribute("value") == "Auto-save regression note", "Worksheet auto-save did not restore"
+            care_photo = wait.until(EC.visibility_of_element_located((By.ID, "care-family-photo")))
+            wait.until(lambda d: d.execute_script("return arguments[0].naturalWidth", care_photo) > 0)
+
             result = driver.execute_cdp_cmd(
                 "Page.printToPDF",
                 {"printBackground": True, "preferCSSPageSize": True},
@@ -200,8 +221,16 @@ def main() -> int:
             assert "Milo" in second_text, "Care-page PDF download lost the personalized name"
             assert page_has_image(second_reader), "Care-page PDF download lost the personalized photo"
 
+            clear_button = driver.find_element(By.ID, "care-clear-form-data")
+            clear_button.click()
+            wait.until(EC.alert_is_present()).accept()
+            wait.until(lambda d: d.find_element(By.ID, "care-other-conditions").get_attribute("value") == "")
+            assert driver.execute_script(
+                "return localStorage.getItem('yourpetshealthlog.care-form.v1:'+location.pathname);"
+            ) is None, "Clear form data did not remove the localStorage record"
+
             print(
-                "Personalization browser test PASS: homepage PDF + accessible worksheet print + care-page PDF all retain photo/name"
+                "Browser regression PASS: focus/busy state + root SW + worksheet autosave/clear + PDF/print personalization"
             )
             return 0
         finally:
