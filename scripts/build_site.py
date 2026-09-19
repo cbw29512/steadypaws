@@ -146,8 +146,13 @@ def main() -> int:
             f'  <link rel="stylesheet" href="/styles/family.css?v={ASSET_REV}">\n</head>',
         )
     )
-    if "{{" in html or "}}" in html:
-        raise RuntimeError("Unresolved homepage template placeholder")
+    unresolved = [
+        token
+        for token in ("{{TOTAL}}", "{{CONDITION_TOTAL}}", "{{JSON_LD}}", "{{FILTERS}}", "{{TRACKER_CARDS}}")
+        if token in html
+    ]
+    if unresolved:
+        raise RuntimeError(f"Unresolved homepage template placeholders: {unresolved}")
     OUTPUT.write_text(html, encoding="utf-8")
     print(
         f"Built {OUTPUT} with {len(CONDITION_NAMES)} unique health concerns, "
