@@ -16,6 +16,23 @@ CARE_DIR = ROOT / "care"
 SITE_URL = "https://yourpetshealthlog.netlify.app"
 CARE_ASSET_REV = "20260901-printphoto2"
 
+SPECIES_CONTEXT = {
+    "Cat": "For cats, consistent notes can make quiet day-to-day changes easier to describe later. This version keeps the selected concern tied to repeatable home observations without asking you to interpret the cause.",
+    "Dog": "For dogs, routines such as meals, walks, activity, sleep, and bathroom habits can create a useful timeline. This version keeps the selected concern organized around repeatable observations you can bring to a visit.",
+    "Rabbit": "Rabbits often benefit from careful routine notes because eating, droppings, posture, movement, and behavior can change together. This version keeps those observations organized without turning them into a diagnosis.",
+    "Guinea Pig": "For guinea pigs, small changes in eating, weight, movement, breathing, or daily routine can be hard to reconstruct from memory. This version gives those observations a consistent place to live.",
+    "Ferret": "For ferrets, appetite, energy, weight, movement, breathing, and episode notes can be easier to compare when they are recorded the same way each time. This version is built around that consistency.",
+    "Chinchilla": "For chinchillas, eating, droppings, weight, movement, coat or skin changes, and environmental notes can be useful to keep together. This version emphasizes repeatable observations rather than interpretation.",
+    "Hamster": "For hamsters, brief daily notes can preserve small changes in appetite, weight, activity, grooming, breathing, or a visible lump that might otherwise be difficult to remember later.",
+    "Rat / Mouse": "For rats and mice, weight, appetite, breathing, mobility, grooming, and social behavior can change quickly enough that a simple written timeline is useful. This version keeps that history together.",
+    "Bird": "For birds, weight, appetite, droppings, breathing, perching, activity, feathers, and voice can all be useful parts of a home observation record. This version keeps those notes consistent and easy to review.",
+    "Reptile": "For reptiles, health observations often make more sense beside husbandry notes such as temperature, humidity, UVB, feeding, shedding, and activity. This version keeps the relevant environment and body observations together.",
+    "Horse": "For horses, repeated notes about movement, work tolerance, body condition, appetite, hooves, breathing, and medication can make trends easier to discuss with the veterinary and farrier teams.",
+    "Aquarium Fish": "For aquarium fish, body and behavior observations are most useful when water conditions and maintenance are recorded alongside them. This version keeps those details on the same timeline.",
+    "Amphibian": "For amphibians, skin, posture, appetite, activity, weight, temperature, humidity, or water conditions can be useful to record together. This version keeps the environment and visible changes connected.",
+    "All Pets": "This general-purpose tracker is designed for observations that apply across many species and keeps the record focused on what happened, when it happened, and what you want to discuss next.",
+}
+
 
 def care_slug(item: dict) -> str:
     return Path(item["filename"]).stem
@@ -94,6 +111,40 @@ def page_json_ld(item: dict, heading: str, description: str, canonical: str) -> 
         graph[1]["about"] = {"@id": condition["@id"]}
     payload = {"@context": "https://schema.org", "@graph": graph}
     return '<script type="application/ld+json">' + json.dumps(payload, ensure_ascii=False, separators=(",", ":")) + "</script>"
+
+
+def natural_list(values: list[str]) -> str:
+    cleaned = [display_field(value) for value in values]
+    if not cleaned:
+        return ""
+    if len(cleaned) == 1:
+        return cleaned[0]
+    if len(cleaned) == 2:
+        return f"{cleaned[0]} and {cleaned[1]}"
+    return ", ".join(cleaned[:-1]) + f", and {cleaned[-1]}"
+
+
+def render_tracker_context(item: dict) -> str:
+    species = item["species"].strip()
+    concern = condition_name(item)
+    context = SPECIES_CONTEXT.get(species, SPECIES_CONTEXT["All Pets"])
+    daily = natural_list(item["fields"])
+    review = natural_list(item["summary"][:4])
+    if species == "Cat":
+        more_link = '<p><a class="text-link" href="/pets/cat-health-trackers.html">Browse more cat health trackers <span aria-hidden="true">→</span></a></p>'
+    elif species == "Dog":
+        more_link = '<p><a class="text-link" href="/pets/dog-health-trackers.html">Browse more dog health trackers <span aria-hidden="true">→</span></a></p>'
+    else:
+        more_link = '<p><a class="text-link" href="/#finder">Browse trackers for another pet or concern <span aria-hidden="true">→</span></a></p>'
+    return (
+        '<section class="care-context" aria-labelledby="tracker-focus">'
+        f'<h2 id="tracker-focus">What this {escape(species.lower())} {escape(concern.lower())} tracker records</h2>'
+        f'<p>{escape(context)}</p>'
+        f'<p><strong>Daily record:</strong> {escape(daily)}. '
+        f'<strong>Review before the next visit:</strong> {escape(review)}.</p>'
+        '<p>These are observation prompts, not medical targets or instructions. Use the fields that match the plan from your veterinary team and leave the rest blank when they do not apply.</p>'
+        f'{more_link}</section>'
+    )
 
 
 def render_daily_table(item: dict) -> str:
@@ -180,6 +231,8 @@ def render_page(item: dict) -> str:
       <p id="care-autosave-status" class="care-personalization-status" role="status">Worksheet entries auto-save only in this browser on this device.</p>
       <p class="care-note" id="care-safety"><strong>For organizing care, not medical advice.</strong> Follow their veterinarian's plan and contact a veterinarian for urgent or concerning changes.</p>
     </header>
+
+    {render_tracker_context(item)}
 
     <div class="care-form" aria-describedby="care-safety">
       <fieldset class="care-fieldset">
