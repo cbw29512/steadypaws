@@ -12,7 +12,7 @@ from tracker_catalog import CONDITION_NAMES, GROUP_LABELS, TRACKERS, condition_k
 ROOT = Path(__file__).resolve().parents[1]
 TEMPLATE = ROOT / "templates" / "index.template.html"
 OUTPUT = ROOT / "index.html"
-ASSET_REV = "20260919-trust-content2"
+ASSET_REV = "20260927-design-pass1"
 
 
 def render_json_ld() -> str:
@@ -130,11 +130,12 @@ def render_variant(item: dict, concern: str) -> str:
         f'data-species="{escape(species, quote=True)}" data-search="{search}">'
         f'<span class="species-badge {badge_class(item["group"])}">{escape(badge_label(item))}</span>'
         f'<p>{escape(item["description"])}</p>'
+        f'<div class="variant-actions">'
         f'<a class="download-link care-download" href="/downloads/{filename}" aria-label="{download_label}" '
         f'data-pdf-url="/downloads/{filename}" data-download-name="{filename}" download>'
-        f'Get their care paperwork <span aria-hidden="true">↓</span></a>'
-        f'<a class="accessible-link" href="{care_page(item)}" aria-label="{accessible_label}">Accessible web worksheet</a>'
-        f'</div>'
+        f'Download PDF <span aria-hidden="true">↓</span></a>'
+        f'<a class="accessible-link" href="{care_page(item)}" aria-label="{accessible_label}">Fill in online</a>'
+        f'</div></div>'
     )
 
 
@@ -147,12 +148,12 @@ def render_cards() -> str:
             quote=True,
         )
         rendered_variants = "".join(render_variant(item, name) for item in variants)
+        versions = "1 tailored version" if len(variants) == 1 else f"{len(variants)} tailored versions"
         cards.append(
             f'<article class="tracker-card condition-card" data-condition="{escape(key, quote=True)}" '
             f'data-search="{search}">'
-            f'<span class="condition-kicker">Primary health concern</span>'
+            f'<span class="condition-kicker">{versions}</span>'
             f'<h3>{escape(name)}</h3>'
-            f'<p class="condition-help">Choose the version made for your pet. The tracker also has room to note other health conditions.</p>'
             f'<div class="tracker-variants">{rendered_variants}</div></article>'
         )
     return "\n          ".join(cards)
