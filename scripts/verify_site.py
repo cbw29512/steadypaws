@@ -20,8 +20,10 @@ LOGGER = logging.getLogger(__name__)
 ROOT = Path(__file__).resolve().parents[1]
 EXPECTED_SITE_URL = "https://yourpetshealthlog.netlify.app/"
 EXPECTED_SUPPORT_URL = "https://buymeacoffee.com/divclass016"
-EXPECTED_ASSET_REV = "20260919-trust-content2"
-CARE_ASSET_REV = "20260919-trust-content2"
+EXPECTED_ASSET_REV = "20260927-design-pass1"
+CARE_ASSET_REV = "20260927-design-pass1"
+# Hand-written information pages keep their own asset revision until they are next edited.
+STATIC_PAGE_ASSET_REV = "20260919-trust-content2"
 EXPECTED_VENDOR_SHA512 = "z8IYLHO8bTgFqj+yrPyIJnzBDf7DDhWwiEsk4sY+Oe6J2M+WQequeGS7qioI5vT6rXgVRb4K1UVQC5ER7MKzKQ=="
 VENDOR_PATH = ROOT / "assets/vendor/pdf-lib-1.17.1.min.js"
 
@@ -284,7 +286,7 @@ def assert_accessible_care_pages() -> None:
 def assert_security_sitemap_and_static_pages() -> None:
     for filename in ("404.html", "accessibility.html", "privacy.html", "about.html"):
         html = (ROOT / filename).read_text(encoding="utf-8")
-        if f'/assets/paw.svg?v={EXPECTED_ASSET_REV}' not in html:
+        if f'/assets/paw.svg?v={STATIC_PAGE_ASSET_REV}' not in html:
             raise AssertionError(f"Stale branding asset in {filename}")
     netlify = (ROOT / "netlify.toml").read_text(encoding="utf-8")
     required = (
