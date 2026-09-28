@@ -46,3 +46,26 @@
   .care-table { min-width:0; font-size:8pt; }
   .care-table input,.field input,.field textarea,.summary-item textarea { border-color:#666; }
 }
+
+/* Design pass 2026-09-27: clear print/download flow and a quiet support slot */
+.care-actions { align-items:center; }
+.care-steps { display:flex; flex-wrap:wrap; gap:8px 22px; margin:0 0 18px; padding:0; list-style:none; counter-reset:care-step; color:var(--muted); font-size:.9rem; }
+.care-steps li { counter-increment:care-step; display:flex; align-items:center; gap:8px; }
+.care-print-button { font-weight:800; }
+.care-steps li::before { content:counter(care-step); display:inline-grid; place-items:center; flex:0 0 22px; width:22px; height:22px; border-radius:50%; background:#e5f0eb; color:#415f56; font-size:.75rem; font-weight:900; }
+.care-steps strong { color:var(--ink); }
+.care-personalization-status { min-height:0; margin:0 0 10px; font-size:.84rem; }
+.care-note { margin-top:14px; }
+.care-finish { display:grid; grid-template-columns:minmax(0,1.4fr) minmax(260px,.8fr); gap:22px; align-items:stretch; margin-top:32px; }
+.care-finish-copy { padding:24px; border:1px solid #b9c9c3; border-radius:18px; background:#f5f8f6; }
+.care-finish-copy h2 { margin:0 0 8px; font-size:clamp(1.35rem,3vw,1.8rem); }
+.care-finish-copy p { color:var(--muted); }
+.care-finish-actions { display:flex; flex-wrap:wrap; gap:12px; }
+.care-finish-actions .button-secondary { font:inherit; font-weight:800; cursor:pointer; }
+.care-support { display:flex; flex-direction:column; justify-content:center; gap:14px; padding:22px; border:1px solid #d9c9bb; border-radius:18px; background:linear-gradient(145deg,#fffefa,#fbf3eb); }
+.care-support p { margin:0; color:var(--muted); font-size:.92rem; }
+.care-support strong { color:var(--ink); }
+.care-support .button { align-self:flex-start; }
+@media (max-width:760px) { .care-finish { grid-template-columns:1fr; } .care-steps { flex-direction:column; gap:6px; } }
+@media (max-width:700px) { .care-finish-actions .button,.care-support .button { width:100%; } .nav-wrap nav { display:none; } }
+@media print { .care-steps,.care-finish,.button-coffee { display:none !important; } }
