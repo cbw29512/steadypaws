@@ -69,3 +69,14 @@ section[id] { scroll-margin-top: 92px; }
   html { scroll-behavior: auto; }
   *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; scroll-behavior: auto !important; }
 }
+
+/* Design pass 2026-09-27: compact, single-line header on phones */
+@media (max-width: 760px) {
+  .nav-wrap { gap: 12px; }
+  .brand { min-width: 0; font-size: .95rem; line-height: 1.2; }
+  .brand-logo { width: 34px; height: 34px; }
+  .nav-wrap .button-small { flex: 0 0 auto; white-space: nowrap; }
+}
+@media (max-width: 400px) {
+  .brand span { max-width: 128px; }
+}
