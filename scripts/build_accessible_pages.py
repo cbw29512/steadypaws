@@ -225,6 +225,7 @@ def render_page(item: dict) -> str:
         <a class="button" href="{pdf_url}" download>Download printable PDF</a>
         <button id="care-print-personalized" class="button care-print-button" type="button">Print this worksheet</button>
         <button id="clear-care-form-data" class="button button-secondary" type="button">Clear Form Data</button>
+        <a class="button button-secondary" href="https://buymeacoffee.com/divclass016" target="_blank" rel="noopener noreferrer">☕ Help keep these trackers free</a>
         <a class="text-link" href="/#finder">Choose a different pet health tracker <span aria-hidden="true">→</span></a>
       </div>
       <p id="care-personalization-status" class="care-personalization-status" role="status">Tip: add a name or photo on the Your Pet’s Health Log finder page before opening this tracker if you want it included when printing.</p>
