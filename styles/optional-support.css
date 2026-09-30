@@ -1,0 +1,16 @@
+/* A secondary support option after a useful result, outside the health record. */
+.app-support {
+  display: flex; align-items: center; gap: 1rem;
+  margin-top: 1.5rem; padding: 1rem;
+  border-top: 1px solid var(--line, #d9e1de); background: #f7faf9;
+}
+.app-support > div { flex: 1; }
+.app-support h3 { margin: 0 0 .4rem; font-size: 1.125rem; }
+.app-support p { margin: 0; font-size: 1rem; line-height: 1.5; }
+.app-support .app-action { width: auto; flex-shrink: 0; font-size: 1rem; }
+@media (max-width: 600px) {
+  .app-support { flex-direction: column; align-items: flex-start; }
+}
+@media print {
+  .app-support { display: none !important; }
+}

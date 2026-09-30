@@ -1,6 +1,6 @@
 'use strict';
 
-const CACHE = 'yourpetshealthlog-v3';
+const CACHE = 'yourpetshealthlog-v4';
 const CORE = [
   '/',
   '/app/',
@@ -13,7 +13,8 @@ const CORE = [
   '/styles/base.css',
   '/styles/components.css',
   '/styles/care.css',
-  '/styles/mobile-app.css'
+  '/styles/mobile-app.css',
+  '/styles/optional-support.css'
 ];
 
 async function cacheWorksheets(cache) {
