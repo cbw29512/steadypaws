@@ -9,11 +9,13 @@ logging.basicConfig(level=logging.INFO, format="%(levelname)s | %(message)s")
 LOGGER = logging.getLogger(__name__)
 ROOT = Path(__file__).resolve().parents[1]
 SUPPORT_URL = "https://buymeacoffee.com/divclass016"
+WELCOME_URL = "https://welcomehomepet.netlify.app/"
 
 CARE_FOOTER = (
     '<footer class="care-footer"><p>Your Pet’s Health Log · Free pet health trackers for animals you love · '
     '<a href="/about.html">About</a> · <a href="/accessibility.html">Accessibility options</a> · '
     '<a href="/privacy.html">Privacy</a> · <a href="/terms.html">Terms</a> · '
+    f'<a href="{WELCOME_URL}">New pet checklists</a> · '
     f'<a href="{SUPPORT_URL}" target="_blank" rel="noopener noreferrer">Support Your Pet’s Health Log</a></p></footer>'
 )
 
@@ -26,12 +28,15 @@ def append_footer_links(path: Path) -> None:
         raise ValueError(f"Footer marker missing: {path}")
     about_link = '<a href="/about.html">About</a>'
     terms_link = '<a href="/terms.html">Terms</a>'
+    welcome_link = f'<a href="{WELCOME_URL}">New pet checklists</a>'
     support_link = f'<a href="{SUPPORT_URL}" target="_blank" rel="noopener noreferrer">Support Your Pet’s Health Log</a>'
     additions = ""
     if about_link not in html:
         additions += about_link
     if terms_link not in html:
         additions += terms_link
+    if WELCOME_URL not in html:
+        additions += welcome_link
     if SUPPORT_URL not in html:
         additions += support_link
     if additions:
