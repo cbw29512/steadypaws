@@ -3,5 +3,5 @@
   "welcome_url": "https://welcomehomepet.netlify.app/",
   "currency": "USD",
   "paid_product": "household-pet-care-binder",
-  "notes": "ONE Gumroad product only: Household Pet Care Binder & Sitter Handover at $12–$15. Do not sell the free 72 condition trackers. Set checkout_url in data/household_binder.json when live. Do not publish site buy-button changes before that URL exists."
+  "notes": "ONE Gumroad product only: Household Pet Care Binder & Sitter Handover at $12. Live checkout: https://divclass.gumroad.com/l/household-pet-care-binder. Do not sell the free 72 condition trackers."
 }
