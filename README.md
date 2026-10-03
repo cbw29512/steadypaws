@@ -41,12 +41,22 @@ This keeps the displayed download count, family choices, search cards, generated
 python -m pip install -r requirements.txt
 python scripts/build_trackers.py
 python scripts/build_site.py
+python scripts/build_packs.py
+python scripts/build_household_binder.py
 python scripts/verify_site.py
+python scripts/verify_packs.py
 ```
+
+**Commerce rule (see `docs/COMMERCE_BRIEF.md`):** the site stays the free app (72 condition trackers + Quick Phone Log). Gumroad sells **one** product — the Household Pet Care Binder & Sitter Handover ($12–$15). Do not sell reprints of the free trackers.
+
+`scripts/build_packs.py` writes the public `/packs/` marketing page.  
+`scripts/build_household_binder.py` writes fillable US Letter + A4 PDFs under `fulfillment/household-binder/` for Gumroad upload (gitignored; never published by Netlify).
+
+Set `checkout_url` in `data/household_binder.json` / `data/packs.json` only when Gumroad is live. **Do not publish site buy-button changes before that URL exists.**
 
 ## Netlify
 
-Netlify reads `netlify.toml` and runs the tracker generator and homepage builder before publishing the repository root. The production URL is `https://yourpetshealthlog.netlify.app/`.
+Netlify reads `netlify.toml` and runs the tracker generator, homepage builder, and packs page builder before publishing the repository root. The production URL is `https://yourpetshealthlog.netlify.app/`. Only production context builds (credit protection).
 
 ## Product principles
 
