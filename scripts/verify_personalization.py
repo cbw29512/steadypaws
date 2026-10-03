@@ -151,7 +151,7 @@ def main() -> int:
             accessible_link = variant.find_element(By.CSS_SELECTOR, ".accessible-link")
 
             driver.execute_script("arguments[0].scrollIntoView({block:'center', inline:'nearest'});", download_link)
-            wait.until(lambda d: download_link.is_displayed() and download_link.is_enabled() and "Personalize" in download_link.text)
+            wait.until(lambda d: download_link.is_displayed() and download_link.is_enabled() and "personalized" in download_link.text.lower())
             try:
                 download_link.click()
             except Exception:
