@@ -65,13 +65,15 @@ def main() -> int:
     try:
         for path in (
             ROOT / "index.html",
+            ROOT / "packs" / "index.html",
             ROOT / "pets" / "cat-health-trackers.html",
             ROOT / "pets" / "dog-health-trackers.html",
             ROOT / "privacy.html",
             ROOT / "accessibility.html",
             ROOT / "about.html",
         ):
-            append_footer_links(path)
+            if path.is_file():
+                append_footer_links(path)
         care_count = polish_care_pages()
         LOGGER.info("Commercial trust polish applied to homepage, %d care pages, hubs, About, and information pages", care_count)
         return 0

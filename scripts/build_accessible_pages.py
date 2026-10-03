@@ -298,7 +298,13 @@ def render_page(item: dict) -> str:
 
 
 def write_sitemap() -> None:
-    urls = [f"{SITE_URL}/", f"{SITE_URL}/about.html", f"{SITE_URL}/accessibility.html", f"{SITE_URL}/privacy.html"]
+    urls = [
+        f"{SITE_URL}/",
+        f"{SITE_URL}/about.html",
+        f"{SITE_URL}/accessibility.html",
+        f"{SITE_URL}/privacy.html",
+        f"{SITE_URL}/packs/",
+    ]
     urls.extend(care_url(item) for item in TRACKERS)
     lastmod = date.today().isoformat()
     body = "\n".join(

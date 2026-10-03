@@ -112,9 +112,10 @@ def assert_required_files() -> None:
         "assets/paw.svg", "assets/og-card.png", "assets/site.js", "assets/launch-polish-1.js", "assets/personalization-bridge-print1.js",
         "assets/care-personalization-print1.js", "assets/care-autosave.js", "assets/offline.js", "assets/vendor/pdf-lib-1.17.1.min.js", "sw.js",
         "netlify.toml", "robots.txt", "sitemap.xml", "requirements.txt",
-        "templates/index.template.html", "scripts/tracker_catalog.py", "scripts/fetch_vendor.py",
-        "scripts/build_trackers.py", "scripts/build_site.py", "scripts/build_accessible_pages.py",
-        "scripts/verify_accessibility.py", "scripts/verify_personalization.py", "scripts/serve_ci.py",
+        "templates/index.template.html", "templates/packs.template.html", "scripts/tracker_catalog.py", "scripts/fetch_vendor.py",
+        "scripts/build_trackers.py", "scripts/build_site.py", "scripts/build_accessible_pages.py", "scripts/build_packs.py",
+        "scripts/verify_accessibility.py", "scripts/verify_personalization.py", "scripts/verify_packs.py", "scripts/serve_ci.py",
+        "data/packs.json", "data/commerce.json", "styles/packs.css", "packs/index.html",
     )
     missing = [path for path in required if not (ROOT / path).is_file()]
     if missing:
@@ -349,7 +350,7 @@ def assert_security_sitemap_and_static_pages() -> None:
             raise AssertionError(f"Stale branding asset in {filename}")
     netlify = (ROOT / "netlify.toml").read_text(encoding="utf-8")
     required = (
-        "python scripts/fetch_vendor.py", "python scripts/build_accessible_pages.py", "Strict-Transport-Security",
+        "python scripts/fetch_vendor.py", "python scripts/build_accessible_pages.py", "python scripts/build_packs.py", "Strict-Transport-Security",
         'X-Frame-Options = "DENY"', "script-src 'self'", "connect-src 'self'", "img-src 'self' data: blob:",
         "object-src 'none'", "worker-src 'self'", "frame-ancestors 'none'", 'for = "/styles/*"', 'for = "/assets/*"',
     )
@@ -365,9 +366,16 @@ def assert_security_sitemap_and_static_pages() -> None:
     root = ET.parse(ROOT / "sitemap.xml").getroot()
     namespace = {"s": "http://www.sitemaps.org/schemas/sitemap/0.9"}
     urls = [node.text for node in root.findall("s:url/s:loc", namespace) if node.text]
-    expected = {EXPECTED_SITE_URL, f"{EXPECTED_SITE_URL}about.html", f"{EXPECTED_SITE_URL}accessibility.html", f"{EXPECTED_SITE_URL}privacy.html", *(care_page_url(item) for item in TRACKERS)}
-    if len(urls) != 76 or set(urls) != expected:
-        raise AssertionError("Sitemap must contain exactly 76 canonical URLs")
+    expected = {
+        EXPECTED_SITE_URL,
+        f"{EXPECTED_SITE_URL}about.html",
+        f"{EXPECTED_SITE_URL}accessibility.html",
+        f"{EXPECTED_SITE_URL}privacy.html",
+        f"{EXPECTED_SITE_URL}packs/",
+        *(care_page_url(item) for item in TRACKERS),
+    }
+    if len(urls) != 77 or set(urls) != expected:
+        raise AssertionError("Sitemap must contain exactly 77 canonical URLs")
     LOGGER.info("Security, cache policy, static pages, robots, and sitemap: PASS")
 
 

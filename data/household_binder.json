@@ -1,0 +1,18 @@
+{
+  "id": "household-pet-care-binder",
+  "title": "Household Pet Care Binder & Sitter Handover",
+  "price_display": "$12",
+  "price_cents": 1200,
+  "eyebrow": "Printable household binder",
+  "blurb": "The fillable household binder the free site does not give away: pet profile with microchip and insurance, vaccines and preventatives, medication schedule, vet visit log, emergency contacts, sitter handbook, feeding and supply checklists, grooming, weight, expenses, and a travel go-bag. US Letter and A4 included.",
+  "audience": "Multi-pet homes, fosters, and anyone who needs a sitter-ready household packet",
+  "checkout_url": null,
+  "page_target": "28-40",
+  "formats": ["US Letter", "A4"],
+  "differentiators": [
+    "Not a reprint of the free 72 condition trackers",
+    "Fillable fields for typing or printing blank",
+    "Sitter handover + emergency authorization included",
+    "Pairs with free Your Pet’s Health Log condition trackers and Quick Phone Log"
+  ]
+}
