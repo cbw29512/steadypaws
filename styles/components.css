@@ -151,6 +151,11 @@
 .hero-trust li::before { content:"✓"; position:absolute; left:0; top:1px; display:grid; place-items:center; width:18px; height:18px; border-radius:50%; background:#e5f0eb; color:var(--brand); font-size:.7rem; font-weight:900; }
 .species-shortcuts > span:first-child { color:var(--muted); font-weight:750; }
 .library-toolbar { margin-bottom:0; }
+/* Paired tracker actions, used by the homepage library and the species hubs. */
+.variant-actions { display:flex; flex-wrap:wrap; align-items:center; gap:6px 14px; margin-top:auto; padding-top:12px; }
+.variant-actions .download-link { display:inline-flex; align-items:center; gap:6px; min-height:40px; margin-top:0; padding:0 14px; border:1px solid var(--brand); border-radius:999px; background:var(--brand); color:var(--white); font-size:.82rem; }
+.variant-actions .download-link:hover,.variant-actions .download-link:focus-visible { background:var(--brand-2); border-color:var(--brand-2); color:var(--white); text-decoration:none; }
+.variant-actions .accessible-link { display:inline-flex; align-items:center; min-height:40px; margin-top:0; color:var(--brand); font-size:.82rem; font-weight:800; text-decoration:underline; text-underline-offset:3px; }
 .ways-section h2 { margin-bottom:26px; }
 .ways-section .tracking-paths { margin-top:0; }
 .ways-section .tracking-path h3 { margin-bottom:10px; font-size:1.25rem; }

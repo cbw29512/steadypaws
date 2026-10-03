@@ -12,6 +12,7 @@ logging.basicConfig(level=logging.INFO, format="%(levelname)s | %(message)s")
 LOGGER = logging.getLogger(__name__)
 ROOT = Path(__file__).resolve().parents[1]
 SITE_URL = "https://yourpetshealthlog.netlify.app"
+SUPPORT_URL = "https://buymeacoffee.com/divclass016"
 HUBS = {
     "cat": ROOT / "pets/cat-health-trackers.html",
     "dog": ROOT / "pets/dog-health-trackers.html",
@@ -59,6 +60,22 @@ def verify_hub(animal: str, path: Path) -> None:
             target = ROOT / urlparse(href).path.lstrip("/")
             if not target.is_file():
                 raise AssertionError(f"Broken care link on {animal} hub: {href}")
+
+        # A search visitor must be able to download from the hub itself, not only
+        # after a second hop into the worksheet.
+        pdf_links = [href for href in parser.hrefs if href.startswith("/downloads/")]
+        if len(pdf_links) != len(care_links):
+            raise AssertionError(
+                f"{animal} hub offers {len(pdf_links)} downloads for {len(care_links)} trackers"
+            )
+        for href in pdf_links:
+            target = ROOT / urlparse(href).path.lstrip("/")
+            if not target.is_file():
+                raise AssertionError(f"Broken download link on {animal} hub: {href}")
+        if html.count(SUPPORT_URL) < 2:
+            raise AssertionError(f"{animal} hub must offer support beside the download actions")
+        if html.index('class="library-support"') > html.index('class="tracker-grid"'):
+            raise AssertionError(f"{animal} hub support note must sit above the tracker grid")
         LOGGER.info("%s health tracker hub: PASS", animal.title())
     except Exception:
         LOGGER.exception("%s health tracker hub: FAIL", animal.title())

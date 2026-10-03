@@ -22,8 +22,6 @@ EXPECTED_SITE_URL = "https://yourpetshealthlog.netlify.app/"
 EXPECTED_SUPPORT_URL = "https://buymeacoffee.com/divclass016"
 EXPECTED_ASSET_REV = "20261003-convert1"
 CARE_ASSET_REV = "20261003-convert1"
-# Hand-written information pages keep their own revision until they are next edited.
-STATIC_PAGE_ASSET_REV = "20260919-trust-content2"
 EXPECTED_VENDOR_SHA512 = "z8IYLHO8bTgFqj+yrPyIJnzBDf7DDhWwiEsk4sY+Oe6J2M+WQequeGS7qioI5vT6rXgVRb4K1UVQC5ER7MKzKQ=="
 VENDOR_PATH = ROOT / "assets/vendor/pdf-lib-1.17.1.min.js"
 
@@ -326,7 +324,7 @@ def assert_accessible_care_pages() -> None:
 def assert_security_sitemap_and_static_pages() -> None:
     for filename in ("404.html", "accessibility.html", "privacy.html", "about.html"):
         html = (ROOT / filename).read_text(encoding="utf-8")
-        if f'/assets/paw.svg?v={STATIC_PAGE_ASSET_REV}' not in html:
+        if f'/assets/paw.svg?v={EXPECTED_ASSET_REV}' not in html:
             raise AssertionError(f"Stale branding asset in {filename}")
     netlify = (ROOT / "netlify.toml").read_text(encoding="utf-8")
     required = (
@@ -389,6 +387,10 @@ def assert_pdfs() -> None:
         for marker in ("This week at a glance", "Since the last vet visit", "Questions for the vet", "Plan / next steps from the vet"):
             if marker not in second_page:
                 raise AssertionError(f"Page 2 marker missing from {item['filename']}: {marker}")
+        for page_text in (first_page, second_page):
+            for marker in ("yourpetshealthlog.netlify.app", "buymeacoffee.com/divclass016"):
+                if marker not in page_text:
+                    raise AssertionError(f"Printed sheet has no return path in {item['filename']}: {marker}")
         if "*" in first_page:
             raise AssertionError(f"Ambiguous asterisk marker remains on printable sheet: {item['filename']}")
         if str(reader.root_object.get("/Lang")) != "en-US":
