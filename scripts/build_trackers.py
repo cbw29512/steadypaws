@@ -16,6 +16,8 @@ from tracker_catalog import TRACKERS, condition_name
 ROOT = Path(__file__).resolve().parents[1]
 OUT = ROOT / "downloads"
 OUT.mkdir(parents=True, exist_ok=True)
+SITE_HOST = "yourpetshealthlog.netlify.app"
+SUPPORT_HOST = "buymeacoffee.com/divclass016"
 
 BRAND = HexColor("#55756C")
 BRAND2 = HexColor("#5F776F")
@@ -143,6 +145,9 @@ def draw_header(c: canvas.Canvas, spec: dict, page: int, subtitle: str | None = 
     c.setFillColor(MUTED)
     c.setFont("Helvetica", 7.5)
     c.drawRightString(width - 36, 20, f"Page {page} | Your Pet's Health Log")
+    # A printed sheet lives on a fridge for weeks; this is its only way back.
+    c.setFont("Helvetica", 7)
+    c.drawString(36, 20, f"Free at {SITE_HOST} | Keep them free: {SUPPORT_HOST}")
 
 
 def draw_disclaimer(c: canvas.Canvas) -> None:

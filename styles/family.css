@@ -17,14 +17,20 @@
 .tracker-variant[hidden] { display:none; }
 .tracker-variant .species-badge { margin-bottom:8px; }
 .tracker-variant p { margin:0 0 12px; font-size:.84rem; line-height:1.45; }
-.tracker-variant .download-link { display:inline-flex; margin-top:0; padding-top:0; border-top:0; min-height:28px; align-items:center; }
-.tracker-variant .accessible-link { display:inline-flex; min-height:28px; align-items:center; margin-top:6px; color:var(--muted); font-size:.8rem; font-weight:750; text-decoration:underline; text-underline-offset:3px; }
+.tracker-variant .download-link { display:inline-flex; align-items:center; }
 .condition-card.has-multiple-variants .tracker-variants { gap:12px; }
 .condition-card.has-multiple-variants .tracker-variant { padding:14px; border:1px solid #e0e8e4; border-radius:14px; background:#fbfdfc; }
-.browse-tools { margin-top:30px; border:1px solid var(--line); border-radius:18px; background:rgba(255,254,250,.76); }
-.browse-tools summary { padding:18px 20px; color:var(--brand); font-weight:850; cursor:pointer; }
-.browse-tools summary:hover { text-decoration:underline; text-underline-offset:4px; }
-.browse-tools .library-tools { margin:0; border:0; border-top:1px solid var(--line); border-radius:0 0 18px 18px; }
+/* Browsing the whole library at once: cards pack by height so a concern with six
+   tailored versions does not leave a hole beside the single-version cards. */
+.tracker-grid { display:block; columns:3 300px; column-gap:18px; }
+.tracker-grid > .tracker-card { width:100%; min-height:0; margin:0 0 18px; break-inside:avoid; content-visibility:visible; }
+.tracker-grid > .tracker-card[hidden] { display:none; }
+.tracker-card:hover { transform:none; }
+.condition-kicker { color:var(--muted); letter-spacing:.06em; }
+.condition-card h3 { margin:6px 0 14px; font-size:1.2rem; }
+.condition-card.has-multiple-variants .tracker-variant { display:flex; flex-wrap:wrap; align-items:center; justify-content:space-between; gap:8px 10px; padding:10px 12px; }
+.condition-card.has-multiple-variants .tracker-variant p { display:none; }
+.condition-card.has-multiple-variants .tracker-variant .species-badge { margin:0; white-space:nowrap; }
 @media (max-width:1100px) { .family-grid-more { grid-template-columns:repeat(3,minmax(0,1fr)); } }
 @media (max-width:980px) { .family-grid-primary { grid-template-columns:repeat(2,minmax(0,1fr)); } }
 @media (max-width:760px) { .family-grid-more { grid-template-columns:repeat(2,minmax(0,1fr)); } .family-more { min-height:148px; } }

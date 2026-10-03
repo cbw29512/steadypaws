@@ -14,7 +14,8 @@ from tracker_catalog import TRACKERS, condition_name
 ROOT = Path(__file__).resolve().parents[1]
 CARE_DIR = ROOT / "care"
 SITE_URL = "https://yourpetshealthlog.netlify.app"
-CARE_ASSET_REV = "20260919-trust-content2"
+SUPPORT_URL = "https://buymeacoffee.com/divclass016"
+CARE_ASSET_REV = "20261003-convert1"
 
 SPECIES_CONTEXT = {
     "Cat": "For cats, consistent notes can make quiet day-to-day changes easier to describe later. This version keeps the selected concern tied to repeatable home observations without asking you to interpret the cause.",
@@ -204,6 +205,12 @@ def render_page(item: dict) -> str:
   <meta property="og:title" content="{escape(title, quote=True)}">
   <meta property="og:description" content="{escape(description, quote=True)}">
   <meta property="og:url" content="{canonical}">
+  <meta property="og:image" content="{SITE_URL}/assets/og-card.png">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:image:alt" content="Your Pet’s Health Log — free printable pet health trackers, no account or email required.">
+  <meta name="twitter:image" content="{SITE_URL}/assets/og-card.png">
+  <meta name="twitter:card" content="summary_large_image">
   <link rel="icon" href="/assets/paw.svg?v={ASSET_REV}" type="image/svg+xml">
   <link rel="stylesheet" href="/styles/base.css?v={ASSET_REV}">
   <link rel="stylesheet" href="/styles/components.css?v={ASSET_REV}">
@@ -215,7 +222,7 @@ def render_page(item: dict) -> str:
 </head>
 <body class="care-page">
   <a class="skip-link" href="#main">Skip to pet health tracker</a>
-  <header class="site-header"><div class="shell nav-wrap"><a class="brand" href="/" aria-label="Your Pet’s Health Log home"><img class="brand-logo" src="/assets/paw.svg?v={ASSET_REV}" width="38" height="38" alt=""><span>Your Pet’s Health Log</span></a><nav aria-label="Tracker navigation"><a href="/#finder">Find another pet health tracker</a><a href="/accessibility.html">Accessibility</a></nav></div></header>
+  <header class="site-header"><div class="shell nav-wrap"><a class="brand" href="/" aria-label="Your Pet’s Health Log home"><img class="brand-logo" src="/assets/paw.svg?v={ASSET_REV}" width="38" height="38" alt=""><span>Your Pet’s Health Log</span></a><nav aria-label="Tracker navigation"><a href="/#library">All trackers</a><a href="/accessibility.html">Accessibility</a></nav><a class="button button-small button-coffee" href="{SUPPORT_URL}" target="_blank" rel="noopener noreferrer"><span aria-hidden="true">☕</span> Buy me a coffee</a></div></header>
   <main id="main" class="care-shell">
     <header class="care-header">
       <p class="eyebrow">Free pet health tracker · {escape(species)}</p>
@@ -223,10 +230,14 @@ def render_page(item: dict) -> str:
       <p class="lede">Use this simple tracker to record {escape(intro.lower())}. Keep the important details together for the days between veterinary visits.</p>
       <div class="care-actions">
         <a class="button" href="{pdf_url}" download>Download printable PDF</a>
-        <button id="care-print-personalized" class="button care-print-button" type="button">Print this worksheet</button>
-        <button id="clear-care-form-data" class="button button-secondary" type="button">Clear Form Data</button>
-        <a class="text-link" href="/#finder">Choose a different pet health tracker <span aria-hidden="true">→</span></a>
+        <button id="care-print-personalized" class="button button-secondary care-print-button" type="button">Print this worksheet</button>
+        <a class="text-link" href="/#library">Choose a different pet health tracker <span aria-hidden="true">→</span></a>
       </div>
+      <ol class="care-steps" aria-label="How to use this tracker">
+        <li><span><strong>Download or print it blank</strong> to write by hand</span></li>
+        <li><span><strong>Or fill it in below</strong> on this device</span></li>
+        <li><span><strong>Print a clean copy</strong> for the vet visit</span></li>
+      </ol>
       <p id="care-personalization-status" class="care-personalization-status" role="status">Tip: add a name or photo on the Your Pet’s Health Log finder page before opening this tracker if you want it included when printing.</p>
       <p id="care-autosave-status" class="care-personalization-status" role="status">Worksheet entries auto-save only in this browser on this device.</p>
       <p class="care-note" id="care-safety"><strong>For organizing care, not medical advice.</strong> Follow their veterinarian's plan and contact a veterinarian for urgent or concerning changes.</p>
@@ -264,6 +275,21 @@ def render_page(item: dict) -> str:
         <label class="field">Plan / next steps from the vet<textarea rows="5"></textarea></label>
       </fieldset>
     </div>
+
+    <section class="care-finish" aria-labelledby="care-finish-title">
+      <div class="care-finish-copy">
+        <h2 id="care-finish-title">Finished filling it in?</h2>
+        <p>Print this page for a clean copy to bring to their vet, or download the blank PDF to keep on paper.</p>
+        <div class="care-finish-actions">
+          <a class="button" href="{pdf_url}" download>Download printable PDF</a>
+          <button id="clear-care-form-data" class="button button-secondary" type="button">Clear Form Data</button>
+        </div>
+      </div>
+      <aside class="care-support" aria-label="Support Your Pet’s Health Log">
+        <p><strong>Free, ad-free, and no account.</strong> If this tracker made a hard day a little easier, a coffee helps keep every tracker free.</p>
+        <a class="button button-small button-coffee" href="{SUPPORT_URL}" target="_blank" rel="noopener noreferrer"><span aria-hidden="true">☕</span> Buy me a coffee</a>
+      </aside>
+    </section>
 
     <footer class="care-footer"><p>Your Pet’s Health Log · Free pet health trackers for animals you love · <a href="/accessibility.html">Accessibility options</a> · <a href="/privacy.html">Privacy</a></p></footer>
   </main>

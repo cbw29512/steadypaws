@@ -28,7 +28,8 @@
   let activeGroup = 'all';
   let familyTerms = [];
   let familyLabel = '';
-  let journeyStarted = false;
+  // The whole library is browsable on load; a pet, filter, or search only narrows it.
+  let journeyStarted = true;
   let photoJpegBytes = null;
   let photoDataUrl = '';
   let preparingDownload = false;
@@ -63,8 +64,8 @@
 
   function updateDownloadLabels() {
     const label = hasPersonalization()
-      ? 'Personalize & get their care paperwork <span aria-hidden="true">↓</span>'
-      : 'Get their care paperwork <span aria-hidden="true">↓</span>';
+      ? 'Download personalized PDF <span aria-hidden="true">↓</span>'
+      : 'Download PDF <span aria-hidden="true">↓</span>';
     careDownloads.forEach(link => {
       if (!link.dataset.busy) link.innerHTML = label;
     });
@@ -89,6 +90,7 @@
       const query = normalize(search.value);
       const browsing = journeyStarted || Boolean(query) || activeGroup !== 'all';
       let visible = 0;
+      let visibleForms = 0;
 
       cards.forEach(card => {
         const variants = [...card.querySelectorAll('.tracker-variant')];
@@ -105,7 +107,10 @@
         const showCard = browsing && visibleVariants > 0;
         card.hidden = !showCard;
         card.classList.toggle('has-multiple-variants', visibleVariants > 1);
-        if (showCard) visible += 1;
+        if (showCard) {
+          visible += 1;
+          visibleForms += visibleVariants;
+        }
       });
 
       if (!browsing) {
@@ -114,9 +119,9 @@
         return;
       }
 
-      count.textContent = visible === 1
-        ? '1 primary health concern ready to choose'
-        : `${visible} primary health concerns ready to choose`;
+      const concernText = visible === 1 ? '1 health concern' : `${visible} health concerns`;
+      const formText = visibleForms === 1 ? '1 free tracker' : `${visibleForms} free trackers`;
+      count.textContent = `Showing ${concernText} · ${formText} ready to download`;
       empty.hidden = visible !== 0;
     } catch (error) {
       console.error('Your Pet’s Health Log health-concern filtering failed:', error);

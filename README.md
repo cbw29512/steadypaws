@@ -59,6 +59,24 @@ Netlify reads `netlify.toml` and runs the tracker generator and homepage builder
 - Species-specific observation fields where physiology or husbandry differs
 - Clear boundary between organization and veterinary medical advice
 
-## Support
+## Download and support paths
+
+Every surface that can hand someone a tracker leads with the download, and offers
+optional support next to that action rather than buried below it:
+
+- **Homepage** — the whole library renders on load; the pet picker, filter chips
+  and search narrow it. A persistent support note sits above the grid, and after
+  a download the support card moves inline under the tracker that was taken.
+- **Species hubs** (`pets/*.html`) — each concern offers a direct PDF download
+  beside its online worksheet, with the same support note above the grid.
+- **Care worksheets** (`care/*.html`) — a download/print finish block with a
+  support slot beside it, both hidden in print.
+- **Quick Phone Log** (`app/`) — optional support after a vet summary is
+  prepared, hidden in print so the clinical record stays clean.
+- **Printable PDFs** — every page footer carries the site host and the support
+  host, because a printed sheet has no other way back.
 
 The site support link points to `https://buymeacoffee.com/divclass016`.
+
+`scripts/build_og_card.py` renders the shared social preview card. It is run by
+hand and the PNG is committed, so deploys never depend on host fonts.

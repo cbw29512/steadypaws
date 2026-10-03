@@ -16,7 +16,12 @@
   <meta property="og:url" content="https://yourpetshealthlog.netlify.app/">
   <meta property="og:title" content="Free Pet Health Tracker Printables | Your Pet’s Health Log">
   <meta property="og:description" content="Simple, family-first pet health trackers. Choose your pet and their biggest health concern, then get printable care paperwork built for them.">
-  <meta name="twitter:card" content="summary">
+  <meta property="og:image" content="https://yourpetshealthlog.netlify.app/assets/og-card.png">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:image:alt" content="Your Pet’s Health Log — free printable pet health trackers, no account or email required.">
+  <meta name="twitter:image" content="https://yourpetshealthlog.netlify.app/assets/og-card.png">
+  <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:title" content="Free Pet Health Tracker Printables | Your Pet’s Health Log">
   <meta name="twitter:description" content="{{TOTAL}} free pet health tracker forms across {{CONDITION_TOTAL}} health concerns. No account. No email wall.">
   <link rel="icon" href="/assets/paw.svg" type="image/svg+xml">
@@ -32,8 +37,8 @@
   <header class="site-header">
     <div class="shell nav-wrap">
       <a class="brand" href="/" aria-label="Your Pet’s Health Log home"><img class="brand-logo" src="/assets/paw.svg" width="38" height="38" alt=""><span>Your Pet’s Health Log</span></a>
-      <nav aria-label="Primary navigation"><a href="#finder">Find a pet health tracker</a><a href="#how">How it helps</a><a href="#safety">Care &amp; safety</a></nav>
-      <a class="button button-small" href="https://buymeacoffee.com/divclass016" target="_blank" rel="noopener noreferrer">Buy me a coffee</a>
+      <nav aria-label="Primary navigation"><a href="#library">All trackers</a><a href="#finder">Find by pet</a><a href="/app/">Quick Phone Log</a><a href="#safety">Care &amp; safety</a></nav>
+      <a class="button button-small button-coffee" href="https://buymeacoffee.com/divclass016" target="_blank" rel="noopener noreferrer"><span aria-hidden="true">☕</span> Buy me a coffee</a>
     </div>
   </header>
 
@@ -41,34 +46,19 @@
     <section class="hero">
       <div class="shell hero-grid">
         <div>
-          <p class="eyebrow">Track your pet your way</p>
+          <p class="eyebrow">Free printable pet health trackers</p>
           <h1>Keep track of your pet's health when they need you most.</h1>
-          <p class="lede">Choose the way that fits you: tap quick buttons on your phone, fill out a health form online, or print a blank tracker and write by hand.</p>
-          <div class="tracking-paths" aria-label="Choose how you want to track your pet">
-            <article class="tracking-path">
-              <span class="tracking-path-icon" aria-hidden="true">📱</span>
-              <p class="card-kicker">Quick phone log</p>
-              <h2>Tap as things happen</h2>
-              <p>Use simple buttons on your phone or computer to quickly record day-to-day changes.</p>
-              <a class="button" href="/app/">Open Quick Phone Log</a>
-            </article>
-            <article class="tracking-path">
-              <span class="tracking-path-icon" aria-hidden="true">💻</span>
-              <p class="card-kicker">Fill it out online</p>
-              <h2>Type your records yourself</h2>
-              <p>Choose a health form, fill it out in your browser, then print a clean copy when you want one.</p>
-              <a class="button button-secondary" href="#finder">Choose an Online Form</a>
-            </article>
-            <article class="tracking-path">
-              <span class="tracking-path-icon" aria-hidden="true">🖨️</span>
-              <p class="card-kicker">Print &amp; write</p>
-              <h2>Keep it completely on paper</h2>
-              <p>Choose the health tracker you need, print it blank, and fill it out by hand.</p>
-              <a class="button button-secondary" href="#finder">Choose a Printable</a>
-            </article>
+          <p class="lede">{{TOTAL}} free trackers across {{CONDITION_TOTAL}} health concerns, for cats, dogs, rabbits, birds, reptiles, horses and more. Pick the concern you are living with, then download a printable PDF or fill it in online and print a clean copy for the vet.</p>
+          <div class="button-row hero-actions">
+            <a class="button hero-primary" href="#library">Browse all {{TOTAL}} trackers <span aria-hidden="true">→</span></a>
+            <a class="button button-secondary" href="#finder">Find by pet</a>
           </div>
-          <p class="species-shortcuts"><a href="/pets/cat-health-trackers.html">Cat health trackers</a><span aria-hidden="true">·</span><a href="/pets/dog-health-trackers.html">Dog health trackers</a></p>
-          <p class="microcopy"><strong>Which path?</strong> Use Quick Phone Log for fast day-to-day check-ins. Choose an Online Form or Printable when you are tracking a specific health concern or preparing a more detailed record for a vet visit.</p><p class="microcopy">Free. No account. No email. Three ways to keep track, with records ready when it is time to talk with your vet.</p>
+          <ul class="hero-trust" aria-label="What you get">
+            <li>Free printable PDF</li>
+            <li>Fill in online</li>
+            <li>No account. No email.</li>
+          </ul>
+          <p class="species-shortcuts"><span>Popular:</span><a href="/pets/cat-health-trackers.html">Cat health trackers</a><span aria-hidden="true">·</span><a href="/pets/dog-health-trackers.html">Dog health trackers</a><span aria-hidden="true">·</span><a href="/app/">Quick Phone Log</a></p>
         </div>
         <aside class="hero-card" aria-label="What Your Pet’s Health Log helps you track">
           <p class="card-kicker">Pet health tracking, kept simple</p>
@@ -86,7 +76,7 @@
 
     <section id="finder" class="section family-finder">
       <div class="shell">
-        <div class="finder-intro"><p class="eyebrow">Online forms &amp; printable health trackers</p><h2>Who are we caring for?</h2><p id="finder-help">Choose your pet, then choose a health concern. Each tailored tracker can be filled out online or printed blank and completed by hand.</p></div>
+        <div class="finder-intro"><p class="eyebrow">Online forms &amp; printable health trackers</p><h2>Who are we caring for?</h2><p id="finder-help">Choose your pet to narrow the trackers below to the versions built for them, or keep scrolling to browse every health concern.</p></div>
 
         <div class="family-grid family-grid-primary" role="group" aria-label="Choose your pet" aria-describedby="finder-help">
           <button class="family-choice family-choice-primary" type="button" data-family-group="cat" data-family-label="cat"><span class="family-icon" aria-hidden="true">🐱</span><strong>Cat</strong><span>Your small furry shadow</span></button>
@@ -145,23 +135,55 @@
 
     <section id="library" class="section section-soft" tabindex="-1" aria-busy="true">
       <div class="shell">
-        <div class="section-heading"><div><p class="eyebrow">Next, choose the form</p><h2 id="journey-heading">What pet health concern are you tracking?</h2></div><p id="journey-copy">Pick the main issue you need to keep up with. Fill the tailored form out online, or print it blank and write by hand.</p></div>
-        <p id="result-count" class="result-count" aria-live="polite">Choose your pet above to narrow the health trackers, or browse all health concerns.</p>
-        <div class="tracker-grid" id="tracker-grid" aria-busy="true">{{TRACKER_CARDS}}</div>
-        <div id="no-results" class="no-results" hidden><strong>We do not have that tracker yet.</strong><p>Try a broader word below, or choose Browse all to look through the complete collection.</p></div>
+        <div class="section-heading"><div><p class="eyebrow">Every tracker, free</p><h2 id="journey-heading">What pet health concern are you tracking?</h2></div><p id="journey-copy">Open the concern you need, then <strong>Download PDF</strong> to print it blank and write by hand, or <strong>Fill in online</strong> to type your notes and print a clean copy.</p></div>
 
-        <details class="browse-tools">
-          <summary>Prefer to browse or search all pet health concerns?</summary>
-          <div class="library-tools" role="search">
-            <div class="filter-group" aria-label="Browse pet health concerns" aria-busy="true">{{FILTERS}}</div>
-            <label class="search-box"><span class="sr-only">Search pet health concerns</span><input id="tracker-search" type="search" placeholder="Search kidney, arthritis, dental, breathing..." autocomplete="off"></label>
-          </div>
-        </details>
+        <div class="library-tools library-toolbar" role="search">
+          <div class="filter-group" aria-label="Filter pet health concerns by pet" aria-busy="true">{{FILTERS}}</div>
+          <label class="search-box"><span class="sr-only">Search pet health concerns</span><input id="tracker-search" type="search" placeholder="Search kidney, arthritis, dental, breathing..." autocomplete="off"></label>
+        </div>
+
+        <div class="library-status">
+          <p id="result-count" class="result-count" aria-live="polite">Showing every pet health concern. Choose your pet above or filter to narrow the list.</p>
+          <p class="library-support">Free, with no account wall or paywall. <a href="https://buymeacoffee.com/divclass016" target="_blank" rel="noopener noreferrer"><span aria-hidden="true">☕</span> Buy me a coffee</a></p>
+        </div>
+
+        <div class="tracker-grid" id="tracker-grid" aria-busy="true">{{TRACKER_CARDS}}</div>
+        <div id="no-results" class="no-results" hidden><strong>We do not have that tracker yet.</strong><p>Try a broader word, or choose All to look through the complete collection.</p></div>
 
         <aside id="support-after-download" class="support-after-download" aria-label="Support Your Pet’s Health Log" hidden>
-          <div><p class="support-kicker">Only if this helped</p><strong>Help keep every pet health tracker free.</strong><p class="support-copy">Your Pet’s Health Log has no account wall or paywall. If this made a hard day a little easier, you can help us keep it that way.</p></div>
-          <a class="button button-small" href="https://buymeacoffee.com/divclass016" target="_blank" rel="noopener noreferrer">Buy me a coffee</a>
+          <div><p class="support-kicker">Only if this helped</p><strong>Help keep every pet health tracker free.</strong><p class="support-copy">That tracker is yours to keep. Your Pet’s Health Log has no account wall or paywall, so a coffee from the people it helped is what keeps the next tracker free.</p></div>
+          <a class="button button-small button-coffee" href="https://buymeacoffee.com/divclass016" target="_blank" rel="noopener noreferrer"><span aria-hidden="true">☕</span> Buy me a coffee</a>
         </aside>
+      </div>
+    </section>
+
+    <section class="section ways-section" aria-labelledby="ways-title">
+      <div class="shell">
+        <p class="eyebrow">Track your pet your way</p>
+        <h2 id="ways-title">Three ways to keep track</h2>
+        <div class="tracking-paths">
+          <article class="tracking-path">
+            <span class="tracking-path-icon" aria-hidden="true">🖨️</span>
+            <p class="card-kicker">Print &amp; write</p>
+            <h3>Keep it completely on paper</h3>
+            <p>Choose the health tracker you need, download the PDF, print it blank, and fill it out by hand.</p>
+            <a class="button" href="#library">Choose a Printable</a>
+          </article>
+          <article class="tracking-path">
+            <span class="tracking-path-icon" aria-hidden="true">💻</span>
+            <p class="card-kicker">Fill it out online</p>
+            <h3>Type your records yourself</h3>
+            <p>Open a tracker's online worksheet, fill it out in your browser, then print a clean copy when you want one.</p>
+            <a class="button button-secondary" href="#library">Choose an Online Form</a>
+          </article>
+          <article class="tracking-path">
+            <span class="tracking-path-icon" aria-hidden="true">📱</span>
+            <p class="card-kicker">Quick phone log</p>
+            <h3>Tap as things happen</h3>
+            <p>Use simple buttons on your phone or computer to quickly record day-to-day changes.</p>
+            <a class="button button-secondary" href="/app/">Open Quick Phone Log</a>
+          </article>
+        </div>
       </div>
     </section>
 
@@ -169,7 +191,7 @@
       <div class="shell"><p class="eyebrow">Whichever path you choose</p><h2>Less trying to remember. More time being there for them.</h2><div class="steps"><article><span aria-hidden="true">1</span><h3>Choose your pet</h3><p>Start with the animal you are caring for so the tracker fits the kind of care they need.</p></article><article><span aria-hidden="true">2</span><h3>Focus on the biggest concern</h3><p>Track the health issue that matters most right now, while keeping room on the sheet for their other conditions.</p></article><article><span aria-hidden="true">3</span><h3>Walk in prepared</h3><p>Bring the tracker to the next vet visit so you can spend less time trying to remember and more time talking about what they need.</p></article></div></div>
     </section>
 
-    <section class="section library-note"><div class="shell resource-grid"><div><p class="eyebrow">Built with care</p><h2>A pet health tracker should fit the animal — not the other way around.</h2><p class="lede compact">A health concern can have the same name across species, but what is useful to observe may be different. Your Pet’s Health Log lists each concern once, then gives you the version built for your pet.</p></div><div class="principles"><p><strong>Focused:</strong> each sheet centers one primary health concern so the daily record stays useful.</p><p><strong>Whole-picture:</strong> every sheet has room to note other health conditions.</p><p><strong>Personal:</strong> you can optionally add their name and photo before downloading.</p><p><strong>Accessible:</strong> every tailored form also has a keyboard- and screen-reader-friendly web worksheet.</p><p><strong>Free:</strong> every pet health tracker can be used without an account or email address.</p></div></div></section>
+    <section class="section library-note"><div class="shell resource-grid"><div><p class="eyebrow">Built with care</p><h2>A pet health tracker should fit the animal — not the other way around.</h2><p class="lede compact">A health concern can have the same name across species, but what is useful to observe may be different. Your Pet’s Health Log lists each concern once, then gives you the version built for your pet.</p></div><div class="principles"><p><strong>Focused:</strong> each sheet centers one primary health concern so the daily record stays useful.</p><p><strong>Whole-picture:</strong> every sheet has room to note other health conditions.</p><p><strong>Personal:</strong> you can optionally add their name and photo before downloading.</p><p><strong>Accessible web worksheet:</strong> every tailored form can also be filled in online with a keyboard- and screen-reader-friendly worksheet.</p><p><strong>Free:</strong> every pet health tracker can be used without an account or email address.</p></div></div></section>
 
     <section class="section section-soft" aria-labelledby="tracker-faq-title">
       <div class="shell">
