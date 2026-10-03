@@ -109,7 +109,7 @@ def assert_required_files() -> None:
     required = (
         "index.html", "404.html", "accessibility.html", "privacy.html", "about.html",
         "styles/base.css", "styles/components.css", "styles/family.css", "styles/care.css", "styles/launch-polish-1.css",
-        "assets/paw.svg", "assets/site.js", "assets/launch-polish-1.js", "assets/personalization-bridge-print1.js",
+        "assets/paw.svg", "assets/og-card.png", "assets/site.js", "assets/launch-polish-1.js", "assets/personalization-bridge-print1.js",
         "assets/care-personalization-print1.js", "assets/care-autosave.js", "assets/offline.js", "assets/vendor/pdf-lib-1.17.1.min.js", "sw.js",
         "netlify.toml", "robots.txt", "sitemap.xml", "requirements.txt",
         "templates/index.template.html", "scripts/tracker_catalog.py", "scripts/fetch_vendor.py",
@@ -212,6 +212,27 @@ def assert_conversion_paths() -> None:
         raise AssertionError("Support link must be both persistent and offered after a download")
     if library.index('id="tracker-grid"') < library.index('class="library-support"'):
         raise AssertionError("Persistent support note must sit above the tracker grid, not below it")
+
+    # A link shared into a pet-owner group should preview as something, not a bare blob.
+    card = f"{EXPECTED_SITE_URL}assets/og-card.png"
+    shareable = [
+        ROOT / "index.html", ROOT / "app" / "index.html",
+        ROOT / "pets" / "cat-health-trackers.html", ROOT / "pets" / "dog-health-trackers.html",
+        *sorted((ROOT / "care").glob("*.html")),
+    ]
+    for path in shareable:
+        html = path.read_text(encoding="utf-8")
+        for marker in (f'property="og:image" content="{card}"', 'content="summary_large_image"'):
+            if marker not in html:
+                raise AssertionError(f"Shared-link preview missing from {path.name}: {marker}")
+    with (ROOT / "assets/og-card.png").open("rb") as handle:
+        header = handle.read(24)
+    if header[:8] != b"\x89PNG\r\n\x1a\n":
+        raise AssertionError("Social preview card is not a PNG")
+    width = int.from_bytes(header[16:20], "big")
+    height = int.from_bytes(header[20:24], "big")
+    if (width, height) != (1200, 630):
+        raise AssertionError(f"Social preview card must be 1200x630, found {width}x{height}")
 
     site_js = (ROOT / "assets/site.js").read_text(encoding="utf-8")
     if "let journeyStarted = true;" not in site_js:

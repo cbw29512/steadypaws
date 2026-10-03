@@ -205,6 +205,12 @@ def render_page(item: dict) -> str:
   <meta property="og:title" content="{escape(title, quote=True)}">
   <meta property="og:description" content="{escape(description, quote=True)}">
   <meta property="og:url" content="{canonical}">
+  <meta property="og:image" content="{SITE_URL}/assets/og-card.png">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:image:alt" content="Your Pet’s Health Log — free printable pet health trackers, no account or email required.">
+  <meta name="twitter:image" content="{SITE_URL}/assets/og-card.png">
+  <meta name="twitter:card" content="summary_large_image">
   <link rel="icon" href="/assets/paw.svg?v={ASSET_REV}" type="image/svg+xml">
   <link rel="stylesheet" href="/styles/base.css?v={ASSET_REV}">
   <link rel="stylesheet" href="/styles/components.css?v={ASSET_REV}">
