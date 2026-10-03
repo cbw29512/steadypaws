@@ -219,7 +219,11 @@ def assert_no_external_runtime_dependencies() -> None:
         ROOT / "pets" / "cat-health-trackers.html", ROOT / "pets" / "dog-health-trackers.html",
     ]
     html_pages.extend((ROOT / "care").glob("*.html"))
-    allowed_external_hosts = {"yourpetshealthlog.netlify.app", "buymeacoffee.com", "schema.org"}
+    allowed_external_hosts = {
+        "yourpetshealthlog.netlify.app", "buymeacoffee.com", "schema.org",
+        # Chris's own companion site, linked from the footer by apply_commercial_trust.py.
+        "welcomehomepet.netlify.app",
+    }
     for path in html_pages:
         text = path.read_text(encoding="utf-8")
         for url in re.findall(r'https://[^"\'<>\s]+', text):

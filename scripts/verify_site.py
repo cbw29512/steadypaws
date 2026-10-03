@@ -20,8 +20,10 @@ LOGGER = logging.getLogger(__name__)
 ROOT = Path(__file__).resolve().parents[1]
 EXPECTED_SITE_URL = "https://yourpetshealthlog.netlify.app/"
 EXPECTED_SUPPORT_URL = "https://buymeacoffee.com/divclass016"
-EXPECTED_ASSET_REV = "20260919-trust-content2"
-CARE_ASSET_REV = "20260919-trust-content2"
+EXPECTED_ASSET_REV = "20261003-convert1"
+CARE_ASSET_REV = "20261003-convert1"
+# Hand-written information pages keep their own revision until they are next edited.
+STATIC_PAGE_ASSET_REV = "20260919-trust-content2"
 EXPECTED_VENDOR_SHA512 = "z8IYLHO8bTgFqj+yrPyIJnzBDf7DDhWwiEsk4sY+Oe6J2M+WQequeGS7qioI5vT6rXgVRb4K1UVQC5ER7MKzKQ=="
 VENDOR_PATH = ROOT / "assets/vendor/pdf-lib-1.17.1.min.js"
 
@@ -147,6 +149,7 @@ def assert_homepage() -> None:
         "Who are we caring for?", "What pet health concern are you tracking?", "Make their tracker feel like theirs.",
         "Private by design", "Accessible web worksheet", "Another pet", "Browse all", "Care &amp; safety",
         'id="support-after-download"', "Help keep every pet health tracker free.",
+        f"Browse all {len(TRACKERS)} trackers", "Download PDF", "Fill in online", 'class="library-support"',
         'id="family-name"', 'id="family-photo"', 'type="file"', 'accept="image/*"',
         f'/assets/paw.svg?v={EXPECTED_ASSET_REV}', f'/assets/site.js?v={EXPECTED_ASSET_REV}',
         f'/styles/launch-polish-1.css?v={EXPECTED_ASSET_REV}', '/assets/launch-polish-1.js?v=1',
@@ -159,6 +162,7 @@ def assert_homepage() -> None:
     for forbidden in (
         "In development", "buymeacoffee.com/yourname", "cdn.jsdelivr.net", "<script>", "style=",
         "Your family member's care paperwork", "Pick your family member.", "View all concerns",
+        "Get their care paperwork", 'class="browse-tools"',
     ):
         if forbidden in html:
             raise AssertionError(f"Homepage contains forbidden marker: {forbidden}")
@@ -181,6 +185,44 @@ def assert_homepage() -> None:
         if clean and not (ROOT / clean).exists():
             raise AssertionError(f"Broken local reference: {target}")
     LOGGER.info("Homepage pet-first SEO, dedupe, picker, photo flow, support timing, and links: PASS")
+
+
+def assert_conversion_paths() -> None:
+    """The homepage must lead with trackers and keep support beside the download actions."""
+    html = (ROOT / "index.html").read_text(encoding="utf-8")
+
+    hero_end = html.find('class="hero-card"')
+    library_start = html.find('id="library"')
+    ways_start = html.find('id="ways-title"')
+    if min(hero_end, library_start, ways_start) < 0:
+        raise AssertionError("Homepage hero, library, or tracking-ways landmarks are missing")
+    if not hero_end < library_start < ways_start:
+        raise AssertionError("Homepage no longer leads with the trackers before the tracking-ways section")
+    hero = html[:hero_end]
+    if f'href="#library"' not in hero:
+        raise AssertionError("Hero does not send visitors to the tracker library first")
+
+    library_end = html.find("</section>", html.find('id="support-after-download"'))
+    library = html[library_start:library_end]
+    for marker in (
+        'id="tracker-search"', 'class="filter-group"', 'class="library-support"',
+        EXPECTED_SUPPORT_URL, 'id="support-after-download"',
+    ):
+        if marker not in library:
+            raise AssertionError(f"Tracker library section is missing: {marker}")
+    if library.count(EXPECTED_SUPPORT_URL) < 2:
+        raise AssertionError("Support link must be both persistent and offered after a download")
+    if library.index('id="tracker-grid"') < library.index('class="library-support"'):
+        raise AssertionError("Persistent support note must sit above the tracker grid, not below it")
+
+    site_js = (ROOT / "assets/site.js").read_text(encoding="utf-8")
+    if "let journeyStarted = true;" not in site_js:
+        raise AssertionError("Tracker library no longer renders before a pet is chosen")
+    launch_js = (ROOT / "assets/launch-polish-1.js").read_text(encoding="utf-8")
+    for marker in ("revealSupportNear", "returnSupportToLibraryEnd", "closest('.condition-card')"):
+        if marker not in launch_js:
+            raise AssertionError(f"Post-download support placement marker missing: {marker}")
+    LOGGER.info("Trackers-first homepage with support beside the download actions: PASS")
 
 
 def assert_personalization_source() -> None:
@@ -284,7 +326,7 @@ def assert_accessible_care_pages() -> None:
 def assert_security_sitemap_and_static_pages() -> None:
     for filename in ("404.html", "accessibility.html", "privacy.html", "about.html"):
         html = (ROOT / filename).read_text(encoding="utf-8")
-        if f'/assets/paw.svg?v={EXPECTED_ASSET_REV}' not in html:
+        if f'/assets/paw.svg?v={STATIC_PAGE_ASSET_REV}' not in html:
             raise AssertionError(f"Stale branding asset in {filename}")
     netlify = (ROOT / "netlify.toml").read_text(encoding="utf-8")
     required = (
@@ -362,6 +404,7 @@ def main() -> int:
         assert_required_files()
         assert_vendor_and_paw()
         assert_homepage()
+        assert_conversion_paths()
         assert_personalization_source()
         assert_print_design_source()
         assert_accessible_care_pages()

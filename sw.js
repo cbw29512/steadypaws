@@ -1,6 +1,6 @@
 'use strict';
 
-const CACHE = 'yourpetshealthlog-v3';
+const CACHE = 'yourpetshealthlog-v4';
 const CORE = [
   '/',
   '/app/',
