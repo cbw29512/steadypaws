@@ -8,29 +8,118 @@
 .more-family { margin-top:28px; padding:26px; border:1px solid var(--line); border-radius:22px; background:#f8fbf9; }
 .more-family-title { margin:0 0 18px; color:var(--ink); font-weight:850; }
 .family-grid-more { grid-template-columns:repeat(5,minmax(0,1fr)); }
-.condition-card { min-height:0; }
-.condition-kicker { color:var(--brand-2); font-size:.69rem; font-weight:900; letter-spacing:.08em; text-transform:uppercase; }
-.condition-card h3 { margin-top:10px; }
-.condition-help { margin:0 0 16px; font-size:.88rem; line-height:1.5; }
-.tracker-variants { display:grid; gap:10px; margin-top:auto; }
-.tracker-variant { padding-top:14px; border-top:1px solid var(--line); }
+/* Animal → issue → one health log. No grouped species stacks. */
+.condition-card { min-height:245px; }
+.condition-card h3 { margin:8px 0 10px; font-size:1.2rem; line-height:1.25; }
+.condition-kicker { color:var(--brand-2); font-size:.78rem; font-weight:850; }
+.tracker-grid {
+  display:grid;
+  grid-template-columns:repeat(3,minmax(0,1fr));
+  gap:18px;
+  align-items:stretch;
+}
+.tracker-grid > .tracker-card {
+  min-width:0;
+  margin:0;
+  content-visibility:visible;
+}
+.tracker-grid > .tracker-card[hidden],
+.choose-pet-prompt[hidden],
 .tracker-variant[hidden] { display:none; }
-.tracker-variant .species-badge { margin-bottom:8px; }
-.tracker-variant p { margin:0 0 12px; font-size:.84rem; line-height:1.45; }
-.tracker-variant .download-link { display:inline-flex; align-items:center; }
-.condition-card.has-multiple-variants .tracker-variants { gap:12px; }
-.condition-card.has-multiple-variants .tracker-variant { padding:14px; border:1px solid #e0e8e4; border-radius:14px; background:#fbfdfc; }
-/* Browsing the whole library at once: cards pack by height so a concern with six
-   tailored versions does not leave a hole beside the single-version cards. */
-.tracker-grid { display:block; columns:3 300px; column-gap:18px; }
-.tracker-grid > .tracker-card { width:100%; min-height:0; margin:0 0 18px; break-inside:avoid; content-visibility:visible; }
-.tracker-grid > .tracker-card[hidden] { display:none; }
-.tracker-card:hover { transform:none; }
-.condition-kicker { color:var(--muted); letter-spacing:.06em; }
-.condition-card h3 { margin:6px 0 14px; font-size:1.2rem; }
-.condition-card.has-multiple-variants .tracker-variant { display:flex; flex-wrap:wrap; align-items:center; justify-content:space-between; gap:8px 10px; padding:10px 12px; }
-.condition-card.has-multiple-variants .tracker-variant p { display:none; }
-.condition-card.has-multiple-variants .tracker-variant .species-badge { margin:0; white-space:nowrap; }
+.tracker-variants { display:flex; flex:1; flex-direction:column; min-width:0; }
+.tracker-variant { display:flex; flex:1; flex-direction:column; min-width:0; }
+.tracker-variant .species-badge { display:none; }
+.tracker-variant p { margin:0 0 14px; color:var(--muted); line-height:1.5; font-size:.9rem; }
+.condition-card .variant-actions {
+  display:grid;
+  grid-template-columns:minmax(0,1fr);
+  gap:8px;
+  align-items:stretch;
+  margin-top:auto;
+  padding-top:10px;
+}
+.condition-card .variant-actions .accessible-link,
+.condition-card .variant-actions .download-link {
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  box-sizing:border-box;
+  width:100%;
+  min-width:0;
+  min-height:43px;
+  padding:10px 12px;
+  margin:0;
+  border:1px solid var(--brand);
+  border-radius:11px;
+  font-size:.88rem;
+  font-weight:800;
+  text-align:center;
+  line-height:1.3;
+  text-decoration:none;
+}
+.condition-card .variant-actions .accessible-link {
+  color:#fff;
+  background:var(--brand);
+}
+.condition-card .variant-actions .accessible-link:hover,
+.condition-card .variant-actions .accessible-link:focus-visible {
+  color:#fff;
+  background:var(--brand-2);
+}
+.condition-card .variant-actions .download-link {
+  color:var(--brand);
+  background:#fff;
+}
+.condition-card .variant-actions .download-link:hover,
+.condition-card .variant-actions .download-link:focus-visible {
+  background:#eaf2ef;
+  color:var(--brand-2);
+}
+.issue-select-label,.search-box {
+  display:grid;
+  flex:1 1 220px;
+  gap:7px;
+  min-width:0;
+  color:var(--ink);
+  font-size:.88rem;
+}
+.issue-select-label select {
+  width:100%;
+  min-height:44px;
+  padding:9px 12px;
+  border:1px solid #82978f;
+  border-radius:12px;
+  background:#fff;
+  color:var(--ink);
+  font:inherit;
+}
+.issue-select-label select:disabled { background:#edf2ef; color:#64736d; }
+.issue-select-label select:focus-visible { outline:3px solid var(--focus); outline-offset:2px; }
+.library-toolbar { display:flex; flex-wrap:wrap; align-items:end; }
+.advanced-pet-filters { width:100%; font-size:.9rem; }
+.advanced-pet-filters summary { color:var(--brand); cursor:pointer; font-weight:750; }
+.advanced-pet-filters .filter-group { margin-top:12px; }
+.choose-pet-prompt {
+  padding:22px;
+  margin:0 0 18px;
+  border:1px solid #b9c9c3;
+  border-radius:16px;
+  background:#fffefa;
+  color:var(--ink);
+  line-height:1.5;
+}
+.choose-pet-prompt button {
+  padding:0;
+  border:0;
+  background:transparent;
+  color:var(--brand);
+  font:inherit;
+  text-decoration:underline;
+  cursor:pointer;
+}
+.choose-pet-prompt button:focus-visible { outline:3px solid var(--focus); outline-offset:3px; }
+@media (max-width:1100px) { .tracker-grid { grid-template-columns:repeat(2,minmax(0,1fr)); } }
+@media (max-width:620px) { .tracker-grid { grid-template-columns:minmax(0,1fr); } }
 @media (max-width:1100px) { .family-grid-more { grid-template-columns:repeat(3,minmax(0,1fr)); } }
 @media (max-width:980px) { .family-grid-primary { grid-template-columns:repeat(2,minmax(0,1fr)); } }
 @media (max-width:760px) { .family-grid-more { grid-template-columns:repeat(2,minmax(0,1fr)); } .family-more { min-height:148px; } }
