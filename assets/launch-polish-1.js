@@ -40,8 +40,8 @@
           const group = familyChoice.dataset.familyGroup || 'all';
           const label = familyChoice.dataset.familyLabel || 'pet';
           journeyCopy.textContent = group === 'all'
-            ? 'Each health concern appears once. Open the concern you need and choose the version made for your pet.'
-            : `Choose the main health concern you want to track for your ${label}. Their tracker has room for other health conditions too.`;
+            ? 'Every card shows one animal-specific health log. Choose the issue and open its log.'
+            : `Choose the health issue for your ${label}, then open the log or download a printable PDF.`;
         }
       }, 0);
       return;
@@ -51,7 +51,7 @@
       returnSupportToLibraryEnd();
       window.setTimeout(() => {
         if (journeyHeading) journeyHeading.textContent = 'Browse pet health concerns';
-        if (journeyCopy) journeyCopy.textContent = 'Each concern is listed once. When several tailored forms exist, choose the version made for your pet.';
+        if (journeyCopy) journeyCopy.textContent = 'One animal and one health issue per card. Choose the matching log to continue.';
       }, 0);
     }
   }

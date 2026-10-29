@@ -131,30 +131,41 @@ def render_variant(item: dict, concern: str) -> str:
         f'<span class="species-badge {badge_class(item["group"])}">{escape(badge_label(item))}</span>'
         f'<p>{escape(item["description"])}</p>'
         f'<div class="variant-actions">'
+        f'<a class="accessible-link" href="{care_page(item)}" aria-label="{accessible_label}">Open health log</a>'
         f'<a class="download-link care-download" href="/downloads/{filename}" aria-label="{download_label}" '
         f'data-pdf-url="/downloads/{filename}" data-download-name="{filename}" download>'
         f'Download PDF <span aria-hidden="true">↓</span></a>'
-        f'<a class="accessible-link" href="{care_page(item)}" aria-label="{accessible_label}">Fill in online</a>'
         f'</div></div>'
     )
 
 
 def render_cards() -> str:
+    """One care concern and exactly one animal on each card.
+
+    Each item is an immutable catalog tracker; all filtering happens on its
+    species/group/condition attributes, never on a mixed-species wrapper.
+    """
     cards = []
-    for name, variants in grouped_conditions():
-        key = condition_key(variants[0])
+    ordered = sorted(
+        TRACKERS,
+        key=lambda item: (condition_name(item).casefold(), item["species"].casefold()),
+    )
+    for item in ordered:
+        name = condition_name(item)
+        key = condition_key(item)
+        filename = escape(item["filename"], quote=True)
+        species = escape(item["species"])
+        group = escape(item["group"], quote=True)
         search = escape(
-            " ".join([name] + [f'{item["species"]} {item["search"]}' for item in variants]),
+            f'{name} {item["species"]} {item["search"]} {item["description"]}',
             quote=True,
         )
-        rendered_variants = "".join(render_variant(item, name) for item in variants)
-        versions = "1 tailored version" if len(variants) == 1 else f"{len(variants)} tailored versions"
         cards.append(
             f'<article class="tracker-card condition-card" data-condition="{escape(key, quote=True)}" '
-            f'data-search="{search}">'
-            f'<span class="condition-kicker">{versions}</span>'
+            f'data-tracker-id="{filename}" data-group="{group}" data-search="{search}">'
+            f'<span class="condition-kicker">{species}</span>'
             f'<h3>{escape(name)}</h3>'
-            f'<div class="tracker-variants">{rendered_variants}</div></article>'
+            f'<div class="tracker-variants">{render_variant(item, name)}</div></article>'
         )
     return "\n          ".join(cards)
 
@@ -171,14 +182,14 @@ def main() -> int:
         .replace('href="/styles/launch-polish-1.css"', f'href="/styles/launch-polish-1.css?v={ASSET_REV}"')
         .replace('href="/assets/paw.svg"', f'href="/assets/paw.svg?v={ASSET_REV}"')
         .replace('src="/assets/paw.svg"', f'src="/assets/paw.svg?v={ASSET_REV}"')
-        .replace('src="/assets/site.js"', f'src="/assets/site.js?v={ASSET_REV}"')
+        .replace('src="/assets/site.js"', f'src="/assets/site.js?v={ASSET_REV}-animal-issue-20261029"')
         .replace('src="/assets/offline.js"', f'src="/assets/offline.js?v={ASSET_REV}"')
         .replace(
             "</head>",
             f'  {render_json_ld()}\n'
             f'  <script src="/assets/offline.js?v={ASSET_REV}" defer></script>\n'
             f'  <script src="/assets/personalization-bridge-print1.js?v={ASSET_REV}" defer></script>\n'
-            f'  <link rel="stylesheet" href="/styles/family.css?v={ASSET_REV}">\n</head>',
+            f'  <link rel="stylesheet" href="/styles/family.css?v={ASSET_REV}-animal-issue-20261029">\n</head>',
         )
     )
     unresolved = [token for token in ("{{TOTAL}}", "{{CONDITION_TOTAL}}", "{{FILTERS}}", "{{TRACKER_CARDS}}") if token in html]
