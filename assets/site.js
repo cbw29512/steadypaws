@@ -8,6 +8,7 @@
   const cards = [...document.querySelectorAll('.condition-card')];
   const search = document.querySelector('#tracker-search');
   const issueSelect = document.querySelector('#condition-select');
+  const animalSelect = document.querySelector('#animal-select');
   const choosePrompt = document.querySelector('#choose-pet-prompt');
   const browseAllLinks = [...document.querySelectorAll('[data-browse-all]')];
   const count = document.querySelector('#result-count');
@@ -103,7 +104,7 @@
       });
       const initial = document.createElement('option');
       initial.value = '';
-      initial.textContent = journeyStarted ? 'All health issues' : 'Choose an animal first';
+      initial.textContent = 'All health issues';
       issueSelect.replaceChildren(initial);
       [...issues.entries()]
         .sort((a, b) => a[1].localeCompare(b[1]))
@@ -113,7 +114,8 @@
           option.textContent = label;
           issueSelect.append(option);
         });
-      issueSelect.disabled = !journeyStarted;
+      // Never disable the selector: the full issue library remains usable before a pet is chosen.
+      issueSelect.disabled = false;
       if ([...issueSelect.options].some(option => option.value === previous)) {
         issueSelect.value = previous;
       }
@@ -181,6 +183,7 @@
     try {
       setFilterBusy(true);
       activeGroup = choice.dataset.familyGroup || 'all';
+      if (animalSelect) animalSelect.value = choice.dataset.familyLabel || 'pet';
       familyLabel = choice.dataset.familyLabel || 'family member';
       familyTerms = normalize(choice.dataset.familyTerm || '')
         .split(/\s*\|\s*/)
@@ -381,6 +384,7 @@
   chips.forEach(chip => chip.addEventListener('click', () => {
     setFilterBusy(true);
     activeGroup = chip.dataset.filter || 'all';
+    if (animalSelect) animalSelect.value = '';
     familyLabel = '';
     familyTerms = [];
     journeyStarted = true;
@@ -403,7 +407,29 @@
     applyFilters();
   });
 
-  issueSelect?.addEventListener('change', applyFilters);
+  animalSelect?.addEventListener('change', () => {
+    const choice = familyChoices.find(item => item.dataset.familyLabel === animalSelect.value);
+    if (choice) {
+      selectFamily(choice);
+    } else if (!animalSelect.value) {
+      // Clearing the animal restores the initial guided state.
+      activeGroup = 'all';
+      familyTerms = [];
+      familyLabel = '';
+      journeyStarted = false;
+      search.value = '';
+      if (issueSelect) issueSelect.value = '';
+      clearFamilySelection();
+      setActiveChip('all');
+      populateIssueOptions();
+      applyFilters();
+    }
+  });
+
+  issueSelect?.addEventListener('change', () => {
+    if (issueSelect.value && !journeyStarted) journeyStarted = true;
+    applyFilters();
+  });
   browseAllLinks.forEach(link => link.addEventListener('click', event => {
     const all = document.querySelector('.family-choice-all');
     if (!all) return;

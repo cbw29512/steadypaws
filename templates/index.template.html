@@ -76,17 +76,16 @@
 
     <section id="finder" class="section family-finder">
       <div class="shell">
-        <div class="finder-intro"><p class="eyebrow">Online forms &amp; printable health trackers</p><h2>Who are we caring for?</h2><p id="finder-help">Step 1: Choose an animal. Step 2: Pick its health issue. Step 3: Open the health log or print the matching form.</p></div>
+        <div class="finder-intro"><p class="eyebrow">Online forms &amp; printable health trackers</p><h2>Who are we caring for?</h2><p id="finder-help">All animal buttons are visible below. Choose one here, or use the Animal dropdown beside the health-issue filter. Then open the matching health log.</p></div>
 
         <div class="family-grid family-grid-primary" role="group" aria-label="Choose your pet" aria-describedby="finder-help">
           <button class="family-choice family-choice-primary" type="button" data-family-group="cat" data-family-label="cat"><span class="family-icon" aria-hidden="true">🐱</span><strong>Cat</strong><span>Your small furry shadow</span></button>
           <button class="family-choice family-choice-primary" type="button" data-family-group="dog" data-family-label="dog"><span class="family-icon" aria-hidden="true">🐶</span><strong>Dog</strong><span>Your always-there companion</span></button>
-          <button class="family-more family-choice-primary" type="button" aria-expanded="false" aria-controls="more-family"><span class="family-icon" aria-hidden="true">♥</span><strong>Another pet</strong><span>Rabbit, bird, horse, reptile, and more</span></button>
           <button class="family-choice family-choice-primary family-choice-all" type="button" data-family-group="all" data-family-label="pet"><span class="family-icon" aria-hidden="true">∞</span><strong>Browse all</strong><span>See every health concern once</span></button>
         </div>
 
-        <div id="more-family" class="more-family" hidden>
-          <p class="more-family-title">Who else are we caring for?</p>
+        <div id="more-family" class="more-family">
+          <p class="more-family-title">Another pet? All animal choices are shown below.</p>
           <div class="family-grid family-grid-more" role="group" aria-label="More pets">
             <button class="family-choice" type="button" data-family-group="small-mammal" data-family-term="rabbit" data-family-label="rabbit"><span class="family-icon" aria-hidden="true">🐰</span><strong>Rabbit</strong><span>Your quiet little housemate</span></button>
             <button class="family-choice" type="button" data-family-group="small-mammal" data-family-term="guinea pig" data-family-label="guinea pig"><span class="family-icon" aria-hidden="true">🐹</span><strong>Guinea pig</strong><span>Your tiny voice at feeding time</span></button>
@@ -138,23 +137,23 @@
         <div class="section-heading"><div><p class="eyebrow">Step 2 · Pick the issue</p><h2 id="journey-heading">What pet health concern are you tracking?</h2></div><p id="journey-copy">Choose your animal above, then its health issue. Every card is for one animal and one issue. Select <strong>Open health log</strong> to type your notes, or <strong>Download PDF</strong> to print it.</p></div>
 
         <div class="library-tools library-toolbar" role="search">
-          <label class="issue-select-label" for="condition-select"><strong>Health issue</strong><select id="condition-select" aria-label="Filter by health issue" disabled><option value="">Choose an animal first</option></select></label>
+          <label class="issue-select-label" for="animal-select"><strong>1. Choose animal</strong><select id="animal-select" aria-label="Choose animal type"><option value="">Choose animal...</option><option value="cat">Cat</option><option value="dog">Dog</option><option value="rabbit">Rabbit</option><option value="guinea pig">Guinea pig</option><option value="ferret">Ferret</option><option value="chinchilla">Chinchilla</option><option value="hamster">Hamster</option><option value="rat or mouse">Rat or mouse</option><option value="bird">Bird</option><option value="reptile">Reptile</option><option value="horse">Horse</option><option value="fish or amphibian">Fish or amphibian</option><option value="pet">All animals</option></select></label>
+          <label class="issue-select-label" for="condition-select"><strong>2. Choose health issue</strong><select id="condition-select" aria-label="Filter by health issue"><option value="">All health issues</option></select></label>
           <label class="search-box"><strong>Or search by issue</strong><input id="tracker-search" type="search" placeholder="Kidney, arthritis, dental, breathing..." autocomplete="off"></label>
           <details class="advanced-pet-filters"><summary>More animal filters</summary><div class="filter-group" aria-label="Filter pet health concerns by animal" aria-busy="true">{{FILTERS}}</div></details>
         </div>
 
         <div class="library-status">
           <p id="result-count" class="result-count" aria-live="polite">Choose an animal above to see its health issues.</p>
-          <p class="library-support">Free, with no account wall or paywall. <a href="https://buymeacoffee.com/divclass016" target="_blank" rel="noopener noreferrer"><span aria-hidden="true">☕</span> Buy me a coffee</a></p>
+          <p class="library-support">Every health log is free, with no account wall or paywall.</p>
         </div>
 
-        <p id="choose-pet-prompt" class="choose-pet-prompt">Start with your pet above. We'll show the health issues and the matching logs just for that animal. <button type="button" data-browse-all>Or browse all trackers</button>.</p>
+        <p id="choose-pet-prompt" class="choose-pet-prompt">Start with <strong>1. Choose animal</strong> above, or use the visible animal buttons. Then select <strong>2. Choose health issue</strong>. <button type="button" data-browse-all>Or browse all trackers</button>.</p>
         <div class="tracker-grid" id="tracker-grid" aria-busy="true">{{TRACKER_CARDS}}</div>
         <div id="no-results" class="no-results" hidden><strong>No matching health log for that animal and issue.</strong><p>Choose another issue, clear the search, or browse all animal types.</p></div>
 
         <aside id="support-after-download" class="support-after-download" aria-label="Support Your Pet’s Health Log" hidden>
-          <div><p class="support-kicker">Only if this helped</p><strong>Help keep every pet health tracker free.</strong><p class="support-copy">That tracker is yours to keep. Your Pet’s Health Log has no account wall or paywall, so a coffee from the people it helped is what keeps the next tracker free. Need household records and a sitter handover? <a href="/packs/">See the household binder</a>.</p></div>
-          <a class="button button-small button-coffee" href="https://buymeacoffee.com/divclass016" target="_blank" rel="noopener noreferrer"><span aria-hidden="true">☕</span> Buy me a coffee</a>
+          <div><p class="support-kicker">Your tracker is ready</p><strong>Keep a copy for the next vet visit.</strong><p class="support-copy">You can print another copy whenever you need one. For household records, emergency contacts, and a sitter handover, <a href="/packs/">see the optional household binder</a>.</p></div>
         </aside>
       </div>
     </section>
@@ -167,7 +166,6 @@
           <p class="lede compact">Condition trackers stay free here. The paid product is a fillable household packet: pet profile, vaccines, meds, vet log, emergency contacts, sitter handbook, supplies, and travel — not a reprint of the free PDFs.</p>
           <div class="button-row">
             <a class="button" href="/packs/">See household binder</a>
-            <a class="button button-secondary" href="https://buymeacoffee.com/divclass016" target="_blank" rel="noopener noreferrer">Buy me a coffee</a>
           </div>
         </div>
         <div class="principles">
@@ -241,6 +239,6 @@
     </section>
   </main>
 
-  <footer class="site-footer"><div class="shell footer-trust" aria-label="Privacy and support promise"><strong>Free · Ad-free · No account · No health-data tracking</strong><span>Supported by optional donations.</span></div><div class="shell footer-wrap"><div class="footer-brand"><img class="footer-logo" src="/assets/paw.svg" width="34" height="34" alt=""><div><strong>Your Pet’s Health Log</strong><p>Simple pet health tracking, ready when you need it.</p></div></div><div class="footer-links"><a href="/about.html">About</a><a href="/accessibility.html">Accessibility</a><a href="/privacy.html">Privacy</a><a href="/terms.html">Terms</a><a href="https://buymeacoffee.com/divclass016" target="_blank" rel="noopener noreferrer">Support</a></div></div></footer>
+  <footer class="site-footer"><div class="shell footer-trust" aria-label="Privacy and support promise"><strong>Free · Ad-free · No account · No health-data tracking</strong><span>Supported by optional donations.</span></div><div class="shell footer-wrap"><div class="footer-brand"><img class="footer-logo" src="/assets/paw.svg" width="34" height="34" alt=""><div><strong>Your Pet’s Health Log</strong><p>Simple pet health tracking, ready when you need it.</p></div></div><div class="footer-links"><a href="/about.html">About</a><a href="/accessibility.html">Accessibility</a><a href="/privacy.html">Privacy</a><a href="/terms.html">Terms</a></div></div></footer>
 </body>
 </html>

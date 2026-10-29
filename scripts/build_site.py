@@ -182,14 +182,14 @@ def main() -> int:
         .replace('href="/styles/launch-polish-1.css"', f'href="/styles/launch-polish-1.css?v={ASSET_REV}"')
         .replace('href="/assets/paw.svg"', f'href="/assets/paw.svg?v={ASSET_REV}"')
         .replace('src="/assets/paw.svg"', f'src="/assets/paw.svg?v={ASSET_REV}"')
-        .replace('src="/assets/site.js"', f'src="/assets/site.js?v={ASSET_REV}-animal-issue-20261029"')
+        .replace('src="/assets/site.js"', f'src="/assets/site.js?v={ASSET_REV}-visible-picker-20261029b"')
         .replace('src="/assets/offline.js"', f'src="/assets/offline.js?v={ASSET_REV}"')
         .replace(
             "</head>",
             f'  {render_json_ld()}\n'
             f'  <script src="/assets/offline.js?v={ASSET_REV}" defer></script>\n'
             f'  <script src="/assets/personalization-bridge-print1.js?v={ASSET_REV}" defer></script>\n'
-            f'  <link rel="stylesheet" href="/styles/family.css?v={ASSET_REV}-animal-issue-20261029">\n</head>',
+            f'  <link rel="stylesheet" href="/styles/family.css?v={ASSET_REV}-visible-picker-20261029b">\n</head>',
         )
     )
     unresolved = [token for token in ("{{TOTAL}}", "{{CONDITION_TOTAL}}", "{{FILTERS}}", "{{TRACKER_CARDS}}") if token in html]
