@@ -33,6 +33,8 @@ class HomeParser(HTMLParser):
         self.h1_count = 0
         self.condition_cards = 0
         self.condition_keys: list[str] = []
+        self.tracker_ids: list[str] = []
+        self.card_variant_counts: list[int] = []
         self.form_variants = 0
         self.family_choices = 0
         self.care_downloads = 0
@@ -47,10 +49,15 @@ class HomeParser(HTMLParser):
             self.h1_count += 1
         if tag == "article" and "condition-card" in classes:
             self.condition_cards += 1
+            self.card_variant_counts.append(0)
             if values.get("data-condition"):
                 self.condition_keys.append(values["data-condition"] or "")
+            if values.get("data-tracker-id"):
+                self.tracker_ids.append(values["data-tracker-id"] or "")
         if tag == "div" and "tracker-variant" in classes:
             self.form_variants += 1
+            if self.card_variant_counts:
+                self.card_variant_counts[-1] += 1
         if tag == "button" and "family-choice" in classes:
             self.family_choices += 1
         if tag == "a" and "care-download" in classes:
@@ -145,10 +152,10 @@ def assert_homepage() -> None:
         'name="robots" content="index, follow, max-image-preview:large"',
         f'rel="canonical" href="{EXPECTED_SITE_URL}"', f'property="og:url" content="{EXPECTED_SITE_URL}"',
         EXPECTED_SUPPORT_URL, "Free printable pet health trackers", "Keep track of your pet's health when they need you most.",
-        "Who are we caring for?", "What pet health concern are you tracking?", "Make their tracker feel like theirs.",
+        "Who are we caring for?", "What pet health concern are you tracking?", "Make their tracker feel like theirs.", 'id="condition-select"', 'id="choose-pet-prompt"',
         "Private by design", "Accessible web worksheet", "Another pet", "Browse all", "Care &amp; safety",
         'id="support-after-download"', "Help keep every pet health tracker free.",
-        f"Browse all {len(TRACKERS)} trackers", "Download PDF", "Fill in online", 'class="library-support"',
+        f"Browse all {len(TRACKERS)} trackers", "Download PDF", "Open health log", 'class="library-support"',
         'id="family-name"', 'id="family-photo"', 'type="file"', 'accept="image/*"',
         f'/assets/paw.svg?v={EXPECTED_ASSET_REV}', f'/assets/site.js?v={EXPECTED_ASSET_REV}',
         f'/styles/launch-polish-1.css?v={EXPECTED_ASSET_REV}', '/assets/launch-polish-1.js?v=1',
@@ -170,8 +177,14 @@ def assert_homepage() -> None:
     parser.feed(html)
     if parser.h1_count != 1:
         raise AssertionError(f"Expected one h1, found {parser.h1_count}")
-    if parser.condition_cards != len(CONDITION_NAMES) or len(parser.condition_keys) != len(set(parser.condition_keys)):
-        raise AssertionError("Homepage health-concern cards are duplicated or incomplete")
+    if parser.condition_cards != len(TRACKERS):
+        raise AssertionError("Expected one animal-specific card per care tracker")
+    if len(set(parser.condition_keys)) != len(CONDITION_NAMES) or len(parser.condition_keys) != len(TRACKERS):
+        raise AssertionError("Homepage health concerns do not match the complete tracker catalog")
+    if len(parser.tracker_ids) != len(TRACKERS) or len(set(parser.tracker_ids)) != len(TRACKERS):
+        raise AssertionError("Homepage tracker cards must carry unique downloadable IDs")
+    if any(count != 1 for count in parser.card_variant_counts):
+        raise AssertionError("A health concern card contains more than one animal/form")
     if parser.form_variants != len(TRACKERS) or parser.care_downloads != len(TRACKERS) or parser.accessible_links != len(TRACKERS):
         raise AssertionError("Homepage resource count does not match catalog")
     if parser.photo_inputs != 1 or parser.family_choices < 13 or parser.brand_logos != 1:
@@ -204,7 +217,7 @@ def assert_conversion_paths() -> None:
     library_end = html.find("</section>", html.find('id="support-after-download"'))
     library = html[library_start:library_end]
     for marker in (
-        'id="tracker-search"', 'class="filter-group"', 'class="library-support"',
+        'id="tracker-search"', 'id="condition-select"', 'class="filter-group"', 'class="library-support"',
         EXPECTED_SUPPORT_URL, 'id="support-after-download"',
     ):
         if marker not in library:
@@ -236,8 +249,9 @@ def assert_conversion_paths() -> None:
         raise AssertionError(f"Social preview card must be 1200x630, found {width}x{height}")
 
     site_js = (ROOT / "assets/site.js").read_text(encoding="utf-8")
-    if "let journeyStarted = true;" not in site_js:
-        raise AssertionError("Tracker library no longer renders before a pet is chosen")
+    for marker in ("let journeyStarted = false;", "populateIssueOptions", "issueSelect?.addEventListener('change'", "variantFitsFamily", "browseAllLinks"):
+        if marker not in site_js:
+            raise AssertionError(f"Animal → health issue → log journey missing: {marker}")
     launch_js = (ROOT / "assets/launch-polish-1.js").read_text(encoding="utf-8")
     for marker in ("revealSupportNear", "returnSupportToLibraryEnd", "closest('.condition-card')"):
         if marker not in launch_js:
