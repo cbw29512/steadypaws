@@ -152,9 +152,9 @@ def assert_homepage() -> None:
         'name="robots" content="index, follow, max-image-preview:large"',
         f'rel="canonical" href="{EXPECTED_SITE_URL}"', f'property="og:url" content="{EXPECTED_SITE_URL}"',
         EXPECTED_SUPPORT_URL, "Free printable pet health trackers", "Keep track of your pet's health when they need you most.",
-        "Who are we caring for?", "What pet health concern are you tracking?", "Make their tracker feel like theirs.", 'id="condition-select"', 'id="choose-pet-prompt"',
+        "Who are we caring for?", "What pet health concern are you tracking?", "Make their tracker feel like theirs.", 'id="animal-select"', 'id="condition-select"', 'id="choose-pet-prompt"',
         "Private by design", "Accessible web worksheet", "Another pet", "Browse all", "Care &amp; safety",
-        'id="support-after-download"', "Help keep every pet health tracker free.",
+        'id="support-after-download"', "Keep a copy for the next vet visit.",
         f"Browse all {len(TRACKERS)} trackers", "Download PDF", "Open health log", 'class="library-support"',
         'id="family-name"', 'id="family-photo"', 'type="file"', 'accept="image/*"',
         f'/assets/paw.svg?v={EXPECTED_ASSET_REV}', f'/assets/site.js?v={EXPECTED_ASSET_REV}',
@@ -189,6 +189,15 @@ def assert_homepage() -> None:
         raise AssertionError("Homepage resource count does not match catalog")
     if parser.photo_inputs != 1 or parser.family_choices < 13 or parser.brand_logos != 1:
         raise AssertionError("Pet picker, paw branding, or photo personalization is incomplete")
+    if html.count(EXPECTED_SUPPORT_URL) != 1:
+        raise AssertionError("Homepage must have exactly one Buy Me a Coffee link")
+    nav_end = html.find("</header>")
+    if nav_end < 0 or EXPECTED_SUPPORT_URL not in html[:nav_end]:
+        raise AssertionError("Single donation link belongs in the top toolbar")
+    if 'id="more-family" class="more-family" hidden' in html:
+        raise AssertionError("Animal buttons must not be hidden behind a toggle")
+    if 'id="animal-select"' not in html or 'id="condition-select"' not in html:
+        raise AssertionError("Both animal and issue dropdowns must remain visible")
     for target in parser.targets:
         parsed = urlparse(target)
         if parsed.scheme or target.startswith("#"):
@@ -196,7 +205,7 @@ def assert_homepage() -> None:
         clean = parsed.path.lstrip("/")
         if clean and not (ROOT / clean).exists():
             raise AssertionError(f"Broken local reference: {target}")
-    LOGGER.info("Homepage pet-first SEO, dedupe, picker, photo flow, support timing, and links: PASS")
+    LOGGER.info("Homepage pet-first SEO, dedupe, visible picker, one-toolbar donation link, and downloads: PASS")
 
 
 def assert_conversion_paths() -> None:
@@ -217,13 +226,13 @@ def assert_conversion_paths() -> None:
     library_end = html.find("</section>", html.find('id="support-after-download"'))
     library = html[library_start:library_end]
     for marker in (
-        'id="tracker-search"', 'id="condition-select"', 'class="filter-group"', 'class="library-support"',
-        EXPECTED_SUPPORT_URL, 'id="support-after-download"',
+        'id="tracker-search"', 'id="animal-select"', 'id="condition-select"', 'class="filter-group"', 'class="library-support"',
+        'id="support-after-download"',
     ):
         if marker not in library:
             raise AssertionError(f"Tracker library section is missing: {marker}")
-    if library.count(EXPECTED_SUPPORT_URL) < 2:
-        raise AssertionError("Support link must be both persistent and offered after a download")
+    if EXPECTED_SUPPORT_URL in library:
+        raise AssertionError("Support prompts must not interrupt the health-log finder")
     if library.index('id="tracker-grid"') < library.index('class="library-support"'):
         raise AssertionError("Persistent support note must sit above the tracker grid, not below it")
 
