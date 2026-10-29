@@ -7,6 +7,9 @@
   const moreFamily = document.querySelector('#more-family');
   const cards = [...document.querySelectorAll('.condition-card')];
   const search = document.querySelector('#tracker-search');
+  const issueSelect = document.querySelector('#condition-select');
+  const choosePrompt = document.querySelector('#choose-pet-prompt');
+  const browseAllLinks = [...document.querySelectorAll('[data-browse-all]')];
   const count = document.querySelector('#result-count');
   const empty = document.querySelector('#no-results');
   const journeyHeading = document.querySelector('#journey-heading');
@@ -28,8 +31,8 @@
   let activeGroup = 'all';
   let familyTerms = [];
   let familyLabel = '';
-  // The whole library is browsable on load; a pet, filter, or search only narrows it.
-  let journeyStarted = true;
+  // The full static library remains in HTML for no-script visitors; JS starts at animal selection.
+  let journeyStarted = false;
   let photoJpegBytes = null;
   let photoDataUrl = '';
   let preparingDownload = false;
@@ -51,9 +54,10 @@
 
   function variantFitsFamily(variant) {
     const group = variant.dataset.group || '';
-    const groupMatch = activeGroup === 'all' || group === activeGroup;
+    const groupMatch = activeGroup === 'all' || group === activeGroup || group === 'universal';
     if (!groupMatch) return false;
-    if (!familyTerms.length) return true;
+    // Any-pet logs are useful for every selected animal, even a named small mammal.
+    if (group === 'universal' || !familyTerms.length) return true;
     const text = variantText(variant);
     return familyTerms.some(term => text.includes(term));
   }
@@ -85,46 +89,71 @@
     library.scrollIntoView({ behavior, block: 'start' });
   }
 
+  function populateIssueOptions() {
+    if (!issueSelect) return;
+    try {
+      const previous = issueSelect.value;
+      const issues = new Map();
+      cards.forEach(card => {
+        const variant = card.querySelector('.tracker-variant');
+        if (!variant || !variantFitsFamily(variant)) return;
+        const key = card.dataset.condition || '';
+        const label = card.querySelector('h3')?.textContent?.trim() || '';
+        if (key && label) issues.set(key, label);
+      });
+      const initial = document.createElement('option');
+      initial.value = '';
+      initial.textContent = journeyStarted ? 'All health issues' : 'Choose an animal first';
+      issueSelect.replaceChildren(initial);
+      [...issues.entries()]
+        .sort((a, b) => a[1].localeCompare(b[1]))
+        .forEach(([key, label]) => {
+          const option = document.createElement('option');
+          option.value = key;
+          option.textContent = label;
+          issueSelect.append(option);
+        });
+      issueSelect.disabled = !journeyStarted;
+      if ([...issueSelect.options].some(option => option.value === previous)) {
+        issueSelect.value = previous;
+      }
+    } catch (error) {
+      console.error('Your Pet’s Health Log could not list available health issues:', error);
+    }
+  }
+
   function applyFilters() {
     try {
       const query = normalize(search.value);
-      const browsing = journeyStarted || Boolean(query) || activeGroup !== 'all';
+      const browsing = journeyStarted || Boolean(query);
+      const wantedIssue = issueSelect?.value || '';
       let visible = 0;
-      let visibleForms = 0;
 
       cards.forEach(card => {
-        const variants = [...card.querySelectorAll('.tracker-variant')];
-        const queryMatchesCard = !query || cardText(card).includes(query);
-        let visibleVariants = 0;
-
-        variants.forEach(variant => {
-          const searchMatch = !query || queryMatchesCard || variantText(variant).includes(query);
-          const showVariant = browsing && variantFitsFamily(variant) && searchMatch;
-          variant.hidden = !showVariant;
-          if (showVariant) visibleVariants += 1;
-        });
-
-        const showCard = browsing && visibleVariants > 0;
+        // Exactly one animal/version per card. No nested animal stacks.
+        const variant = card.querySelector('.tracker-variant');
+        const issueMatches = !wantedIssue || card.dataset.condition === wantedIssue;
+        const textMatches = !query || cardText(card).includes(query);
+        const showCard = Boolean(browsing && variant && issueMatches &&
+          variantFitsFamily(variant) && textMatches);
         card.hidden = !showCard;
-        card.classList.toggle('has-multiple-variants', visibleVariants > 1);
-        if (showCard) {
-          visible += 1;
-          visibleForms += visibleVariants;
-        }
+        if (variant) variant.hidden = !showCard;
+        card.classList.remove('has-multiple-variants');
+        if (showCard) visible += 1;
       });
 
+      if (choosePrompt) choosePrompt.hidden = browsing;
       if (!browsing) {
-        count.textContent = 'Pick your family member above to narrow the care paperwork, or browse everything below.';
+        count.textContent = 'Step 1: choose your animal above. Step 2: choose its health issue.';
         empty.hidden = true;
         return;
       }
 
-      const concernText = visible === 1 ? '1 health concern' : `${visible} health concerns`;
-      const formText = visibleForms === 1 ? '1 free tracker' : `${visibleForms} free trackers`;
-      count.textContent = `Showing ${concernText} · ${formText} ready to download`;
+      const noun = visible === 1 ? 'health log' : 'health logs';
+      count.textContent = `Showing ${visible} ${noun} for your selection`;
       empty.hidden = visible !== 0;
     } catch (error) {
-      console.error('Your Pet’s Health Log health-concern filtering failed:', error);
+      console.error('Your Pet’s Health Log animal and issue filtering failed:', error);
     }
   }
 
@@ -158,6 +187,7 @@
         .filter(Boolean);
       journeyStarted = true;
       search.value = '';
+      if (issueSelect) issueSelect.value = '';
 
       clearFamilySelection();
       choice.classList.add('is-selected');
@@ -165,13 +195,14 @@
       setActiveChip(activeGroup);
       showPersonalization();
 
-      if (journeyHeading) journeyHeading.textContent = 'What is the biggest health concern right now?';
+      if (journeyHeading) journeyHeading.textContent = '2. Which health issue needs tracking?';
       if (journeyCopy) {
         journeyCopy.textContent = activeGroup === 'all'
-          ? 'Each health concern appears once. Open the concern you need and choose the version made for your family member.'
-          : `Choose the main health concern you want to track for your ${familyLabel}. Their form has room to note other conditions they are living with too.`;
+          ? 'Every card contains one animal-specific health log. Filter by health issue or search below.'
+          : `Choose a health issue for your ${familyLabel}, then open the matching log or download its PDF.`;
       }
 
+      populateIssueOptions();
       applyFilters();
       setFilterBusy(false);
       focusLibrary();
@@ -355,17 +386,30 @@
     journeyStarted = true;
     clearFamilySelection();
     setActiveChip(activeGroup);
-    if (journeyHeading) journeyHeading.textContent = 'Browse primary health concerns';
-    if (journeyCopy) journeyCopy.textContent = 'Each concern is listed once. When several tailored forms exist, choose the one made for your family member.';
+    if (issueSelect) issueSelect.value = '';
+    if (journeyHeading) journeyHeading.textContent = '2. Which health issue needs tracking?';
+    if (journeyCopy) journeyCopy.textContent = 'One animal and one issue per card. Narrow by health issue, then open the log or download a PDF.';
+    populateIssueOptions();
     applyFilters();
     setFilterBusy(false);
     focusLibrary();
   }));
 
   search.addEventListener('input', () => {
-    if (normalize(search.value)) journeyStarted = true;
+    if (normalize(search.value) && !journeyStarted) {
+      journeyStarted = true;
+      populateIssueOptions();
+    }
     applyFilters();
   });
+
+  issueSelect?.addEventListener('change', applyFilters);
+  browseAllLinks.forEach(link => link.addEventListener('click', event => {
+    const all = document.querySelector('.family-choice-all');
+    if (!all) return;
+    event.preventDefault();
+    selectFamily(all);
+  }));
 
   familyName?.addEventListener('input', updateDownloadLabels);
 
@@ -417,6 +461,7 @@
     }
   }));
 
+  populateIssueOptions();
   applyFilters();
   setFilterBusy(false);
   updateDownloadLabels();
