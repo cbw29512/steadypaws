@@ -128,7 +128,7 @@ def main() -> int:
                 "const logo=document.querySelector('.brand-logo'); return !!logo && logo.complete && logo.naturalWidth > 0;"
             ))
 
-            # Initial page must ask for the animal, not dump 72 overlapping cards.
+            # Initial page must show every animal choice and both usable dropdowns.
             assert driver.find_element(By.ID, "choose-pet-prompt").is_displayed(), (
                 "Animal-first prompt is missing on initial load"
             )
@@ -136,8 +136,31 @@ def main() -> int:
                 card.is_displayed()
                 for card in driver.find_elements(By.CSS_SELECTOR, ".condition-card")
             ), "Trackers appear before an animal is chosen"
-
+            assert driver.find_element(By.ID, "more-family").is_displayed(), (
+                "Animal choices are hidden instead of visible"
+            )
+            animal_dropdown = driver.find_element(By.ID, "animal-select")
+            condition_dropdown = driver.find_element(By.ID, "condition-select")
+            assert animal_dropdown.is_displayed() and animal_dropdown.is_enabled(), (
+                "Animal dropdown is missing or disabled"
+            )
+            assert condition_dropdown.is_displayed() and condition_dropdown.is_enabled(), (
+                "Health-issue dropdown looks greyed out before animal selection"
+            )
+            # The dropdown and the visible animal cards must both work.
+            driver.execute_script(
+                "arguments[0].value='dog';"
+                "arguments[0].dispatchEvent(new Event('change',{bubbles:true}));",
+                animal_dropdown,
+            )
+            wait.until(lambda d: any(
+                card.is_displayed() and card.get_attribute("data-group") == "dog"
+                for card in d.find_elements(By.CSS_SELECTOR, ".condition-card")
+            ))
             scroll_and_click(driver, wait, By.CSS_SELECTOR, '[data-family-group="cat"]')
+            assert animal_dropdown.get_attribute("value") == "cat", (
+                "Animal buttons and animal dropdown are not synchronized"
+            )
             selected_cards = wait.until(lambda d: [
                 card for card in d.find_elements(By.CSS_SELECTOR, ".condition-card")
                 if card.is_displayed()
