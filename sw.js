@@ -1,6 +1,6 @@
 'use strict';
 
-const CACHE = 'yourpetshealthlog-v4';
+const CACHE = 'yourpetshealthlog-v5';
 const CORE = [
   '/',
   '/app/',
@@ -59,11 +59,18 @@ self.addEventListener('fetch', event => {
   if (!isWorksheet && !isAppRoute && !isStatic && request.mode !== 'navigate') return;
 
   if (isStatic) {
+    // Network-first: visual/interaction fixes must not be trapped in an old cache.
+    // The cache remains an offline fallback and is versioned for safe invalidation.
     event.respondWith(
-      caches.match(request, { ignoreSearch: true }).then(cached => cached || fetch(request).then(response => {
-        if (response.ok) caches.open(CACHE).then(cache => cache.put(request, response.clone()));
-        return response;
-      }))
+      fetch(request)
+        .then(response => {
+          if (response.ok) {
+            const copy = response.clone();
+            event.waitUntil(caches.open(CACHE).then(cache => cache.put(request, copy)));
+          }
+          return response;
+        })
+        .catch(() => caches.match(request, { ignoreSearch: true }))
     );
     return;
   }
