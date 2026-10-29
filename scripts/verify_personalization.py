@@ -128,7 +128,50 @@ def main() -> int:
                 "const logo=document.querySelector('.brand-logo'); return !!logo && logo.complete && logo.naturalWidth > 0;"
             ))
 
+            # Initial page must ask for the animal, not dump 72 overlapping cards.
+            assert driver.find_element(By.ID, "choose-pet-prompt").is_displayed(), (
+                "Animal-first prompt is missing on initial load"
+            )
+            assert not any(
+                card.is_displayed()
+                for card in driver.find_elements(By.CSS_SELECTOR, ".condition-card")
+            ), "Trackers appear before an animal is chosen"
+
             scroll_and_click(driver, wait, By.CSS_SELECTOR, '[data-family-group="cat"]')
+            selected_cards = wait.until(lambda d: [
+                card for card in d.find_elements(By.CSS_SELECTOR, ".condition-card")
+                if card.is_displayed()
+            ])
+            assert all(
+                card.get_attribute("data-group") in ("cat", "universal")
+                for card in selected_cards
+            ), "Cat filter included another animal"
+            assert all(
+                len(card.find_elements(By.CSS_SELECTOR, ".tracker-variant")) == 1
+                for card in selected_cards
+            ), "Health issue card still stacks multiple animal forms"
+
+            issue_filter = driver.find_element(By.ID, "condition-select")
+            assert issue_filter.is_enabled(), "Health issue filter was not enabled"
+            options = [
+                option for option in issue_filter.find_elements(By.TAG_NAME, "option")
+                if option.get_attribute("value")
+            ]
+            assert options, "Cat selection exposes no health issue choices"
+            driver.execute_script(
+                "arguments[0].value = arguments[1];"
+                "arguments[0].dispatchEvent(new Event('change', {bubbles:true}));",
+                issue_filter, options[0].get_attribute("value"),
+            )
+            narrowed = [
+                card for card in driver.find_elements(By.CSS_SELECTOR, ".condition-card")
+                if card.is_displayed()
+            ]
+            assert narrowed and all(
+                card.get_attribute("data-condition") == options[0].get_attribute("value")
+                for card in narrowed
+            ), "Selected health issue is not narrowing results"
+
             personalize = wait.until(EC.visibility_of_element_located((By.ID, "personalize")))
             assert personalize.is_displayed(), "Personalization panel did not open"
 
