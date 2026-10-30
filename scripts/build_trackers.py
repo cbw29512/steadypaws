@@ -16,7 +16,7 @@ from tracker_catalog import TRACKERS, condition_name
 ROOT = Path(__file__).resolve().parents[1]
 OUT = ROOT / "downloads"
 OUT.mkdir(parents=True, exist_ok=True)
-SITE_HOST = "yourpetshealthlog.netlify.app"
+SITE_HOST = "yourpetshealthlog.com"
 SUPPORT_HOST = "buymeacoffee.com/divclass016"
 
 BRAND = HexColor("#55756C")
