@@ -21,29 +21,29 @@ def render_json_ld() -> str:
         "@graph": [
             {
                 "@type": "WebSite",
-                "@id": "https://yourpetshealthlog.netlify.app/#website",
-                "url": "https://yourpetshealthlog.netlify.app/",
+                "@id": "https://yourpetshealthlog.com/#website",
+                "url": "https://yourpetshealthlog.com/",
                 "name": "Your Pet’s Health Log",
                 "description": "Free pet health tracking tools, printable worksheets, and a private quick phone log.",
-                "creator": {"@id": "https://yourpetshealthlog.netlify.app/about.html#creator"},
+                "creator": {"@id": "https://yourpetshealthlog.com/about.html#creator"},
             },
             {
                 "@type": "CollectionPage",
-                "@id": "https://yourpetshealthlog.netlify.app/#collection",
-                "url": "https://yourpetshealthlog.netlify.app/",
+                "@id": "https://yourpetshealthlog.com/#collection",
+                "url": "https://yourpetshealthlog.com/",
                 "name": "Free Pet Health Trackers",
-                "isPartOf": {"@id": "https://yourpetshealthlog.netlify.app/#website"},
+                "isPartOf": {"@id": "https://yourpetshealthlog.com/#website"},
                 "description": f"A collection of {len(TRACKERS)} tailored pet health trackers across {len(CONDITION_NAMES)} health concerns.",
             },
             {
                 "@type": "Person",
-                "@id": "https://yourpetshealthlog.netlify.app/about.html#creator",
+                "@id": "https://yourpetshealthlog.com/about.html#creator",
                 "name": "Chris",
-                "url": "https://yourpetshealthlog.netlify.app/about.html",
+                "url": "https://yourpetshealthlog.com/about.html",
             },
             {
                 "@type": "FAQPage",
-                "@id": "https://yourpetshealthlog.netlify.app/#faq",
+                "@id": "https://yourpetshealthlog.com/#faq",
                 "mainEntity": [
                     {
                         "@type": "Question",
