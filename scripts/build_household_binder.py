@@ -20,7 +20,7 @@ LOGGER = logging.getLogger(__name__)
 ROOT = Path(__file__).resolve().parents[1]
 OUT = ROOT / "fulfillment" / "household-binder"
 META_PATH = ROOT / "data" / "household_binder.json"
-SITE = "yourpetshealthlog.netlify.app"
+SITE = "yourpetshealthlog.com"
 
 BRAND = HexColor("#55756C")
 INK = HexColor("#354842")
@@ -171,7 +171,7 @@ def build_pages(doc: BinderCanvas) -> None:
     for line in (
         "Fillable printable binder for the household paperwork the free site does not include.",
         "Pet profile · vaccines · meds · vet log · emergency contacts · sitter handbook · travel.",
-        "Use one copy per pet. Pair with free condition trackers at yourpetshealthlog.netlify.app.",
+        "Use one copy per pet. Pair with free condition trackers at yourpetshealthlog.com.",
     ):
         doc.c.drawString(40, y, line)
         y -= 18
