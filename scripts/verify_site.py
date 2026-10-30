@@ -18,7 +18,7 @@ from tracker_catalog import CONDITION_NAMES, GROUP_LABELS, TRACKERS, condition_n
 logging.basicConfig(level=logging.INFO, format="%(levelname)s | %(message)s")
 LOGGER = logging.getLogger(__name__)
 ROOT = Path(__file__).resolve().parents[1]
-EXPECTED_SITE_URL = "https://yourpetshealthlog.netlify.app/"
+EXPECTED_SITE_URL = "https://yourpetshealthlog.com/"
 EXPECTED_SUPPORT_URL = "https://buymeacoffee.com/divclass016"
 EXPECTED_ASSET_REV = "20261003-convert1"
 CARE_ASSET_REV = "20261003-convert1"
@@ -440,7 +440,7 @@ def assert_pdfs() -> None:
             if marker not in second_page:
                 raise AssertionError(f"Page 2 marker missing from {item['filename']}: {marker}")
         for page_text in (first_page, second_page):
-            for marker in ("yourpetshealthlog.netlify.app", "buymeacoffee.com/divclass016"):
+            for marker in ("yourpetshealthlog.com", "buymeacoffee.com/divclass016"):
                 if marker not in page_text:
                     raise AssertionError(f"Printed sheet has no return path in {item['filename']}: {marker}")
         if "*" in first_page:

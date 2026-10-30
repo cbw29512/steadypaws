@@ -1,5 +1,5 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://yourpetshealthlog.netlify.app/sitemap.xml
-Sitemap: https://yourpetshealthlog.netlify.app/species-sitemap.xml
+Sitemap: https://yourpetshealthlog.com/sitemap.xml
+Sitemap: https://yourpetshealthlog.com/species-sitemap.xml

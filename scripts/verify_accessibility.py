@@ -220,7 +220,7 @@ def assert_no_external_runtime_dependencies() -> None:
     ]
     html_pages.extend((ROOT / "care").glob("*.html"))
     allowed_external_hosts = {
-        "yourpetshealthlog.netlify.app", "buymeacoffee.com", "schema.org",
+        "yourpetshealthlog.com", "buymeacoffee.com", "schema.org",
         # Chris's own companion site, linked from the footer by apply_commercial_trust.py.
         "welcomehomepet.netlify.app",
     }

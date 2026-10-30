@@ -23,7 +23,7 @@ from tracker_catalog import CONDITION_NAMES, TRACKERS  # noqa: E402
 
 ROOT = Path(__file__).resolve().parents[1]
 OUTPUT = ROOT / "assets" / "og-card.png"
-SITE_HOST = "yourpetshealthlog.netlify.app"
+SITE_HOST = "yourpetshealthlog.com"
 
 WIDTH, HEIGHT = 1200, 630
 BRAND = "#55756C"
