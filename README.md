@@ -56,7 +56,7 @@ Set `checkout_url` in `data/household_binder.json` / `data/packs.json` only when
 
 ## Netlify
 
-Netlify reads `netlify.toml` and runs the tracker generator, homepage builder, and packs page builder before publishing the repository root. The production URL is `https://yourpetshealthlog.netlify.app/`. Only production context builds (credit protection).
+Netlify reads `netlify.toml` and runs the tracker generator, homepage builder, and packs page builder before publishing the repository root. The production URL is `https://yourpetshealthlog.com/`. Only production context builds (credit protection).
 
 ## Product principles
 
