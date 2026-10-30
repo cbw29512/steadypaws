@@ -88,6 +88,9 @@ jobs:
       - name: Verify SEO, downloads, security, and production integrity
         run: python scripts/verify_site.py
 
+      - name: Verify canonical domain and sensitive path defenses
+        run: python scripts/verify_security.py
+
       - name: Verify commercial trust, terms, and support coverage
         run: python scripts/verify_commercial_trust.py
 
