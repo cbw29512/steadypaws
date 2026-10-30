@@ -39,7 +39,7 @@ def main() -> int:
             SUPPORT_URL,
             "/#library",
             "Condition trackers stay free",
-            'rel="canonical" href="https://yourpetshealthlog.netlify.app/packs/"',
+            'rel="canonical" href="https://yourpetshealthlog.com/packs/"',
         ):
             if marker not in html:
                 raise AssertionError(f"packs page missing marker: {marker}")
